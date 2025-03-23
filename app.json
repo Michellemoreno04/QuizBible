@@ -4,7 +4,7 @@
     "slug": "QuizBible",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/quizBible-logo.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -15,7 +15,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.moreno.dev.QuizBible"
     },
     "web": {
       "bundler": "metro",
@@ -32,10 +33,26 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-9836483267876320~2353726828",
+          "iosAppId": "ca-app-pub-9836483267876320~2514822006"
+        }
       ]
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "11200416-890e-443b-87b1-b16a625a5cc6"
+      }
+    },
+    "owner": "moreno.dev"
   }
 }

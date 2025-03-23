@@ -5,9 +5,15 @@ node_modules/
 
 # Expo
 .expo/
+android/
+ios/
 dist/
 web-build/
 expo-env.d.ts
+.app.json
+
+.env
+
 
 # Native
 *.orig.*

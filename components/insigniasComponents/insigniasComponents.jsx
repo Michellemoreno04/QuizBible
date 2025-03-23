@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
         //paddingHorizontal: 15
     },
     badgeContainer: {
-        marginHorizontal: 8,
+        marginRight: 10,
         shadowColor: '#FFD700',
         shadowOffset: { width: 0, height: 4 },
         shadowRadius: 15,

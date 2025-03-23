@@ -7,71 +7,22 @@ import ExploraComponent from '@/components/exploraComponents/exploraComponent';
 import GuardadosComponents from '@/components/exploraComponents/guardadosComponents';
 import { StatusBar } from 'expo-status-bar';
 import  useAuth  from '@/components/authContext/authContext';
-//import {AdBanner} from '@/components/ads/banner';
+import {AdBanner} from '@/components/ads/banner';
 import {NotVidasModal} from '@/components/Modales/notVidasModal';
 import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { db } from '@/components/firebase/firebaseConfig';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
-//import * as Notification from 'expo-notifications';
-//import { useNotification } from '@/components/notificationContext/notificationContext';
+
 
 export default function AppComponent() {
-  
- // const { notification, expoPushToken, error } = useNotification();
+
   const { user } = useAuth();
   const userId = user?.uid;
   const [isNotVidasModalVisible, setNotVidasModalVisible] = useState(false);
   const [userLife, setUserLife] = useState(null);
  
-/*
-  Notification.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowAlert: true, // determina si se muestra una alerta al usuario
-      shouldPlaySound: true, // determina si se reproduce un sonido
-      shouldSetBadge: false, // determina si se actualiza el badge del icono de la app
-      
-    }),
-  });
 
-  useEffect(() => {
-    registerApp();
-  }, []);
-
-  async function registerApp(){
-try {
-
-    const { status: newStatus  } = await Notification.requestPermissionsAsync();
-
-    if (newStatus !== 'granted') {
-      Alert.alert('Permiso requerido', 'Se necesita acceso a la notificaciones para recibir notificaciones de la app.');
-    // Manejar estado de permisos denegados ....
-    
-      return;
-    }
-
-    const token = (await Notification.getExpoPushTokenAsync({
-      projectId: 'e83e168f-b5c9-4951-a256-5cca2f43fe9f', // app id
-    })).data;
-
-    console.log('token es ',token);
-
-  } catch (error) {
-    console.log(error);
-  }
-  }
-
-  async function sendPushNotification( ) {
-    await Notification.scheduleNotificationAsync({
-      content: {
-        title: 'Notificacion de prueba',
-        body: 'NotificacionN ',
-         data: { type: 'weekly_progress' }, // la data es para poder identificar la notificacion
-      },
-      trigger: { seconds: 5 },
-    })
-  }
-*/
 useEffect(() => {
   if (!userId) {
     setUserLife(null); // Limpia el estado relacionado con el usuario
@@ -141,7 +92,7 @@ if(!userId){
            
             <ExploraComponent />
             <GuardadosComponents />
-             {/*<AdBanner />*/}
+             {<AdBanner />}
           </View>
         </ScrollView>
       </SafeAreaView>

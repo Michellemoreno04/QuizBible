@@ -1,0 +1,19 @@
+# Excluir dependencias, ya que se instalarán de nuevo
+node_modules
+
+# Archivos de control de versiones
+.git
+.gitignore
+
+# Carpetas generadas por compilaciones previas
+dist
+build
+
+# Archivos de log y temporales
+*.log
+temp/
+cache/
+
+# Otros archivos o carpetas que no sean necesarios en producción
+coverage
+.expo

@@ -52,28 +52,13 @@ const ExploraComponent = () => {
  useEffect(() => {
   const checkReadingStatus = async () => {
     const lastReadingDate = await AsyncStorage.getItem("lastReadingDate");
-    const today = new Date().toDateString();
-    //console.log('ha leido la ultima vez',lastReadingDate);
- 
+    const today = new Date().toISOString().split('T')[0]; // Formato YYYY-MM-DD
 
- if (lastReadingDate === null) {
-  await AsyncStorage.setItem("lastReadingDate", today);
-  //console.log('se ha seteado la ultima lectura');
-  return;
- }
-   
-    if (lastReadingDate !== today) {
-      setHasReadTheDailyVerse(true);
-    } else {
-      setHasReadTheDailyVerse(false);
-      
-    }
-    
+    setHasReadTheDailyVerse(lastReadingDate === today);
   };
 
   checkReadingStatus();
 }, []);
-
 
   const menuItems = [
       { 

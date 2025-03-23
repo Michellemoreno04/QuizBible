@@ -1,4 +1,4 @@
-/*import { Text, View } from 'react-native'
+import { Text, View } from 'react-native'
 import React, { useState } from 'react'
 import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 import { Platform } from 'react-native';
@@ -42,8 +42,8 @@ export const AdBanner = () => {
               />
             )}
             
-            /*   {adError && (
-            {/* Banner de respaldo *
+            {/* Banner de respaldo */}
+            {adError && (
               <BannerAd
                 unitId={adUnitId}
                 size={BannerAdSize.BANNER} // Tamaño alternativo
@@ -54,4 +54,3 @@ export const AdBanner = () => {
     )
   
 }
-*/

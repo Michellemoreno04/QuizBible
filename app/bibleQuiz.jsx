@@ -57,62 +57,103 @@ const BibleQuiz = () => {
   const { user } = useAuth();
   const userId = user?.uid;
 
-// Cargar el anuncio
+  const retryCount = useRef(0);
+const maxLoadRetries = 3;
   useEffect(() => {
-    try {
-      const unsubscribeLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
-        setInternitialLoaded(true);
-        console.log('interstitial cargado0');
-      });
-  
-      const unsubscribeOpened = interstitial.addAdEventListener(AdEventType.OPENED, () => {
-        if (Platform.OS === 'ios') {
-          // Prevent the close button from being unreachable by hiding the status bar on iOS
-          StatusBar.setHidden(true)
-        }
-      });
-  
-      const unsubscribeClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
-        if (Platform.OS === 'ios') {
-          StatusBar.setHidden(false)
-        }
-        stopMusic();
-        setShowModal(false);
-        
-      });
-  
-      // Start loading the interstitial straight away
-      interstitial.load();
-     
 
-    // Unsubscribe from events on unmount
+
+    const loadInterstitial = () => {
+      interstitial.load();
+    };
+
+    const handleError = (error) => {
+      console.log('Error cargando interstitial:', error);
+      if (retryCount.current < maxLoadRetries) {
+        retryCount.current += 1;
+        setTimeout(loadInterstitial, 3000);
+      }
+    };
+
+    const unsubscribeLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
+      setInternitialLoaded(true);
+      retryCount.current = 0;
+      console.log('Interstitial cargado');
+    });
+
+    const unsubscribeOpened = interstitial.addAdEventListener(AdEventType.OPENED, () => {
+      if (Platform.OS === 'ios') {
+        StatusBar.setHidden(true);
+      }
+    });
+
+    const unsubscribeClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
+      if (Platform.OS === 'ios') {
+        StatusBar.setHidden(false);
+      }
+      stopMusic();
+      setShowModal(false);
+      mostrarModalRacha();
+      navigation.navigate('(tabs)');
+    });
+
+    const unsubscribeError = interstitial.addAdEventListener(AdEventType.ERROR, handleError);
+
+    loadInterstitial();
+
     return () => {
       unsubscribeLoaded();
       unsubscribeOpened();
       unsubscribeClosed();
+      unsubscribeError();
     };
-  } catch (error) {
-    console.log(error)
-        }
   }, []);
 
-  const showAds = () => { 
+  const showAds = async () => {
     stopMusic();
-      interstitial.show();
- 
-      interstitial.addAdEventListener(AdEventType.CLOSED, () => {
-        
-        setShowModal(false);
-        mostrarModalRacha();
-        navigation.navigate('(tabs)'); 
+    let showAttempts = 0;
+    const maxShowAttempts = 3;
 
-      });
-if(!interstitialLoaded){
+    const tryShowAd = async () => {
+      while (showAttempts < maxShowAttempts) {
+        try {
+          if (interstitialLoaded) {
+            await interstitial.show();
+            return true;
+          }
+          
+          // Esperar carga si no está listo
+          await new Promise((resolve, reject) => {
+            const loadedListener = interstitial.addAdEventListener(AdEventType.LOADED, () => {
+              loadedListener();
+              resolve();
+            });
+            
+            const errorListener = interstitial.addAdEventListener(AdEventType.ERROR, (error) => {
+              errorListener();
+              reject(error);
+            });
+          });
+          
+          await interstitial.show();
+          return true;
+        } catch (error) {
+          console.log('Error mostrando anuncio:', error);
+          showAttempts++;
+          if (showAttempts >= maxShowAttempts) throw error;
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+      }
+    };
 
-  navigation.navigate('(tabs)');
-}
-    
-  }
+    try {
+      await tryShowAd();
+    } catch (error) {
+      console.log('No se pudo mostrar el anuncio después de 3 intentos');
+      setShowModal(false);
+      navigation.navigate('(tabs)');
+    }
+  };
+
 
   // Verifica el nivel del usuario para mostrar el modal de nivel  
  useEffect(() => {
@@ -208,7 +249,6 @@ if(!interstitialLoaded){
 
   const pregunta = questions[currentQuestion]?.question;
   const referencia = questions[currentQuestion]?.bibleReference;
-  const textoBiblico = questions[currentQuestion]?.bibleText;
   const correcta = questions[currentQuestion]?.correctAnswer;
   const respuestas = questions[currentQuestion]?.answers || [];
  // Animaciones
@@ -460,7 +500,7 @@ useEffect(() => {
     setRespuestaSeleccionada(null); // Asegurar doblemente el reset
   }, [currentQuestion]);
 
-  // sonido
+  // sonido de fondo
   useEffect(() => {
     if(!userId) return null;
     

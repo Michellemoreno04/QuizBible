@@ -8,6 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useSound } from '../soundFunctions/soundFunction';
 import { RewardedAd, RewardedAdEventType, TestIds } from 'react-native-google-mobile-ads';
 
+
 const adUnitId = __DEV__ 
 ? TestIds.REWARDED 
 : Platform.OS === 'ios' ? process.env.EXPO_PUBLIC_REWARDED_ID_IOS 
@@ -74,6 +75,7 @@ useEffect(() => {
 
     }
   };
+  
     
    useEffect(() => {
      if (isVisible) {
@@ -131,12 +133,12 @@ useEffect(() => {
  
            <View style={styles.progressContainer}>
              <Text style={styles.progressText}>
-               {respuestasCorrectas}/10 respuestas correctas
+               {respuestasCorrectas}/{7}
              </Text>
              <View style={styles.progressBarBackground}>
                <LinearGradient
                  colors={['#76ff03', '#4CAF50']}
-                 style={[styles.progressBarFill, { width: `${(respuestasCorrectas / 10) * 100}%` }]}
+                 style={[styles.progressBarFill, { width: `${(respuestasCorrectas / 7) * 100}%` }]}
                />
              </View>
            </View>

@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+       "useFrameworks": "static"
     },
     "android": {
       "adaptiveIcon": {
@@ -25,6 +26,7 @@
     },
     "plugins": [
       "expo-router",
+    
       [
         "expo-splash-screen",
         {
@@ -54,5 +56,11 @@
       }
     },
     "owner": "moreno.dev"
+  },
+  "doctor":{
+    "reactNativeDirectoryCheck": {
+        "exclude": ["firebase","react-native-toast-notifications"]
+      },
+      "listUnknownPackages": false
   }
 }

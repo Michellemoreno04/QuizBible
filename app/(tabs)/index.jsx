@@ -8,10 +8,9 @@ import GuardadosComponents from '@/components/exploraComponents/guardadosCompone
 import { StatusBar } from 'expo-status-bar';
 import  useAuth  from '@/components/authContext/authContext';
 import {AdBanner} from '@/components/ads/banner';
-import {NotVidasModal} from '@/components/Modales/notVidasModal';
+import {NotVidasModal} from '@/components/Modales/recargarVidas';
 import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { db } from '@/components/firebase/firebaseConfig';
-
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
@@ -30,7 +29,7 @@ useEffect(() => {
   }
 
   const dbRef = doc(db, 'users', userId);
-  let unsubscribe; // Variable para almacenar la función de desuscripción
+  let unsubscribe; 
 
   const setupSnapshotListener = async () => {
     try {
@@ -84,7 +83,7 @@ if(!userId){
   Platform.OS === 'android' && { paddingTop: RNStatusBar.currentHeight }]}>
         <ScrollView>
           <View style={styles.screen}>
-            <NotVidasModal visible={isNotVidasModalVisible} setVisible={setNotVidasModalVisible} />
+           <NotVidasModal visible={isNotVidasModalVisible} setVisible={setNotVidasModalVisible} />
 
            <HeaderHome />
   
@@ -92,7 +91,7 @@ if(!userId){
            
             <ExploraComponent />
             <GuardadosComponents />
-             {<AdBanner />}
+             <AdBanner />
           </View>
         </ScrollView>
       </SafeAreaView>

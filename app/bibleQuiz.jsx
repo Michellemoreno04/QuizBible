@@ -16,7 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import NivelModal from '@/components/Modales/modalNivel';
 import { niveles } from '@/components/Niveles/niveles';
 import { InterstitialAd, AdEventType, TestIds } from 'react-native-google-mobile-ads';
-import RewardedAdModal from '../components/Modales/modalNotVidas';
+import {RewardedAdModal} from '../components/Modales/modalNotVidas';
 
 
 
@@ -59,10 +59,10 @@ const BibleQuiz = () => {
 
   const retryCount = useRef(0);
 const maxLoadRetries = 3;
-  useEffect(() => {
 
+ useEffect(() => {
 
-    const loadInterstitial = () => {
+const loadInterstitial = () => {
       interstitial.load();
     };
 
@@ -142,7 +142,7 @@ const maxLoadRetries = 3;
           if (showAttempts >= maxShowAttempts) throw error;
           await new Promise(resolve => setTimeout(resolve, 1000));
         }
-      }
+      } 
     };
 
     try {
@@ -151,34 +151,42 @@ const maxLoadRetries = 3;
       console.log('No se pudo mostrar el anuncio después de 3 intentos');
       setShowModal(false);
       navigation.navigate('(tabs)');
+    }finally {
+      stopMusic();
+      setShowModal(false);
+      navigation.navigate('(tabs)');
     }
   };
 
 
   // Verifica el nivel del usuario para mostrar el modal de nivel  
- useEffect(() => {
-  const checkNivel = async () => {
-    const userRef = doc(db, 'users', userId);
-    try {
-      if (userInfo.Exp) {
-        const nivelActual = niveles(userInfo.Exp).nivel;
-        const nivelAnterior = userInfo.Nivel || 0;
+  useEffect(() => {
+    const checkNivel = async () => {
+      const userRef = doc(db, 'users', userId);
+      try {
+        if (userInfo.Exp) {
+          const nivelActual = niveles(userInfo.Exp).nivel;
+          const nivelAnterior = userInfo.Nivel || 0;
   
-        updateDoc(userRef, { Nivel: nivelActual });
+          if (nivelActual === nivelAnterior) return; // No hacer nada si no hay cambio
   
-        if (nivelAnterior !== null && nivelActual > nivelAnterior) {
-          setShowNivelModal(true);
-         // console.log('debio mostrar modal');
-        }else{
-          //console.log('noo debio mostrar modal');
+          // Actualizar Firestore y estado local inmediatamente
+          await updateDoc(userRef, { Nivel: nivelActual });
+          
+          // Actualiza el estado local aquí (depende de cómo manejes userInfo)
+          // Ejemplo si usas un estado de React:
+          setUserInfo(prev => ({ ...prev, Nivel: nivelActual }));
+  
+          if (nivelActual > nivelAnterior) {
+            setShowNivelModal(true);
+          }
         }
+      } catch (error) {
+        console.error('Error al verificar el nivel:', error);
       }
-    } catch (error) {
-      console.error('Error al verificar el nivel:', error);
-    }
-  };
-  checkNivel();
-  }, [userInfo.Nivel, userInfo.Exp]);
+    };
+    checkNivel();
+  }, [userInfo.Exp]); // Solo depende de Exp para evitar ciclos
 
   // Obtén las preguntas de Firestore
   useEffect(() => {
@@ -320,7 +328,7 @@ useEffect(() => {
         questions[currentQuestion]?.index
       );
   
-      // Actualizamos la experiencia en la base de datos inmediatamente.
+      
       // NOTA: No actualizamos las monedas en cada pregunta correcta.
       const userDocRef = doc(db, 'users', userId);
       await updateDoc(userDocRef, {
@@ -333,7 +341,7 @@ useEffect(() => {
         setRespuestaSeleccionada(null);
       } else {
         // Al finalizar el quiz, calculamos las monedas ganadas:
-        // 10 monedas por cada respuesta correcta acumulada.
+       
         const totalMonedas = nuevasRespuestasCorrectas * 10;
         await updateDoc(userDocRef, {
           // Sumamos las monedas totales ganadas al valor actual.
@@ -347,7 +355,7 @@ useEffect(() => {
       }
     } else {
       // Caso: Respuesta incorrecta.
-      // Se muestra cuál era la respuesta correcta.
+      
       setMostrarRespuestaCorrecta(true);
       await playSound(require('../assets/sound/incorrect-choice.mp3'));
   
@@ -355,15 +363,30 @@ useEffect(() => {
         const userDocRef = doc(db, 'users', userId);
   
         if (userInfo.Vidas >= 1) {
+          const newVidas = userInfo.Vidas - 1;
           try {
             // Se resta una vida.
             await updateDoc(userDocRef, {
-              Vidas: userInfo.Vidas - 1,
+              Vidas: newVidas,
             });
             setUserInfo((prevUserInfo) => ({
               ...prevUserInfo,
-              Vidas: prevUserInfo.Vidas - 1,
+              Vidas: newVidas,
             }));
+
+            if(newVidas === 0) {
+            
+              const totalMonedas = resultadoRespuestas * 10;
+              await updateDoc(userDocRef, {
+                Monedas: userInfo.Monedas + totalMonedas,
+              });
+              const today = new Date().toDateString();
+              await AsyncStorage.setItem("lastQuizDate", today);
+              setShowModalNotVidas(true);
+              
+             
+             // return;
+            }
   
             // Si quedan preguntas, avanzamos a la siguiente.
             if (currentQuestion < questions.length - 1) {
@@ -477,7 +500,6 @@ useEffect(() => {
   };
 
  
-
   const salir = () => {
     Alert.alert('Salir', '¿Seguro que deseas salir?', [
       {
@@ -545,32 +567,24 @@ useEffect(() => {
       }).start();
     });
   });
-}, [currentQuestion, pregunta]); // Añadir currentQuestion como dependencia
+}, [currentQuestion, pregunta]); 
 
 
-  const addLive = async () => {
-    const userDocRef = doc(db, 'users', userId);
-
-    try {
-      await updateDoc(userDocRef, {
-        Vidas: userInfo.Vidas + 1,
-      });
-    } catch (error) {
-      console.error('Error al actualizar las vidas:', error);
-      Alert.alert('Error', 'No se pudieron actualizar las vidas.');
-    } finally {
-      setCurrentQuestion(currentQuestion + 1);
-      setRespuestaSeleccionada(null);
-    
-      
-    }
-  }
-
-  
   // Función para cerrar el modal de recompensade vidas
   const cerrarRewardModal = () => {
-    setShowModalNotVidas(false);
-    setShowModal(true);
+
+  try {
+    if(userInfo.Vidas === 0){
+      
+      setShowModalNotVidas(false);
+      stopMusic();
+      setShowModal(true);
+      return;
+    }
+  }catch (error) {
+    console.log('Error al cerrar el modal de recompensa:', error);
+  }
+    //setShowModal(true);
 
   }
   const cerrarPuntuacionModal = () => {
@@ -593,7 +607,7 @@ useEffect(() => {
       <ModalRacha userInfo={userInfo} isVisible={showModalRacha} setShowModalRacha={setShowModalRacha} />
       <ModalRachaPerdida userInfo={userInfo} isVisible={showModalRachaPerdida} setShowModalRachaPerdida={setShowModalRachaPerdida} />
       <NivelModal Exp={userInfo.Exp} nivel={userInfo?.Nivel} isVisible={showNivelModal} onClose={() => setShowNivelModal(false)}/>
-      <RewardedAdModal isVisible={showModalNotVidas} onClose={cerrarRewardModal} addLife={addLive } />
+      <RewardedAdModal isVisible={showModalNotVidas} onClose={cerrarRewardModal} userId={userId}/>
 <ImageBackground 
         source={require('../assets/images/bg-quiz.png')} 
          resizeMode="cover" 
@@ -648,9 +662,7 @@ useEffect(() => {
 
             <View style={styles.answersContainer}  key={questions[currentQuestion]?.questionId}>
               {respuestas.map((respuesta, index) => {
-                //const isSelected = respuestaSeleccionada === respuesta;
-                //const isCorrect = mostrarRespuestaCorrecta && respuesta === correcta;
-                //const isIncorrect = mostrarRespuestaCorrecta && respuesta !== correcta;
+                
                 const uniqueKey = `${questions[currentQuestion]?.questionId}-${index}`;
                 return (
                   <Animated.View

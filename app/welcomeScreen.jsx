@@ -19,9 +19,9 @@ const WelcomeScreen = () => {
 
   const features = [
     { icon: '📖', title: 'Versiculos Diarios', desc: 'Para que compartas con tus amistades y vayas profundizando con las palabras de Dios. ' },
-    { icon: '✝️', title: 'Preguntas Sobre La Biblia', desc: 'Asi vas reforzando tus conocimientos con preguntas y respuestas de la Biblia. ' },
-    { icon: '🕊️', title: 'Lecturas Diarias', desc: 'Tambien vas a leer sobre temas importantes como el Amor, la Fe y muchos temas de grande importancia. ' },
-    { icon: '🎓', title: 'Control de Estudios Diarios', desc: 'Diariamente que estudies estaras aumentado una racha que te mantendra motivado estudiando y aprendiendo todos los dias. ' },
+    { icon: '❓', title: 'Preguntas Sobre La Biblia', desc: 'Asi vas reforzando tus conocimientos con preguntas y respuestas de la Biblia. ' },
+    { icon: '📖', title: 'Lecturas Diarias', desc: 'Tambien vas a leer sobre temas importantes como el Amor, la Fe y muchos temas de grande importancia. ' },
+    { icon: '✝️', title: 'Control de Estudios Diarios', desc: 'Diariamente que estudies estaras aumentado una racha que te mantendra motivado estudiando y aprendiendo todos los dias. ' },
   ];
 
   React.useEffect(() => {

@@ -71,6 +71,7 @@ const {user} = useAuth();
     }
   }, [isVisible]);
 
+  
   const addCoin = async () => {
     const userDocRef = doc(db, 'users', userId);
     await updateDoc(userDocRef, {
@@ -78,6 +79,7 @@ const {user} = useAuth();
     });
   };
 
+  
   const handleShowAd = async () => {
     if (loaded && rewardedAd) {
       try {
@@ -174,7 +176,7 @@ const {user} = useAuth();
 
             <TouchableOpacity 
               style={styles.primaryButton}
-              onPress={handleShowAd}
+             // onPress={handleShowAd}
               activeOpacity={0.9}>
               <LinearGradient
                 colors={['#4CAF50', '#45A049']}

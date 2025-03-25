@@ -1,6 +1,11 @@
 # Excluir dependencias, ya que se instalarán de nuevo
 node_modules
 
+
+
+/android
+/ios
+
 # Archivos de control de versiones
 .git
 .gitignore

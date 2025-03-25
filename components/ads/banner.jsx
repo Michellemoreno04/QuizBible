@@ -42,8 +42,8 @@ export const AdBanner = () => {
               />
             )}
             
-            {/* Banner de respaldo */}
-            {adError && (
+        
+           {adError && (
               <BannerAd
                 unitId={adUnitId}
                 size={BannerAdSize.BANNER} // Tamaño alternativo

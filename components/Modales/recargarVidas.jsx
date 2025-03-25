@@ -2,6 +2,7 @@ import React from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 export const NotVidasModal = ({ visible,setVisible }) => {
+  
   return (
     <Modal
       animationType="fade"

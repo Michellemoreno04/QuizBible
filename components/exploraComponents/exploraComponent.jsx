@@ -8,6 +8,7 @@ import  useAuth  from '../authContext/authContext';
 import { db } from '../../components/firebase/firebaseConfig';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import {NoCoinsModal} from '../Modales/notCoints';
+import {RewardedAdModal} from '../Modales/modalNotVidas';
 
 
 
@@ -20,6 +21,7 @@ const ExploraComponent = () => {
   const [hasReadTheDailyVerse, setHasReadTheDailyVerse] = useState(false);
   const [showFullScreen, setShowFullScreen] = useState(false);
   const [showNoCoinsModal, setShowNoCoinsModal] = useState(false);
+  const [showNotVidasModal, setShowNotVidasModal] = useState(false);
   const animationRef = useRef(null);
 
  
@@ -73,18 +75,6 @@ const ExploraComponent = () => {
       family: MaterialCommunityIcons,
       screen: 'dailyReading'
     },
-    /*{ 
-      name: 'Oracion',
-      icon: 'hands-pray',
-      family: MaterialCommunityIcons,
-      screen: 'PrayersScreen'
-    },
-    { 
-      name: 'Comunidad',
-      icon: 'account-group',
-      family: MaterialCommunityIcons,
-      screen: 'CommunityScreen'
-    },*/
   ];
 
   const handlePress = (screenName) => {
@@ -94,13 +84,21 @@ const handleAnimationPress = async () => {
 
  const userRef = doc(db, 'users', userId);
  const userDoc = await getDoc(userRef);
-  const monedas = userDoc.data()?.Monedas || 0;
+ const monedas = userDoc.data()?.Monedas || 0;
+ const vidas = userDoc.data()?.Vidas || 0;
 
   if (monedas < 100) {
      // si el usuario no tiene suficientes monedas
     setShowNoCoinsModal(true);
     return; 
   }
+  if (vidas < 1) {
+    setShowNotVidasModal(true);
+    
+    return; 
+  }
+
+    
     
   await updateDoc(userRef, { Monedas: monedas - 100 });
       
@@ -114,9 +112,11 @@ const handleAnimationPress = async () => {
  
     };
 
+    
   return (
     <View >
       <NoCoinsModal visible={showNoCoinsModal} onClose={() => setShowNoCoinsModal(false)} />
+      <RewardedAdModal isVisible={showNotVidasModal} onClose={() => setShowNotVidasModal(false)} userId={userId}/>
     <View>
               <Text style={styles.title}>Explora</Text>
             </View>

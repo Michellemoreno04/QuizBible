@@ -41,7 +41,7 @@ export default function NivelModal({ nivel, isVisible, onClose, Exp }) {
               source={animation}
               autoPlay
               loop
-              style={styles.medalAnimation}
+              style={styles.modalAnimation}
               
             />
           
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+  
     gap: 10,
   },
   title: {
@@ -121,22 +121,24 @@ const styles = StyleSheet.create({
   },
   medalContainer: {
     width: 200,
-    height: 200,
+   // height: 200,
     //marginVertical: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    position: 'relative',
+   
   },
-  medalAnimation: {
-    width: '100%',
-    height: '100%',
-    zIndex: 1,
+  modalAnimation: {
+    width: 150,
+    height: 150,
+    zIndex: 5,
+    backgroundColor: '#00000022',
+    borderRadius: 20,
+
   },
 
   infoContainer: {
     
     width: '100%',
-    marginBottom: 20,
   },
   insigniaName: {
     fontSize: 28,

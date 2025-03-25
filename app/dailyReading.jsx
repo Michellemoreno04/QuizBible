@@ -32,7 +32,7 @@ const DailyReading = () => {
   const [interstitialLoaded, setInternitialLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const userId = user.uid;
-  const toast = useToast();
+
    
 
   useEffect(() => {

@@ -7,7 +7,6 @@ import { db } from '../components/firebase/firebaseConfig';
 import { addDoc, collection, doc, getDoc, getDocs, query, where, orderBy, startAfter, limit } from 'firebase/firestore';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useToast } from 'react-native-toast-notifications';
 import { InterstitialAd, AdEventType, TestIds } from 'react-native-google-mobile-ads';
 
 
@@ -18,7 +17,7 @@ const adUnitId = __DEV__
 
 // Crea la instancia del anuncio
 const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
-  keywords: ['religion', 'bible']// esto es para anuncios personalizados
+  keywords: ['religion', 'bible']
 });
 
 
@@ -31,6 +30,8 @@ const DailyReading = () => {
   const [readingText, setReadingText] = useState([]);
   const [interstitialLoaded, setInternitialLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+  const [currentTextPosition, setCurrentTextPosition] = useState(0);
   const userId = user.uid;
 
    
@@ -186,38 +187,58 @@ const DailyReading = () => {
 
 
   // Función para reproducir el texto con Speech
-  const handleSpeak = () => {
-
-    setIsLoading(true);
-// aqui vamos hacer que si el usuario sale de del componente se pare la lectura
+  const handleSpeak = async () => {
     if (readingText.length === 0) return;
-// Limpiar cualquier reproducción pendiente antes de iniciar una nueva
-      Speech.stop();
-
-    // Se combina el título y el texto para reproducirlos
-    const textToSpeak = `${readingText[0].titulo}. ${readingText[0].texto}`;
-
+    
     if (!isSpeaking) {
-      Speech.speak(textToSpeak, {
-        language: 'es',
-        pitch: 0.8,
-        rate: 0.9, // Velocidad de lectura
-        onStart: () => setIsSpeaking(true),
-        onDone: () => setIsSpeaking(false),
-        onStopped: () => setIsSpeaking(false),
-        onError: () => setIsSpeaking(false), // Manejar errores
+      setIsLoadingAudio(true);
+      const textToSpeak = `${readingText[0].titulo}. ${readingText[0].texto}`;
+      
+      // Si estamos comenzando desde el inicio
+      if (currentTextPosition === 0) {
+        Speech.stop();
+      }
+      
+      // Obtener el texto desde la posición actual
+      const remainingText = textToSpeak.slice(currentTextPosition);
+      
+      Speech.speak(remainingText, {
+        language: 'es-ES',
+        pitch: 1.0,
+        rate: 0.95,
+        onStart: () => {
+          setIsSpeaking(true);
+          setIsLoadingAudio(false);
+        },
+        onDone: () => {
+          setIsSpeaking(false);
+          setCurrentTextPosition(0); // Resetear posición al terminar
+        },
+        onStopped: () => {
+          // Guardar aproximadamente la posición actual
+          const words = textToSpeak.slice(0, currentTextPosition).split(' ').length;
+          const approxPosition = Math.floor(currentTextPosition + (words * 5));
+          setCurrentTextPosition(Math.min(approxPosition, textToSpeak.length));
+          
+          setIsSpeaking(false);
+          setIsLoadingAudio(false);
+        },
+        onError: () => {
+          setIsSpeaking(false);
+          setIsLoadingAudio(false);
+          setCurrentTextPosition(0);
+        },
       });
     } else {
       Speech.stop();
-      setIsSpeaking(false);
     }
-    setIsLoading(false);
   };
 
-  // Detener la reproducción al desmontar el componente
+  // Resetear la posición del texto cuando se desmonta el componente
   useEffect(() => {
     return () => {
       Speech.stop();
+      setCurrentTextPosition(0);
     };
   }, []);
 
@@ -307,14 +328,18 @@ if(isLoading){
             onPress={handleSpeak}
             activeOpacity={0.8}
           >
-            <FontAwesome6 
-              name={isSpeaking ? "pause" : "play"} 
-              size={28} 
-              color="white" 
-              style={styles.audioIcon}
-            />
+            {isLoadingAudio ? (
+              <ActivityIndicator size="small" color="white" style={styles.audioIcon} />
+            ) : (
+              <FontAwesome6 
+                name={isSpeaking ? "pause" : "play"} 
+                size={28} 
+                color="white" 
+                style={styles.audioIcon}
+              />
+            )}
             <Text style={styles.audioButtonText}>
-              {isSpeaking ? 'Reproduciendo...' : 'Reproducir' || isLoading && 'Cargando...'}
+              {isLoadingAudio ? 'Cargando...' : isSpeaking ? 'Reproduciendo...' : 'Reproducir'}
             </Text>
           </TouchableOpacity>
         </View>

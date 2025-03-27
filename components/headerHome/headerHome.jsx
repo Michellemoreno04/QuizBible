@@ -93,7 +93,9 @@ export const HeaderHome = () => {
             </Text>
             <View className="flex-row ">
               <Text style={styles.level} >
-                {niveles(userAuthenticated?.Exp || 0).insignia}
+              {userAuthenticated?.Exp >= 200 
+      ? niveles(userAuthenticated?.Exp || 0).insignia 
+      : 'Principiante'}
               </Text>
             </View>
           </View>

@@ -24,7 +24,7 @@ export default function AppComponent() {
 
 useEffect(() => {
   if (!userId) {
-    setUserLife(null); // Limpia el estado relacionado con el usuario
+    setUserLife(null);
     return;
   }
 
@@ -33,18 +33,19 @@ useEffect(() => {
 
   const setupSnapshotListener = async () => {
     try {
-      
       const lastLostLifeDate = await AsyncStorage.getItem("lastLostLifeDate");
       const today = new Date().toDateString();
 
-      // Configurar listener en tiempo real
       unsubscribe = onSnapshot(dbRef, async (docSnapshot) => {
         if (!docSnapshot.exists()) return;
         
         const userData = docSnapshot.data();
         setUserLife(userData.Vidas); 
 
-        // Verificar si es un nuevo día y las vidas son menores a 2
+        // Solo mostrar el modal y recargar vidas si:
+        // 1. Es un nuevo día
+        // 2. Las vidas son menos de 2
+        // 3. La última fecha de pérdida de vida es diferente a hoy
         if (userData.Vidas < 2 && lastLostLifeDate !== today) {
           await updateDoc(dbRef, { Vidas: 2 }); 
           await AsyncStorage.setItem("lastLostLifeDate", today); 
@@ -55,12 +56,12 @@ useEffect(() => {
       console.error('Error:', error);
     }
   };
+  
   setupSnapshotListener();
 
-  // Limpieza: desuscribirse del listener al desmontar o cambiar userId
   return () => {
     if (unsubscribe) {
-      unsubscribe(); // Asegúrate de cancelar la suscripción al desmontar
+      unsubscribe();
     }
   }
 }, [userId]);
@@ -70,7 +71,7 @@ useEffect(() => {
 if(!userId){
   return <ActivityIndicator size="large" color="white" />
 }
-
+//14.7.0 sin que contenga "^14.7.0" en la versión.
   return (
     <LinearGradient
       colors={[ '#1E3A5F', '#3C6E9F']}
@@ -91,7 +92,7 @@ if(!userId){
            
             <ExploraComponent />
             <GuardadosComponents />
-             <AdBanner />
+             <AdBanner/>
           </View>
         </ScrollView>
       </SafeAreaView>

@@ -9,12 +9,11 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true,
-       "useFrameworks": "static"
+      "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/quizBible-logo.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.moreno.dev.QuizBible"
@@ -26,11 +25,10 @@
     },
     "plugins": [
       "expo-router",
-    
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/quizBible-logo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
@@ -43,6 +41,7 @@
           "iosAppId": "ca-app-pub-9836483267876320~2514822006"
         }
       ]
+      
     ],
     "experiments": {
       "typedRoutes": true
@@ -57,10 +56,13 @@
     },
     "owner": "moreno.dev"
   },
-  "doctor":{
+  "doctor": {
     "reactNativeDirectoryCheck": {
-        "exclude": ["firebase","react-native-toast-notifications"]
-      },
-      "listUnknownPackages": false
+      "exclude": [
+        "firebase",
+        "react-native-toast-notifications"
+      ]
+    },
+    "listUnknownPackages": false
   }
 }

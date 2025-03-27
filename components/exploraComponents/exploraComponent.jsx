@@ -9,6 +9,7 @@ import { db } from '../../components/firebase/firebaseConfig';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import {NoCoinsModal} from '../Modales/notCoints';
 import {RewardedAdModal} from '../Modales/modalNotVidas';
+import { AdBanner } from '../ads/banner';
 
 
 
@@ -192,6 +193,7 @@ const handleAnimationPress = async () => {
                <FontAwesome5 name="coins" size={24} color="yellow" />
                </View>
               </View>
+               <AdBanner />
             </Modal>
     </View>
   );

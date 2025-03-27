@@ -1,4 +1,4 @@
-import { Text, View } from 'react-native'
+import { Text, View,StyleSheet } from 'react-native'
 import React, { useState } from 'react'
 import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 import { Platform } from 'react-native';
@@ -27,7 +27,7 @@ export const AdBanner = () => {
       };
   
     return (
-      <View>
+      <View style={styles.container}>
          {!adError && (
               <BannerAd
               key={retryCount} // Usar el contador de reintentos como clave
@@ -54,3 +54,16 @@ export const AdBanner = () => {
     )
   
 }
+
+const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+    alignItems: 'center',
+    position: 'relative',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: 'transparent',
+    zIndex: 999,
+  },
+});

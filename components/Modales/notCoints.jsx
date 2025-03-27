@@ -34,6 +34,7 @@ export const NoCoinsModal = ({ visible, onClose }) => {
 const {user} = useAuth();
  const userId = user?.uid;
 
+// aquicargamos el anuncio
   useEffect(() => {
     if (isVisible) {
       // Crear nueva instancia cada vez que se abre el modal
@@ -98,6 +99,7 @@ const {user} = useAuth();
     }
   };
 
+  // animacion del modal
   React.useEffect(() => {
     if (visible) {
       setIsVisible(true);
@@ -176,7 +178,7 @@ const {user} = useAuth();
 
             <TouchableOpacity 
               style={styles.primaryButton}
-             // onPress={handleShowAd}
+              onPress={handleShowAd}
               activeOpacity={0.9}>
               <LinearGradient
                 colors={['#4CAF50', '#45A049']}

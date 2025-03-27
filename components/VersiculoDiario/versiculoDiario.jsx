@@ -9,6 +9,7 @@ import {
   ImageBackground,
   Animated,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import { Feather, AntDesign } from "@expo/vector-icons";
 import { db } from "../firebase/firebaseConfig";
@@ -136,30 +137,33 @@ export const VersiculosDiarios = () => {
 
   // Función para compartir la imagen capturada sin botones
   const share = async () => {
-    setIsProcessing(true);
-    toast.show('Compartiendo...',
-       { type: 'success', 
-        icon: <ActivityIndicator size="small" color="white" />
-
-        });
     try {
+      // Ocultar los botones antes de capturar
       setHideButtons(true);
-      setTimeout(async () => {
-        const uri = await captureRef(viewRef, {
-          format: "png",
-          quality: 1,
-        });
-        await Share.share({
-          url: uri,
-          title: "Compartir Versículo",
-        });
-        setHideButtons(false);
-      }, 200);
+      toast.show("⭐ Compartiendo...",{
+        type: "success",
+        placement: "top",
+      });
+      // Esperar un momento para que se actualice el renderizado
+      await new Promise(resolve => setTimeout(resolve, 200));
+  
+      // Capturar la imagen usando el viewRef
+      const uri = await captureRef(viewRef, {
+        format: "png",
+        quality: 0.8,
+      });
+  
+      // Compartir la imagen
+      await Share.share({
+        url: Platform.OS === 'ios' ? uri : uri,
+        message: `${versiculo?.versiculo}\n${versiculo?.texto}`,
+        appLink: 'https://play.google.com/store/apps/details?id=com.app.QuizBible', // pentiendte para cambiar al link real
+      });
     } catch (error) {
-      console.error("Error al capturar y compartir:", error.message);
-      setHideButtons(false);
-    }finally{
-      setIsProcessing(false);
+      console.error("Error al compartir:", error);
+      toast.show("😢 Error al compartir", { type: "danger" });
+    } finally {
+      // Mostrar los botones nuevamente
       setHideButtons(false);
     }
   };
@@ -196,8 +200,6 @@ toast.show("⭐ Guardando...",{
   placement: "top",
   icon: <ActivityIndicator size="small" color="white" />,
 });
-
-
   try {
     setHideButtons(true);
     await new Promise(resolve => setTimeout(resolve, 200)); // Esperar renderizado
@@ -221,7 +223,9 @@ toast.show("⭐ Guardando...",{
     const docRef = doc(db, `users/${userId}/versiculosFavoritos/${versiculo.id}`);
     await setDoc(docRef, {
       imageUrl,
-      timestamp: serverTimestamp()
+      timestamp: serverTimestamp(),
+      versiculo: versiculo.versiculo,
+      texto: versiculo.texto
     }, { merge: true });
 
     setVersiculoGuardado(true); // Actualizar estado inmediatamente
@@ -335,8 +339,6 @@ return (
       paddingVertical: 8,
       paddingHorizontal: 2,
       borderRadius: 20, // Bordes redondeados
-  
-      
       
     },
     actionText: {

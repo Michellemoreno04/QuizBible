@@ -22,9 +22,9 @@ const SignUp = () => {
   });
   const [error, setError] = useState('');
   const [vidas, setVidas] = useState(2);
-  const [monedas, setMonedas] = useState(200);
-  const [exp, setExp] = useState(0);
-  const [nivel,setNivel] = useState(1);
+  const [monedas, setMonedas] = useState(500);
+  const [exp, setExp] = useState(100);
+  const [nivel,setNivel] = useState(0);
   const [racha, setRacha] = useState(0);
   const [rachaMaxima, setRachaMaxima] = useState(0);
   const [avatarType, setAvatarType] = useState(null);
@@ -43,6 +43,9 @@ const SignUp = () => {
     [field]: value,// Establece el valor del campo correspondiente
   }));
 };
+
+
+
 const handleSignUp = () => {
   setLoading(true);
   if (credenciales.name && credenciales.email && credenciales.password ) {
@@ -90,6 +93,7 @@ createUserWithEmailAndPassword(auth, credenciales.email, credenciales.password)
 
   } else {
     Alert.alert('Por favor, complete todos los campos.');
+    setLoading(false);
   }
 };
 

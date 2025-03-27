@@ -12,7 +12,8 @@ const { width } = Dimensions.get('window');
 
 const VersiculosFavoritos = () => {
   const { user } = useAuth();
-  const [versiculos, setVersiculos] = useState([]);
+  const [versiculos, setVersiculos] = useState({});
+  const [textVerse, setTextVerse] = useState(null);
   const [selectedVerse, setSelectedVerse] = useState(null);
   const [loading, setLoading] = useState(false);
   const toast = useToast();
@@ -73,10 +74,11 @@ const VersiculosFavoritos = () => {
 
   const handleShare = async (imageUrl) => {
     try {
+      const appLink = 'https://play.google.com/store/apps/details?id=com.app.QuizBible';
       await Share.share({
         url: imageUrl,
         title: 'Versículo Inspirador',
-        message: 'Mira este hermoso versículo que encontré:'
+        message: `Mira este hermoso versículo que encontré:\n\n${selectedVerse.versiculo}\n\n${selectedVerse.texto}\n\nDescarga la app aquí: ${appLink}`,
       });
     } catch (error) {
       toast.show('Error al compartir', { type: 'danger' });

@@ -214,7 +214,7 @@ const loadInterstitial = () => {
           collection(db, 'preguntas'),
           orderBy('index'),
           startAfter(lastQuestionIndex),
-          limit(2)
+          limit(7)
         );
         
         const querySnapshot = await getDocs(q);
@@ -369,6 +369,8 @@ useEffect(() => {
             await updateDoc(userDocRef, {
               Vidas: newVidas,
             });
+            const today = new Date().toDateString();
+            await AsyncStorage.setItem("lastLostLifeDate", today);
             setUserInfo((prevUserInfo) => ({
               ...prevUserInfo,
               Vidas: newVidas,
@@ -424,70 +426,6 @@ useEffect(() => {
     }
   };
   
-  
-
-  // Función para saltar una pregunta
-  const skip = async () => {
-    if (userInfo.Monedas < 50) {
-      Alert.alert('No tienes suficientes monedas para saltar la pregunta.');
-      return;
-    }
-
-    if (currentQuestion < questions.length - 1) {
-      const userDocRef = doc(db, 'users', userId);
-      try {
-        await updateDoc(userDocRef, {
-          Monedas: userInfo.Monedas - 50,
-        });
-        setCurrentQuestion(currentQuestion + 1);
-        setRespuestaSeleccionada(null);
-      } catch (error) {
-        console.error('Error al actualizar las monedas:', error);
-        Alert.alert('Error', 'No se pudieron actualizar las monedas.');
-      }
-    } else {
-      Alert.alert('Has completado el quiz.');
-      const today = new Date().toDateString();
-      await AsyncStorage.setItem("lastQuizDate", today);
-      console.log('Fecha del último quiz guardada:', today);
-      setShowModal(true);
-    }
-  };
-
-
-  // Función para "remover dos respuestas incorrectas"
-  const removeTwo = async () => {
-    if (userInfo.Monedas < 50) {
-      Alert.alert('No tienes suficientes monedas para remover respuestas.');
-      return;
-    }
-
-    const respuestasIncorrectas = respuestas.filter(respuesta => respuesta !== correcta);
-    const respuestasRestantes = respuestasIncorrectas.slice(0, 1);
-    const nuevasRespuestas = [correcta, ...respuestasIncorrectas.slice(0, 1)];
-
-    setQuestions((prevQuestions) => {
-      return prevQuestions.map((pregunta) => {
-        if (pregunta.questionId === questions[currentQuestion].questionId) {
-          return {
-            ...pregunta,
-            answers: nuevasRespuestas,
-          };
-        }
-        return pregunta;
-      });
-    });
-
-    const userDocRef = doc(db, 'users', userId);
-    try {
-      await updateDoc(userDocRef, {
-        Monedas: userInfo.Monedas - 50,
-      });
-    } catch (error) {
-      console.error('Error al actualizar las monedas:', error);
-      Alert.alert('Error', 'No se pudieron actualizar las monedas.');
-    }
-  };
 
 
   const mostrarModalRacha = () => {
@@ -695,26 +633,7 @@ useEffect(() => {
               <AntDesign name="rightcircleo" size={24} color="white" />
             </TouchableOpacity>
 
-            <View style={styles.actionsContainer}>
-              <TouchableOpacity
-                onPress={skip}
-                style={styles.actionButton}
-              >
-                <Text style={styles.actionText}>💰50</Text>
-                <Text style={styles.actionText}>Saltar</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity
-                style={[styles.actionButton, respuestas.length <= 2 && styles.disabledButton]}
-                onPress={removeTwo}
-                disabled={respuestas.length <= 2}
-              >
-                <Text style={styles.actionText}>💰50</Text>
-                <Text style={styles.actionText}>
-                  {respuestas.length > 2 ? 'Remover 2 incorrectas' : 'No disponible'}
-                </Text>
-              </TouchableOpacity>
-            </View>
+
           </View>
 </ScrollView>
 
@@ -828,11 +747,13 @@ const styles = StyleSheet.create({
   },
   correctAnswer: {
     borderWidth: 2,
-    borderColor: '#00FF00'
+    borderColor: '#00FF00',
+    backgroundColor: 'rgba(0, 255, 0, 0.3)'
   },
   incorrectAnswer: {
     borderWidth: 2,
-    borderColor: '#FF0000'
+    borderColor: '#FF0000',
+    backgroundColor:'rgba(255, 0, 0, 0.3)'
   },
   answerText: {
     
@@ -842,10 +763,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   checkButton: {
-    width: responsiveWidth * 0.7,
+    width: '100%',
     height: responsiveHeight,
-    marginVertical: height * 0.02,
+    marginVertical: height * 0.03,
     borderRadius: 50,
+    borderWidth: 5,
+    borderColor: 'rgba(0, 0, 255, 0.8)',
     backgroundColor: 'rgba(0, 0, 255, 0.8)',
     flexDirection: 'row',
     justifyContent: 'center',

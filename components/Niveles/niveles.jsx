@@ -9,7 +9,7 @@ export const niveles = (experiencia) => {
       },
       2: {
         name: "Aprendiz",
-        animation: require("../../assets/lottieFiles/award.json"),
+        animation: require("../../assets/lottieFiles/angel-nivel.json"),
         description: "¡Ya estás cosechando los frutos de la constancia! Has completado tus primeras lecciones y demostrado hambre de sabiduría. Sigue alimentando tu espíritu con la Palabra."
       },
       3: {
@@ -164,8 +164,8 @@ export const niveles = (experiencia) => {
   
     return {
       nivel,
-      insignia: insignias[nivel]?.name || '...',
-      animation: insignias[nivel]?.animation || '/animations/default.json',
-      description: insignias[nivel]?.description || '...'
+      insignia: insignias[nivel]?.name || 'Insignia 1',
+      animation: insignias[nivel]?.animation || "../../assets/lottieFiles/award.json",
+      description: insignias[nivel]?.description || 'Continúa ganando experiencia para obtener tu primera insignia'
     };
   };

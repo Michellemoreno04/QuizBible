@@ -36,7 +36,7 @@ export default function NivelModal({ nivel, isVisible, onClose, Exp }) {
           </View>
 
           {/* Insignia principal */}
-          <View style={styles.medalContainer}>
+          <View style={styles.modalContainer}>
             <LottieView
               source={animation}
               autoPlay
@@ -119,8 +119,9 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 15,
   },
-  medalContainer: {
+  modalContainer: {
     width: 200,
+    
    // height: 200,
     //marginVertical: 20,
     justifyContent: 'center',
@@ -128,11 +129,12 @@ const styles = StyleSheet.create({
    
   },
   modalAnimation: {
-    width: 150,
-    height: 150,
+    width: 200,
+    height: 200,
     zIndex: 5,
-    backgroundColor: '#00000022',
+   // backgroundColor: '#00000022',
     borderRadius: 20,
+    
 
   },
 

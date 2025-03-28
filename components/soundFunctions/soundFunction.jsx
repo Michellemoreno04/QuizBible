@@ -35,29 +35,46 @@ export function useSound() {
 // Hook para manejar música de fondo
 export function useBackgroundMusic() {
   const [music, setMusic] = useState();
-  const [isMuted, setIsMuted] = useState(false); // Estado para controlar mute
+  const [isMuted, setIsMuted] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
 
   const startMusic = async (audioFile) => {
     try {
-    //  console.log('Loading Background Music');
+      if (music) {
+        // Si ya existe una instancia de música, primero la limpiamos
+        await stopMusic();
+      }
+      
       const { sound } = await Audio.Sound.createAsync(audioFile, {
         shouldPlay: true,
         isLooping: true,
+        volume: isMuted ? 0 : 1,
       });
+      
       setMusic(sound);
-
-      console.log('Playing Background Music');
+      setIsPlaying(true);
     } catch (error) {
-      console.error('Error playing background music:', error);
+      console.error('Error al iniciar la música:', error);
     }
   };
 
   const stopMusic = async () => {
-    if (music) {
-     // console.log('Stopping Background Music');
-      await music.stopAsync();
-      await music.unloadAsync();
+    try {
+      if (music && isPlaying) {
+        // Verificar si el sonido está cargado antes de intentar detenerlo
+        const status = await music.getStatusAsync();
+        if (status.isLoaded) {
+          await music.stopAsync();
+          await music.unloadAsync();
+        }
+        setMusic(null);
+        setIsPlaying(false);
+      }
+    } catch (error) {
+      console.error('Error al detener la música:', error);
+      // En caso de error, asegurarse de resetear el estado
       setMusic(null);
+      setIsPlaying(false);
     }
   };
 
@@ -65,26 +82,22 @@ export function useBackgroundMusic() {
     if (music) {
       try {
         const newMuteState = !isMuted;
-        await music.setVolumeAsync(newMuteState ? 0 : 1); // 0 = Mute, 1 = Full Volume
+        await music.setVolumeAsync(newMuteState ? 0 : 1);
         setIsMuted(newMuteState);
       } catch (error) {
-        console.error('Error toggling mute:', error);
+        console.error('Error al cambiar el volumen:', error);
       }
-    }else{
-      startMusic();
     }
   };
 
+  // Limpieza al desmontar el componente
   useEffect(() => {
-    // Limpiar música cuando el componente que usa el hook se desmonte
     return () => {
       if (music) {
-       // console.log('Cleaning up Background Music');
-        music.stopAsync();
-        music.unloadAsync();
+        stopMusic();
       }
     };
-  }, [music]);
+  }, []);
 
-  return { startMusic, stopMusic, toggleMute, isMuted };
+  return { startMusic, stopMusic, toggleMute, isMuted, isPlaying };
 }

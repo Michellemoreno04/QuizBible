@@ -14,6 +14,7 @@ import { db } from '@/components/firebase/firebaseConfig';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
+
 export default function AppComponent() {
 
   const { user } = useAuth();
@@ -22,56 +23,14 @@ export default function AppComponent() {
   const [userLife, setUserLife] = useState(null);
  
 
-useEffect(() => {
-  if (!userId) {
-    setUserLife(null);
-    return;
+
+
+
+
+  if(!userId){
+    return <ActivityIndicator size="large" color="white" />
   }
 
-  const dbRef = doc(db, 'users', userId);
-  let unsubscribe; 
-
-  const setupSnapshotListener = async () => {
-    try {
-      const lastLostLifeDate = await AsyncStorage.getItem("lastLostLifeDate");
-      const today = new Date().toDateString();
-
-      unsubscribe = onSnapshot(dbRef, async (docSnapshot) => {
-        if (!docSnapshot.exists()) return;
-        
-        const userData = docSnapshot.data();
-        setUserLife(userData.Vidas); 
-
-        // Solo mostrar el modal y recargar vidas si:
-        // 1. Es un nuevo día
-        // 2. Las vidas son menos de 2
-        // 3. La última fecha de pérdida de vida es diferente a hoy
-        if (userData.Vidas < 2 && lastLostLifeDate !== today) {
-          await updateDoc(dbRef, { Vidas: 2 }); 
-          await AsyncStorage.setItem("lastLostLifeDate", today); 
-          setNotVidasModalVisible(true); 
-        }
-      });
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  };
-  
-  setupSnapshotListener();
-
-  return () => {
-    if (unsubscribe) {
-      unsubscribe();
-    }
-  }
-}, [userId]);
-
-
-
-if(!userId){
-  return <ActivityIndicator size="large" color="white" />
-}
-//14.7.0 sin que contenga "^14.7.0" en la versión.
   return (
     <LinearGradient
       colors={[ '#1E3A5F', '#3C6E9F']}
@@ -84,7 +43,7 @@ if(!userId){
   Platform.OS === 'android' && { paddingTop: RNStatusBar.currentHeight }]}>
         <ScrollView>
           <View style={styles.screen}>
-           <NotVidasModal visible={isNotVidasModalVisible} setVisible={setNotVidasModalVisible} />
+           <NotVidasModal visible={isNotVidasModalVisible} setNotVidasModalVisible={setNotVidasModalVisible} />
 
            <HeaderHome />
   
@@ -96,7 +55,7 @@ if(!userId){
           </View>
         </ScrollView>
       </SafeAreaView>
-      <StatusBar style="light" />
+      <StatusBar style="light"  />
     </LinearGradient>
   );
 }

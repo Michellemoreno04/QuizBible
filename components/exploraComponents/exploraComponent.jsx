@@ -22,7 +22,6 @@ const ExploraComponent = () => {
   const [hasReadTheDailyVerse, setHasReadTheDailyVerse] = useState(false);
   const [showFullScreen, setShowFullScreen] = useState(false);
   const [showNoCoinsModal, setShowNoCoinsModal] = useState(false);
-  const [showNotVidasModal, setShowNotVidasModal] = useState(false);
   const animationRef = useRef(null);
 
  
@@ -93,21 +92,14 @@ const handleAnimationPress = async () => {
     setShowNoCoinsModal(true);
     return; 
   }
-  if (vidas < 1) {
-    setShowNotVidasModal(true);
-    
-    return; 
-  }
-
-    
-    
+  
   await updateDoc(userRef, { Monedas: monedas - 100 });
       
       setShowFullScreen(true);
     };
   
     const handleAnimationFinish = async () => {
-      animationRef.current?.play(0, 280);
+      animationRef.current?.play(0, 250);
       navigation.navigate("bibleQuiz");
       setShowFullScreen(false);
  
@@ -117,13 +109,12 @@ const handleAnimationPress = async () => {
   return (
     <View >
       <NoCoinsModal visible={showNoCoinsModal} onClose={() => setShowNoCoinsModal(false)} />
-      <RewardedAdModal isVisible={showNotVidasModal} onClose={() => setShowNotVidasModal(false)} userId={userId}/>
     <View>
               <Text style={styles.title}>Explora</Text>
             </View>
     <ScrollView 
       horizontal
-      showsHorizontalScrollIndicator={false}
+      showsHorizontalScrollIndicator={false} 
       contentContainerStyle={styles.scrollContainer}
     >
       {menuItems.map((item, index) => {
@@ -194,7 +185,7 @@ const handleAnimationPress = async () => {
                </View>
               </View>
                <AdBanner />
-            </Modal>
+     </Modal>
     </View>
   );
 };

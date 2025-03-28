@@ -39,7 +39,7 @@ const responsiveHeight = height * 0.07; // 7% del alto
 const BibleQuiz = () => {
   const navigation = useNavigation();
   const playSound = useSound();
-  const { startMusic, stopMusic, isMuted, toggleMute } = useBackgroundMusic();
+  const { startMusic, stopMusic, isMuted, toggleMute, isPlaying } = useBackgroundMusic();
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [respuestaSeleccionada, setRespuestaSeleccionada] = useState(null);
@@ -86,14 +86,22 @@ const loadInterstitial = () => {
       }
     });
 
-    const unsubscribeClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
+    const unsubscribeClosed = interstitial.addAdEventListener(AdEventType.CLOSED, async () => {
       if (Platform.OS === 'ios') {
         StatusBar.setHidden(false);
       }
-      stopMusic();
-      setShowModal(false);
-      mostrarModalRacha();
-      navigation.navigate('(tabs)');
+      try {
+        if (isPlaying) {
+          await stopMusic();
+        }
+        setShowModal(false);
+        mostrarModalRacha();
+        navigation.navigate('(tabs)');
+      } catch (error) {
+        console.error('Error al cerrar anuncio:', error);
+        setShowModal(false);
+        navigation.navigate('(tabs)');
+      }
     });
 
     const unsubscribeError = interstitial.addAdEventListener(AdEventType.ERROR, handleError);
@@ -109,50 +117,26 @@ const loadInterstitial = () => {
   }, []);
 
   const showAds = async () => {
-    stopMusic();
-    let showAttempts = 0;
-    const maxShowAttempts = 3;
-
-    const tryShowAd = async () => {
-      while (showAttempts < maxShowAttempts) {
-        try {
-          if (interstitialLoaded) {
-            await interstitial.show();
-            return true;
-          }
-          
-          // Esperar carga si no está listo
-          await new Promise((resolve, reject) => {
-            const loadedListener = interstitial.addAdEventListener(AdEventType.LOADED, () => {
-              loadedListener();
-              resolve();
-            });
-            
-            const errorListener = interstitial.addAdEventListener(AdEventType.ERROR, (error) => {
-              errorListener();
-              reject(error);
-            });
-          });
-          
-          await interstitial.show();
-          return true;
-        } catch (error) {
-          console.log('Error mostrando anuncio:', error);
-          showAttempts++;
-          if (showAttempts >= maxShowAttempts) throw error;
-          await new Promise(resolve => setTimeout(resolve, 1000));
-        }
-      } 
-    };
-
     try {
-      await tryShowAd();
+      // Intentar detener la música antes de mostrar el anuncio
+      if (isPlaying) {
+        await stopMusic();
+        // Pequeña pausa para asegurar que la música se detuvo
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      // Si el anuncio está cargado, mostrarlo
+      if (interstitialLoaded) {
+        await interstitial.show();
+      } else {
+        // Si no está cargado, navegar directamente
+        console.log('Anuncio no cargado, navegando directamente');
+        setShowModal(false);
+        navigation.navigate('(tabs)');
+      }
     } catch (error) {
-      console.log('No se pudo mostrar el anuncio después de 3 intentos');
-      setShowModal(false);
-      navigation.navigate('(tabs)');
-    }finally {
-      stopMusic();
+      console.error('Error al mostrar anuncio:', error);
+      // Asegurar que el usuario siempre pueda salir
       setShowModal(false);
       navigation.navigate('(tabs)');
     }
@@ -369,15 +353,13 @@ useEffect(() => {
             await updateDoc(userDocRef, {
               Vidas: newVidas,
             });
-            const today = new Date().toDateString();
-            await AsyncStorage.setItem("lastLostLifeDate", today);
+            
             setUserInfo((prevUserInfo) => ({
               ...prevUserInfo,
               Vidas: newVidas,
             }));
 
             if(newVidas === 0) {
-            
               const totalMonedas = resultadoRespuestas * 10;
               await updateDoc(userDocRef, {
                 Monedas: userInfo.Monedas + totalMonedas,
@@ -385,9 +367,6 @@ useEffect(() => {
               const today = new Date().toDateString();
               await AsyncStorage.setItem("lastQuizDate", today);
               setShowModalNotVidas(true);
-              
-             
-             // return;
             }
   
             // Si quedan preguntas, avanzamos a la siguiente.
@@ -446,8 +425,20 @@ useEffect(() => {
       },
       {
         text: 'Terminar',
-        onPress: () => {
-          showAds();
+        onPress: async () => {
+          try {
+            if (isPlaying) {
+              await stopMusic();
+              // Pequeña pausa para asegurar que la música se detuvo
+              await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            showAds();
+          } catch (error) {
+            console.error('Error al salir:', error);
+            // En caso de error, asegurar que el usuario pueda salir
+            setShowModal(false);
+            navigation.navigate('(tabs)');
+          }
         },
       },
     ]);
@@ -460,26 +451,36 @@ useEffect(() => {
     setRespuestaSeleccionada(null); // Asegurar doblemente el reset
   }, [currentQuestion]);
 
-  // sonido de fondo
+  // Manejo del sonido de fondo
   useEffect(() => {
-    if(!userId) return null;
-    
+    if (!userId) return;
+
     const backgroundMusic = require('../assets/sound/quiz-music1.mp3');
- 
-     navigation.addListener('focus', () => {
-      startMusic(backgroundMusic);
-     })
     
-     navigation.addListener('blur', () => {
-      stopMusic(); // Detiene la música al salir de la pantalla
+    const unsubscribeFocus = navigation.addListener('focus', () => {
+      if (!isPlaying) {
+        startMusic(backgroundMusic);
+      }
+    });
+    
+    const unsubscribeBlur = navigation.addListener('blur', () => {
+      stopMusic();
     });
   
-   return () => {
-     stopMusic();
-   }
-    
-  }, []);
+    // Limpieza al desmontar
+    return () => {
+      stopMusic();
+      unsubscribeFocus();
+      unsubscribeBlur();
+    };
+  }, [userId, navigation]);
 
+  // Asegurarse de detener la música cuando el componente se desmonta
+  useEffect(() => {
+    return () => {
+      stopMusic();
+    };
+  }, []);
 
 // Animaciones
 useEffect(() => {
@@ -510,27 +511,54 @@ useEffect(() => {
 
   // Función para cerrar el modal de recompensade vidas
   const cerrarRewardModal = () => {
-
-  try {
-    if(userInfo.Vidas === 0){
-      
+    try {
+      // Si el usuario tiene 0 vidas y no ha visto el anuncio, mantener el modal abierto
+      if (userInfo.Vidas === 0) {
+  
+        return;
+      }
+      // Si el usuario tiene vidas (después de ver el anuncio o tenía más de 0)
       setShowModalNotVidas(false);
-      stopMusic();
-      setShowModal(true);
-      return;
-    }
-  }catch (error) {
-    console.log('Error al cerrar el modal de recompensa:', error);
-  }
-    //setShowModal(true);
+      
+      // Solo mostrar modal de puntuación si no quedan más preguntas
+      if (currentQuestion >= questions.length - 1) {
+        setShowModal(true);
+        stopMusic();
+      } else {
+        // Continuar con la siguiente pregunta
+        setCurrentQuestion(currentQuestion + 1);
+        setRespuestaSeleccionada(null);
+      }
 
+
+    } catch (error) {
+      console.log('Error al cerrar el modal de recompensa:', error);
+    }finally{
+     
+        setShowModalNotVidas(false);
+      
+    }
   }
+
   const cerrarPuntuacionModal = () => {
     setShowModal(false);
+    setShowModalNotVidas(false);
     stopMusic();
     navigation.navigate('(tabs)');
 
   }
+
+// Verificar si el usuario tiene vidas
+  useEffect(() => {
+   if(!userId) return null;
+   const checkVidas = async () => {
+    if(userInfo.Vidas === 0){
+      setShowModalNotVidas(true)
+    }
+
+   }
+    checkVidas();
+  }, [userInfo.Vidas])
 
   if (!interstitial) {
     return null;
@@ -545,7 +573,7 @@ useEffect(() => {
       <ModalRacha userInfo={userInfo} isVisible={showModalRacha} setShowModalRacha={setShowModalRacha} />
       <ModalRachaPerdida userInfo={userInfo} isVisible={showModalRachaPerdida} setShowModalRachaPerdida={setShowModalRachaPerdida} />
       <NivelModal Exp={userInfo.Exp} nivel={userInfo?.Nivel} isVisible={showNivelModal} onClose={() => setShowNivelModal(false)}/>
-      <RewardedAdModal isVisible={showModalNotVidas} onClose={cerrarRewardModal} userId={userId}/>
+      <RewardedAdModal isVisible={showModalNotVidas} setIsVisible={setShowModalNotVidas} setShowModal={setShowModal} onClose={cerrarRewardModal} userId={userId} vidas={userInfo.Vidas} />
 <ImageBackground 
         source={require('../assets/images/bg-quiz.png')} 
          resizeMode="cover" 

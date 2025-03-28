@@ -267,7 +267,8 @@ const DailyReading = () => {
     await addDoc(lecturasVistasRef, {
       titulo: readingText[0].titulo,
       fechaStr: today,
-      date: new Date() // Agregar timestamp para ordenamiento
+      date: new Date(), // Agregar timestamp para ordenamiento
+      texto: readingText[0].texto,
     });
 
     await AsyncStorage.setItem('lastReadingDate', today);
@@ -291,6 +292,8 @@ const DailyReading = () => {
       Alert.alert('Error al compartir la lectura.');
     }
   };
+
+  
 
 if(isLoading){
   return <ActivityIndicator size="large" color="gray" />

@@ -14,6 +14,8 @@ import { db } from '../firebase/firebaseConfig';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useNavigation } from '@react-navigation/native';
+
 
 
 const adUnitId = __DEV__ 
@@ -21,10 +23,10 @@ const adUnitId = __DEV__
 : Platform.OS === 'ios' ? process.env.EXPO_PUBLIC_REWARDED_ID_IOS 
 : process.env.EXPO_PUBLIC_REWARDED_ID_ANDROID;
 
-export const RewardedAdModal = ({ isVisible, onClose,userId }) => {
+export const RewardedAdModal = ({ isVisible,setIsVisible, onClose,userId,vidas,setShowModal }) => {
   const [loaded, setLoaded] = useState(false);
   const [rewardedAd, setRewardedAd] = useState(null);
-
+  const navigation = useNavigation();
   
   // Cargar y manejar el anuncio cuando el modal se muestra
   useEffect(() => {
@@ -47,13 +49,11 @@ export const RewardedAdModal = ({ isVisible, onClose,userId }) => {
         RewardedAdEventType.EARNED_REWARD,
         (reward) => {
           console.log('Recompensa obtenida:', reward);
-          onClose();
           addLife();// rewards no le hemos pasado los 
+          onClose();
         }
       );
-
-
-
+    
       // Cargar el anuncio
       newRewarded.load();
       setRewardedAd(newRewarded);
@@ -69,13 +69,13 @@ export const RewardedAdModal = ({ isVisible, onClose,userId }) => {
   }, [isVisible]);
 
   const addLife = async () => {
-    
     try {
       const userDocRef = doc(db, 'users', userId);
       await updateDoc(userDocRef, {
         Vidas: increment(1),
       });
-      
+      // No llamamos a onClose() aquí, esperamos a que el usuario tenga la vida
+      // antes de cerrar el modal
     } catch (error) {
       console.error('Error al actualizar las vidas:', error);
       Alert.alert('Error', 'No se pudieron actualizar las vidas.');
@@ -85,12 +85,30 @@ export const RewardedAdModal = ({ isVisible, onClose,userId }) => {
   const handleShowAd = () => {
     if (loaded && rewardedAd) {
       rewardedAd.show();
-
+      // onClose se llamará automáticamente después de ganar la recompensa
+      // a través del evento EARNED_REWARD
     }
   };
 
+  const cerrar = () =>{
+  try {
+    if(vidas === 0){
+      setIsVisible(false)
+      setShowModal(true)
+    
+    }
+  } catch (error) {
+    console.log(error)
+  }finally{
+    setIsVisible(false)
+    
+  }
+  
+  }
+ 
+
   return (
-    <Modal visible={isVisible} animationType="slide" transparent>
+    <Modal visible={isVisible} animationType="slide" transparent onRequestClose={onClose}>
       <View style={styles.modalContainer}>
         {/* Fondo con efecto blur (requiere @react-native-community/blur) */}
         <BlurView
@@ -131,7 +149,7 @@ export const RewardedAdModal = ({ isVisible, onClose,userId }) => {
           {/* Botón de cierre con icono */}
           <TouchableOpacity 
             style={styles.closeButton} 
-            onPress={onClose}
+            onPress={cerrar}
             hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}
           >
             <Ionicons name="close-circle" size={30} color="#666" />

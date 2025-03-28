@@ -134,9 +134,9 @@ export default function Profile() {
                 {userInfo?.Description || '¡Completa tu perfil para que otros te conozcan mejor!'}
               </Text>
             </View>
-          <AdBanner />
           </View>
         </ScrollView>
+          <AdBanner />
       </SafeAreaView>
     </LinearGradient>
   );

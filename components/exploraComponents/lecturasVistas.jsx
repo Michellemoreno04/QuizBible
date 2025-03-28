@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Modal, StyleSheet, Button, Share, TextInput } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Modal, StyleSheet, Button, Share, TextInput, ScrollView } from 'react-native';
 import useAuth from '../../components/authContext/authContext';
 import { doc, collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
@@ -68,18 +68,23 @@ export default function Lecturas() {
 
   const handleShare = async () => {
     try {
+      const titulo = selectedTema?.titulo || 'Lectura diaria';
       await Share.share({
-        message: `Mi lectura diaria: ${selectedTema.lectura}`,
+        message: `📖 *${titulo}*\n\n${selectedTema.texto}`,
       });
     } catch (error) {
       console.error('Error compartiendo:', error);
     }
   };
 
+
+
   const closeModal = () => {
     setIsModalVisible(false);
     setSelectedTema(null);
   };
+
+
 
   // Renderizar cada item de la lista
   const renderItem = ({ item }) => (
@@ -127,10 +132,11 @@ export default function Lecturas() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
+        <ScrollView>
             {selectedTema && (
               <>
                 <Text style={styles.modalTitle}>{selectedTema.titulo || 'Titulo aqui'}</Text>
-                <Text style={styles.modalText}>{selectedTema.lectura}</Text>
+                <Text style={styles.modalText}>{selectedTema.texto}</Text>
                 
                 <View style={styles.buttonContainer}>
                   <Button
@@ -147,6 +153,7 @@ export default function Lecturas() {
                 />
               </>
             )}
+        </ScrollView>
           </View>
         </View>
       </Modal>

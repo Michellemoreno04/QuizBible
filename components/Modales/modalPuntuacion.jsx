@@ -26,6 +26,7 @@ export function ModalPuntuacion({ isVisible, respuestasCorrectas, expGanada, mon
 
 useEffect(() => {
     if (isVisible) {
+      
       // Crear nueva instancia cada vez que se abre el modal
       const newRewarded = RewardedAd.createForAdRequest(adUnitId, {
         keywords: ['religion', 'bible'],
@@ -43,7 +44,8 @@ useEffect(() => {
         RewardedAdEventType.EARNED_REWARD,
         (reward) => {
           console.log('Recompensa obtenida:', reward);
-           
+           cerrar();
+           mostrarModalRacha();
         }
       );
       // Cargar el anuncio
@@ -56,8 +58,11 @@ useEffect(() => {
         unsubscribeEarned();
         setLoaded(false);
         setRewardedAd(null);
+
       };
+
     }
+  
   }, [isVisible]);
 
   const handleShowAd = async () => {
@@ -68,10 +73,7 @@ useEffect(() => {
       } catch (error) {
         console.log('Error al mostrar el anuncio:', error);
         
-      } finally {
-        cerrar();
-        mostrarModalRacha();
-      }
+      } 
 
     }
   };

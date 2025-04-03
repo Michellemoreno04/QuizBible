@@ -17,15 +17,17 @@ export const manejarRachaDiaria = async (userId,setShowModalRacha,setShowModalRa
     hoy.setHours(0, 0, 0, 0);
 
     let ultimaFecha;
+    
     if (userData?.modalRachaShow) {
       ultimaFecha = userData.modalRachaShow?.toDate
         ? userData.modalRachaShow.toDate()
         : new Date(userData.modalRachaShow);
-    } else {
+    } else { 
       await updateDoc(userDocRef, {
          modalRachaShow: hoy.toISOString()
          });
       ultimaFecha = hoy;
+      
     }
 
     let rachaActual = Number(userData?.Racha || 0);

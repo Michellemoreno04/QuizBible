@@ -40,8 +40,8 @@ export function useBackgroundMusic() {
 
   const startMusic = async (audioFile) => {
     try {
-      if (music) {
-        // Si ya existe una instancia de música, primero la limpiamos
+      // Si ya hay música reproduciéndose, primero la detenemos
+      if (music && isPlaying) {
         await stopMusic();
       }
       
@@ -55,12 +55,15 @@ export function useBackgroundMusic() {
       setIsPlaying(true);
     } catch (error) {
       console.error('Error al iniciar la música:', error);
+      // En caso de error, asegurarse de resetear el estado
+      setMusic(null);
+      setIsPlaying(false);
     }
   };
 
   const stopMusic = async () => {
     try {
-      if (music && isPlaying) {
+      if (music) {
         // Verificar si el sonido está cargado antes de intentar detenerlo
         const status = await music.getStatusAsync();
         if (status.isLoaded) {
@@ -90,14 +93,6 @@ export function useBackgroundMusic() {
     }
   };
 
-  // Limpieza al desmontar el componente
-  useEffect(() => {
-    return () => {
-      if (music) {
-        stopMusic();
-      }
-    };
-  }, []);
 
   return { startMusic, stopMusic, toggleMute, isMuted, isPlaying };
 }

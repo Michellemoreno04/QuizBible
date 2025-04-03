@@ -1,9 +1,9 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, ImageBackground, Animated,Platform, ActivityIndicator,Dimensions, ScrollView } from 'react-native';
 import { AntDesign, FontAwesome5, MaterialCommunityIcons, Octicons } from '@expo/vector-icons';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { doc, updateDoc, onSnapshot, getDocs, collection, limit, query, orderBy, startAfter, serverTimestamp, increment, setDoc } from 'firebase/firestore';
+import { doc, updateDoc, onSnapshot, getDocs, collection, limit, query, orderBy, startAfter, serverTimestamp, increment, setDoc, getDoc } from 'firebase/firestore';
 import useAuth from '../components/authContext/authContext';
 import { db } from '../components/firebase/firebaseConfig';
 import { ModalPuntuacion } from '@/components/Modales/modalPuntuacion';
@@ -17,6 +17,8 @@ import NivelModal from '@/components/Modales/modalNivel';
 import { niveles } from '@/components/Niveles/niveles';
 import { InterstitialAd, AdEventType, TestIds } from 'react-native-google-mobile-ads';
 import {RewardedAdModal} from '../components/Modales/modalNotVidas';
+import QuizActions from '@/components/quizFunctions/quizFuncion';
+import { useIsFocused } from '@react-navigation/native';
 
 
 
@@ -52,15 +54,21 @@ const BibleQuiz = () => {
   const [expGanada, setExpGanada] = useState(0);
   const [preguntasRespondidas, setPreguntasRespondidas] = useState([]);
   const [showNivelModal, setShowNivelModal] = useState(false);
+  const [nivelAnterior, setNivelAnterior] = useState(null);
   const [interstitialLoaded, setInternitialLoaded] = useState(false);
   const [showModalNotVidas, setShowModalNotVidas] = useState(false);
+  const [tiempoRestante, setTiempoRestante] = useState(20); 
+  const [tiempoAgregado, setTiempoAgregado] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const backgroundMusic = require('../assets/sound/quiz-music1.mp3');
+  const isFocused = useIsFocused();
   const { user } = useAuth();
   const userId = user?.uid;
 
   const retryCount = useRef(0);
 const maxLoadRetries = 3;
 
- useEffect(() => {
+useEffect(() => {
 
 const loadInterstitial = () => {
       interstitial.load();
@@ -92,15 +100,23 @@ const loadInterstitial = () => {
       }
       try {
         if (isPlaying) {
-          await stopMusic();
+          await stopMusic(backgroundMusic);
         }
+        setShowModalNotVidas(false);
         setShowModal(false);
         mostrarModalRacha();
-        navigation.navigate('(tabs)');
+        // Se reinicia la pila de navegación para desmontar el componente actual
+        navigation.reset({
+          index: 0,
+          routes: [{ name: '(tabs)' }],
+        });
       } catch (error) {
         console.error('Error al cerrar anuncio:', error);
         setShowModal(false);
-        navigation.navigate('(tabs)');
+        navigation.reset({
+          index: 0,
+          routes: [{ name: '(tabs)' }],
+        });
       }
     });
 
@@ -118,61 +134,75 @@ const loadInterstitial = () => {
 
   const showAds = async () => {
     try {
-      // Intentar detener la música antes de mostrar el anuncio
       if (isPlaying) {
-        await stopMusic();
+        await stopMusic(backgroundMusic);
         // Pequeña pausa para asegurar que la música se detuvo
         await new Promise(resolve => setTimeout(resolve, 100));
       }
-
-      // Si el anuncio está cargado, mostrarlo
       if (interstitialLoaded) {
         await interstitial.show();
       } else {
-        // Si no está cargado, navegar directamente
         console.log('Anuncio no cargado, navegando directamente');
         setShowModal(false);
-        navigation.navigate('(tabs)');
+        navigation.reset({
+          index: 0,
+          routes: [{ name: '(tabs)' }],
+        });
       }
     } catch (error) {
       console.error('Error al mostrar anuncio:', error);
       // Asegurar que el usuario siempre pueda salir
       setShowModal(false);
-      navigation.navigate('(tabs)');
+      navigation.replace('(tabs)');
     }
   };
 
+  // Cierra los modales al salir
+  useFocusEffect(
+    useCallback(() => {
+      return () => {
+        stopMusic(backgroundMusic);
+        setShowModalNotVidas(false); // Cierra modal al salir
+        setShowModal(false);
+        setShowModalRacha(false);
+        setShowModalRachaPerdida(false);
+        setShowNivelModal(false);
+      };
+    }, [])
+  );
 
-  // Verifica el nivel del usuario para mostrar el modal de nivel  
+  // verifica si el nivel ha cambiado
   useEffect(() => {
-    const checkNivel = async () => {
-      const userRef = doc(db, 'users', userId);
-      try {
-        if (userInfo.Exp) {
-          const nivelActual = niveles(userInfo.Exp).nivel;
-          const nivelAnterior = userInfo.Nivel || 0;
+    if (!userId) return;
   
-          if (nivelActual === nivelAnterior) return; // No hacer nada si no hay cambio
-  
-          // Actualizar Firestore y estado local inmediatamente
-          await updateDoc(userRef, { Nivel: nivelActual });
-          
-          // Actualiza el estado local aquí (depende de cómo manejes userInfo)
-          // Ejemplo si usas un estado de React:
-          setUserInfo(prev => ({ ...prev, Nivel: nivelActual }));
-  
-          if (nivelActual > nivelAnterior) {
+    const userRef = doc(db, 'users', userId);
+    const unsubscribe = onSnapshot(userRef, (snapshot) => {
+      const userData = snapshot.data() || {};
+      
+      if (userData.Exp) {
+        const nivelActual = niveles(userData.Exp).nivel;
+        
+        // Usar la versión actualizada del estado anterior
+        setNivelAnterior(prevNivel => {
+          // Mostrar modal solo si el nivel sube
+          if (prevNivel !== null && nivelActual > prevNivel) {
+            console.log('¡Nuevo nivel alcanzado!');
             setShowNivelModal(true);
           }
+          return nivelActual;
+        });
+  
+        // Actualizar Nivel en Firestore solo si es necesario
+        if (userData.Nivel !== nivelActual) {
+          updateDoc(userRef, { Nivel: nivelActual });
         }
-      } catch (error) {
-        console.error('Error al verificar el nivel:', error);
       }
-    };
-    checkNivel();
-  }, [userInfo.Exp]); // Solo depende de Exp para evitar ciclos
+    });
+  
+    return () => unsubscribe();
+  }, [userId]); 
 
-  // Obtén las preguntas de Firestore
+// Funcion para obtener las preguntas
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
@@ -224,13 +254,14 @@ const loadInterstitial = () => {
     fetchQuestions();
   }, []);
 
-  // Escucha en tiempo real para obtener los datos del usuario
+  // Escucha cambios en el documento del usuario
   useEffect(() => {
     const userDocRef = doc(db, 'users', user?.uid);
 
     const unsubscribe = onSnapshot(userDocRef, (doc) => {
       if (doc.exists()) {
-        setUserInfo(doc.data());
+        const userData = doc.data();
+        setUserInfo(userData);
       } else {
         console.error('El documento del usuario no existe');
       }
@@ -316,7 +347,8 @@ useEffect(() => {
       // NOTA: No actualizamos las monedas en cada pregunta correcta.
       const userDocRef = doc(db, 'users', userId);
       await updateDoc(userDocRef, {
-        Exp: userInfo.Exp + 15,
+        Exp: increment(15),
+        Nivel: niveles(userInfo.Exp + 15).nivel
       });
   
       // Si aún quedan preguntas por contestar, avanzamos a la siguiente.
@@ -335,6 +367,7 @@ useEffect(() => {
         const today = new Date().toDateString();
         await AsyncStorage.setItem("lastQuizDate", today);
         // Mostramos el modal final.
+        stopMusic(backgroundMusic);
         setShowModal(true);
       }
     } else {
@@ -382,8 +415,7 @@ useEffect(() => {
               });
               const today = new Date().toDateString();
               await AsyncStorage.setItem("lastQuizDate", today);
-              setShowModal(true);
-              stopMusic();
+              stopMusic(backgroundMusic);
             }
           } catch (error) {
             console.error('Error al actualizar las vidas:', error);
@@ -399,20 +431,18 @@ useEffect(() => {
           });
           const today = new Date().toDateString();
           await AsyncStorage.setItem("lastQuizDate", today);
-          stopMusic();
+          stopMusic(backgroundMusic);
         }
       }, 2000);
     }
   };
   
-
-
   const mostrarModalRacha = () => {
     setShowModal(false);
-    stopMusic(); 
+    stopMusic(backgroundMusic); 
       manejarRachaDiaria(userId, setShowModalRacha, setShowModalRachaPerdida);
       
-      navigation.navigate('(tabs)');
+      navigation.replace('(tabs)');
     
   };
 
@@ -428,7 +458,7 @@ useEffect(() => {
         onPress: async () => {
           try {
             if (isPlaying) {
-              await stopMusic();
+              await stopMusic(backgroundMusic);
               // Pequeña pausa para asegurar que la música se detuvo
               await new Promise(resolve => setTimeout(resolve, 100));
             }
@@ -437,7 +467,9 @@ useEffect(() => {
             console.error('Error al salir:', error);
             // En caso de error, asegurar que el usuario pueda salir
             setShowModal(false);
-            navigation.navigate('(tabs)');
+            setShowNivelModal(false);
+            stopMusic(backgroundMusic);
+            navigation.replace('(tabs)');
           }
         },
       },
@@ -454,33 +486,16 @@ useEffect(() => {
   // Manejo del sonido de fondo
   useEffect(() => {
     if (!userId) return;
-
-    const backgroundMusic = require('../assets/sound/quiz-music1.mp3');
     
-    const unsubscribeFocus = navigation.addListener('focus', () => {
-      if (!isPlaying) {
-        startMusic(backgroundMusic);
-      }
-    });
+    // Iniciar música cuando el componente se monta
+    startMusic(backgroundMusic);
     
-    const unsubscribeBlur = navigation.addListener('blur', () => {
-      stopMusic();
-    });
+    return () => {
+      stopMusic(backgroundMusic);
+    }
   
-    // Limpieza al desmontar
-    return () => {
-      stopMusic();
-      unsubscribeFocus();
-      unsubscribeBlur();
-    };
-  }, [userId, navigation]);
+  }, []); 
 
-  // Asegurarse de detener la música cuando el componente se desmonta
-  useEffect(() => {
-    return () => {
-      stopMusic();
-    };
-  }, []);
 
 // Animaciones
 useEffect(() => {
@@ -522,8 +537,8 @@ useEffect(() => {
       
       // Solo mostrar modal de puntuación si no quedan más preguntas
       if (currentQuestion >= questions.length - 1) {
+        stopMusic(backgroundMusic);
         setShowModal(true);
-        stopMusic();
       } else {
         // Continuar con la siguiente pregunta
         setCurrentQuestion(currentQuestion + 1);
@@ -534,19 +549,33 @@ useEffect(() => {
     } catch (error) {
       console.log('Error al cerrar el modal de recompensa:', error);
     }finally{
-     
+    
         setShowModalNotVidas(false);
       
     }
   }
 
   const cerrarPuntuacionModal = () => {
+    stopMusic(backgroundMusic);
     setShowModal(false);
     setShowModalNotVidas(false);
-    stopMusic();
-    navigation.navigate('(tabs)');
+    manejarRachaDiaria(userId, setShowModalRacha, setShowModalRachaPerdida);
+    
+
+      navigation.navigate('(tabs)');
+    
 
   }
+
+
+  useEffect(() => {
+    
+      if(!isFocused){
+        stopMusic(backgroundMusic);
+        setShowModalNotVidas(false);
+      }
+    
+  }, [isFocused]);
 
 // Verificar si el usuario tiene vidas
   useEffect(() => {
@@ -560,6 +589,48 @@ useEffect(() => {
     checkVidas();
   }, [userInfo.Vidas])
 
+  // Efecto para el temporizador
+  useEffect(() => {
+   
+    let timer;
+  
+    if (tiempoRestante > 0 && 
+        !mostrarRespuestaCorrecta && 
+        !showModal && 
+        !showModalRacha && 
+        !showModalRachaPerdida && 
+        !showModalNotVidas && 
+        !showNivelModal && 
+        !isLoading) {
+      timer = setInterval(() => {
+        setTiempoRestante((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            // Si se acaba el tiempo, pasar a la siguiente pregunta
+            if (currentQuestion < questions.length - 1) {
+              setCurrentQuestion(currentQuestion + 1);
+              setRespuestaSeleccionada(null);
+              setTiempoRestante(30);
+              setTiempoAgregado(false);
+            } else {
+              setShowModal(true);
+            }
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearInterval(timer);
+
+  }, [tiempoRestante, mostrarRespuestaCorrecta, currentQuestion, questions.length, showModal, showModalRacha, showModalRachaPerdida, showModalNotVidas, showNivelModal, isLoading]);
+
+  // Resetear el temporizador cuando cambia la pregunta
+  useEffect(() => {
+    setTiempoRestante(30);
+    setTiempoAgregado(false);
+  }, [currentQuestion]);
+
   if (!interstitial) {
     return null;
   } 
@@ -572,7 +643,15 @@ useEffect(() => {
       <ModalPuntuacion userInfo={userInfo} mostrarModalRacha={mostrarModalRacha} expGanada={expGanada} monedasGanadas={resultadoRespuestas * 10} respuestasCorrectas={resultadoRespuestas} isVisible={showModal} onClose={mostrarModalRacha} cerrar={cerrarPuntuacionModal}/>
       <ModalRacha userInfo={userInfo} isVisible={showModalRacha} setShowModalRacha={setShowModalRacha} />
       <ModalRachaPerdida userInfo={userInfo} isVisible={showModalRachaPerdida} setShowModalRachaPerdida={setShowModalRachaPerdida} />
-      <NivelModal Exp={userInfo.Exp} nivel={userInfo?.Nivel} isVisible={showNivelModal} onClose={() => setShowNivelModal(false)}/>
+      <NivelModal 
+        Exp={userInfo.Exp} 
+        nivel={userInfo?.Nivel} 
+        isVisible={showNivelModal} 
+        onClose={() => {
+          console.log('Cerrando modal de nivel');
+          setShowNivelModal(false);
+        }}
+      />
       <RewardedAdModal isVisible={showModalNotVidas} setIsVisible={setShowModalNotVidas} setShowModal={setShowModal} onClose={cerrarRewardModal} userId={userId} vidas={userInfo.Vidas} />
 <ImageBackground 
         source={require('../assets/images/bg-quiz.png')} 
@@ -616,14 +695,16 @@ useEffect(() => {
   
 
             <Animated.View style={[styles.questionContainer, { opacity: questionOpacity }]}>
-            <Text
-              style={styles.referenceText}
-              
-            >
-              {referencia}
-            </Text>
-            <Text style={styles.questionText}>{pregunta}</Text>
-          </Animated.View>
+              <Text style={styles.referenceText}>
+                {referencia}
+              </Text>
+              <View style={styles.timerContainer}>
+                <Text style={[styles.timerText, tiempoRestante <= 5 && styles.timerTextRed]}>
+                  {tiempoRestante}s
+                </Text>
+              </View>
+              <Text style={styles.questionText}>{pregunta}</Text>
+            </Animated.View>
 
 
             <View style={styles.answersContainer}  key={questions[currentQuestion]?.questionId}>
@@ -661,6 +742,24 @@ useEffect(() => {
               <AntDesign name="rightcircleo" size={24} color="white" />
             </TouchableOpacity>
 
+            <QuizActions 
+              currentQuestion={currentQuestion}
+              questions={questions}
+              setCurrentQuestion={setCurrentQuestion}
+              setRespuestaSeleccionada={setRespuestaSeleccionada}
+              userInfo={userInfo}
+              userId={userId}
+              respuestas={respuestas}
+              correcta={correcta}
+              setQuestions={setQuestions}
+              setShowModal={setShowModal}
+              tiempoRestante={tiempoRestante}
+              setTiempoRestante={setTiempoRestante}
+              tiempoAgregado={tiempoAgregado}
+              setTiempoAgregado={setTiempoAgregado}
+              setIsLoading={setIsLoading}
+              isLoading={isLoading}
+            />
 
           </View>
 </ScrollView>
@@ -830,7 +929,24 @@ const styles = StyleSheet.create({
   actionText: {
     color: 'white',
     fontWeight: 'bold'
-  }
+  },
+  timerContainer: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    padding: 8,
+    borderRadius: 15,
+    zIndex: 1,
+  },
+  timerText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  timerTextRed: {
+    color: 'red',
+  },
 });
 
 export default BibleQuiz;

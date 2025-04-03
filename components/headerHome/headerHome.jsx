@@ -6,42 +6,33 @@ import useAuth  from '../../components/authContext/authContext';
 import { doc, onSnapshot, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../components/firebase/firebaseConfig';
 import { niveles } from '../Niveles/niveles';
+import { LinearGradient } from 'expo-linear-gradient';
 
 
 export const HeaderHome = () => {
  const { user } = useAuth();
+ const userId = user?.uid;
     const [userAuthenticated, setUserAuthenticated] = useState({});
-    const [showNivelModal, setShowNivelModal] = useState(false);
-    const [nivelAnterior, setNivelAnterior] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
-
-
-    const userId = user?.uid;
+   
+  
 
       useEffect(() => {
         if (!userId) return;
     
+        try {
         const userRef = doc(db, 'users', userId);
         const unsubscribe = onSnapshot(userRef, (snapshot) => {
           const userData = snapshot.data() || {};
+      
           setUserAuthenticated(userData);
-    
-          if (userData.Exp) {
-            const nivelActual = niveles(userData.Exp).nivel;
-            const nivelAnterior = userData.Nivel || 0;
-    
-            updateDoc(userRef, { Nivel: nivelActual });
-    
-            if (nivelAnterior !== null && nivelActual > nivelAnterior) {
-              setShowNivelModal(true);
-            }
-    
-            setNivelAnterior(nivelActual);
-          }
-          setIsLoading(false);
         });
-    
         return () => unsubscribe();
+      } catch (error) {
+        console.log(error)
+      }
+    
+        
+          
       }, [userId]);
 
        // Guardar insignia en la base de datos
@@ -91,20 +82,32 @@ export const HeaderHome = () => {
             <Text style={styles.greeting}>
               {`Hola!, ${userAuthenticated?.Name || 'Anónimo'}`}
             </Text>
-            <View className="flex-row ">
-              <Text style={styles.level} >
-              {userAuthenticated?.Exp >= 200 
-      ? niveles(userAuthenticated?.Exp || 0).insignia 
-      : 'Principiante'}
-              </Text>
+            <View style={styles.levelContainer}>
+             <LinearGradient
+    colors={['#FFD700', '#D4AF37', '#FFD700']}
+    start={{ x: 0, y: 0 }}
+    end={{ x: 1, y: 1 }}
+    style={styles.gradientBadge}
+  >
+    <Text style={styles.levelText}>
+      {userAuthenticated?.Exp >= 200 
+        ? niveles(userAuthenticated?.Exp || 0).insignia 
+        : 'PRINCIPIANTE'}
+    </Text>
+  </LinearGradient>
             </View>
           </View>
         </View>
 
-        <View style={styles.rachaContainer}>
+        <LinearGradient
+    colors={['#FFD700', '#D4AF37', '#FFD700']}
+    start={{ x: 0, y: 0 }}
+    end={{ x: 1, y: 1 }}
+     style={styles.rachaContainer}>
           <Text style={styles.rachaText}>{userAuthenticated?.Racha || 0}</Text>
-          <FontAwesome5 name="fire-alt" size={24} color="#FFD700" />
-        </View>
+          <FontAwesome5 name="fire-alt" size={24} color="white" />
+        </LinearGradient>
+      
       </View>
     )
 }
@@ -138,15 +141,26 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#FFFFFF', // Texto blanco para contrastar con el fondo oscuro
       },
-      level: {
-        fontSize: 14,
+      levelContainer: {
+         
+         borderRadius: 10,
+         
+      },
+      gradientBadge: {
+        padding: 5,
+        borderRadius: 20,
+        borderWidth: 2,
+        borderColor: '#CCAA00',
+      },
+      levelText: {
+        fontSize: 12,
+        fontWeight: 'bold',
         color: '#FFFFFF', // Texto blanco
-        
-        borderRadius: 5,
+        textAlign: 'center',
       },
       rachaContainer: {
         position: 'relative',
-        bottom: 10,
+       top: 8,
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: 'rgba(255, 255, 255, 0.2)', // Fondo semi-transparente
@@ -158,7 +172,7 @@ const styles = StyleSheet.create({
       rachaText: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#FFD700', // Texto dorado
+        color: 'white', // Texto dorado
         marginLeft: 5,
       },
 

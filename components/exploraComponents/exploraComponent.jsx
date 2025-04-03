@@ -8,7 +8,6 @@ import  useAuth  from '../authContext/authContext';
 import { db } from '../../components/firebase/firebaseConfig';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import {NoCoinsModal} from '../Modales/notCoints';
-import {RewardedAdModal} from '../Modales/modalNotVidas';
 import { AdBanner } from '../ads/banner';
 
 
@@ -80,12 +79,14 @@ const ExploraComponent = () => {
   const handlePress = (screenName) => {
     navigation.navigate(screenName);
   };
+
+  
 const handleAnimationPress = async () => {
 
  const userRef = doc(db, 'users', userId);
  const userDoc = await getDoc(userRef);
  const monedas = userDoc.data()?.Monedas || 0;
- const vidas = userDoc.data()?.Vidas || 0;
+ 
 
   if (monedas < 100) {
      // si el usuario no tiene suficientes monedas
@@ -99,9 +100,9 @@ const handleAnimationPress = async () => {
     };
   
     const handleAnimationFinish = async () => {
-      animationRef.current?.play(0, 250);
-      navigation.navigate("bibleQuiz");
+      animationRef.current?.play(0, 250); 
       setShowFullScreen(false);
+      navigation.navigate("bibleQuiz");
  
     };
 

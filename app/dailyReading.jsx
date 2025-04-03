@@ -129,6 +129,9 @@ const DailyReading = () => {
   
 // Efecto para obtener el texto de lectura
   useEffect(() => {
+    if(!userId) return;
+
+    
     const fetchDailyVerse = async () => {
       try {
  const today = getLocalDateString();
@@ -142,7 +145,7 @@ const DailyReading = () => {
         }
 
         // 4. Referencia al documento del usuario y la subcolección "lecturasVistas"
-        const userDocRef = doc(db, 'users', user?.uid);
+        const userDocRef = doc(db, 'users', userId);
         const lecturasVistasRef = collection(userDocRef, 'lecturasVistas');
 
         // 5. Consulta la última lectura vista ordenando por "index" de forma descendente

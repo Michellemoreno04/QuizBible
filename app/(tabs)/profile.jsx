@@ -135,8 +135,8 @@ export default function Profile() {
               </Text>
             </View>
           </View>
+      <AdBanner />
         </ScrollView>
-          <AdBanner />
       </SafeAreaView>
     </LinearGradient>
   );

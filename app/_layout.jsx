@@ -7,29 +7,42 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import "react-native-reanimated";
 import { AuthProvider } from "../components/authContext/authContext";
 import { ToastProvider } from 'react-native-toast-notifications'
-
+import { View } from 'react-native';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const [isReady, setIsReady] = useState(false);
   
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
   useEffect(() => {
-    if (loaded) {
-      SplashScreen.hideAsync();
+    async function prepare() {
+      try {
+        if (loaded) {
+          await SplashScreen.hideAsync();
+          setIsReady(true);
+        }
+      } catch (e) {
+        console.warn(e);
+      }
     }
+    prepare();
   }, [loaded]);
 
-  if (!loaded) {
-    return null;
+  if (!loaded || !isReady) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#ffffff' }}>
+        <StatusBar style="auto" />
+      </View>
+    );
   }
   // difine el tema de la aplicacion para el react-native-paper
   const theme = {

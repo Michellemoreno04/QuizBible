@@ -99,7 +99,7 @@ return (
         <View style={styles.container}>
           {/* Logo Section */}
           <View style={styles.logoContainer}>
-            <Text style={styles.title}>BibleBrain</Text>
+            <Text style={styles.title}>QuizBible</Text>
             <Text style={styles.subtitle}>Tu conexión espiritual inteligente</Text>
           </View>
 

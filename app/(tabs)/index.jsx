@@ -1,4 +1,4 @@
-import { View, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, Platform,  StatusBar as RNStatusBar, Alert, Button } from 'react-native';
+import { View, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, Platform,  StatusBar as RNStatusBar} from 'react-native';
 import React, { useEffect, useState } from 'react';
 import {VersiculosDiarios} from '@/components/VersiculoDiario/versiculoDiario';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -9,10 +9,7 @@ import { StatusBar } from 'expo-status-bar';
 import  useAuth  from '@/components/authContext/authContext';
 import {AdBanner} from '@/components/ads/banner';
 import {NotVidasModal} from '@/components/Modales/recargarVidas';
-import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
-import { db } from '@/components/firebase/firebaseConfig';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { MobileAds } from 'react-native-google-mobile-ads';
 
 
 export default function AppComponent() {
@@ -20,12 +17,13 @@ export default function AppComponent() {
   const { user } = useAuth();
   const userId = user?.uid;
   const [isNotVidasModalVisible, setNotVidasModalVisible] = useState(false);
-  const [userLife, setUserLife] = useState(null);
- 
 
-
-
-
+// carga de anuncios
+useEffect(() => {
+  MobileAds()
+    .initialize()
+   
+}, []);
 
   if(!userId){
     return <ActivityIndicator size="large" color="white" />
@@ -39,8 +37,8 @@ export default function AppComponent() {
     
        <SafeAreaView 
        style={[ styles.safeArea, 
-  // Añadimos padding solo para Android
-  Platform.OS === 'android' && { paddingTop: RNStatusBar.currentHeight }]}>
+      // Añadimos padding solo para Android
+       Platform.OS === 'android' && { paddingTop: RNStatusBar.currentHeight }]}>
         <ScrollView>
           <View style={styles.screen}>
            <NotVidasModal visible={isNotVidasModalVisible} setNotVidasModalVisible={setNotVidasModalVisible} />

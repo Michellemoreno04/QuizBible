@@ -37,7 +37,11 @@ export function ModalRacha({ isVisible, setShowModalRacha }) {
 
   const closeModal = () => {
     setShowModalRacha(false);
-    navigation.navigate('(tabs)');
+    
+    navigation.reset({
+      index: 0,
+      routes: [{ name: '(tabs)' }],
+    });
   };
 
   return (

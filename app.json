@@ -7,16 +7,19 @@
     "icon": "./assets/images/quizBible-logo.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
+    "jsEngine": "hermes",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.moreno.dev.QuizBible"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/quizBible-logo.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.moreno.dev.QuizBible"
+      "package": "com.moreno.dev.QuizBible",
+      "enableProguardInReleaseBuilds": true
     },
     "web": {
       "bundler": "metro",
@@ -59,8 +62,8 @@
   "doctor": {
     "reactNativeDirectoryCheck": {
       "exclude": [
-        "firebase",
-        "react-native-toast-notifications"
+        "react-native-toast-notifications",
+        "firebase"
       ]
     },
     "listUnknownPackages": false

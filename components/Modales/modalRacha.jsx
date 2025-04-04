@@ -13,7 +13,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
 
-export function ModalRacha({ isVisible, setShowModalRacha }) {
+export function ModalRacha({ isVisible, setModalRachaVisible }) {
   const { user } = useAuth();
   const playSound = useSound();
   const navigation = useNavigation();
@@ -24,7 +24,7 @@ export function ModalRacha({ isVisible, setShowModalRacha }) {
       playSound(require('../../assets/sound/rachaSound.mp3'));
     }
   }, [isVisible]);
-
+// obtener los datos del usuario
   useEffect(() => {
     const userDocRef = doc(db, 'users', user.uid);
     const unsubscribe = onSnapshot(userDocRef, (doc) => {
@@ -36,12 +36,9 @@ export function ModalRacha({ isVisible, setShowModalRacha }) {
   }, []);
 
   const closeModal = () => {
-    setShowModalRacha(false);
+    setModalRachaVisible(false);
     
-    navigation.reset({
-      index: 0,
-      routes: [{ name: '(tabs)' }],
-    });
+
   };
 
   return (

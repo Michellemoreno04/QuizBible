@@ -75,15 +75,6 @@ useEffect(() => {
     
   }, [currentQuestion]);
 
-  
-  const addCoin = async () => {
-    const userDocRef = doc(db, 'users', userId);
-    await updateDoc(userDocRef, {
-      Monedas: increment(50),
-    });
-  };
-
-  
   const handleShowAd = async () => {
     setIsLoading(true);
       if (rewardedLoaded && !isLoading) {
@@ -96,7 +87,7 @@ useEffect(() => {
         console.log('Error al mostrar el anuncio:', error);
         if(error){
           setIsLoading(true);
-        newRewarded.load();
+       newRewarded.load();
         
         }
         
@@ -109,6 +100,16 @@ useEffect(() => {
 
     }
   };
+  
+  const addCoin = async () => {
+    const userDocRef = doc(db, 'users', userId);
+    await updateDoc(userDocRef, {
+      Monedas: increment(50),
+    });
+  };
+
+  
+
  
 
   const skip = async () => {

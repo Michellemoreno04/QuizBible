@@ -12,7 +12,7 @@ import { MaterialIcons } from '@expo/vector-icons'
 
 const { width, height } = Dimensions.get('window');
 
-export function ModalRachaPerdida({ userInfo,isVisible, setShowModalRachaPerdida }) {
+export function ModalRachaPerdida({ userInfo,isVisible, setModalRachaPerdidaVisible }) {
   const { user } = useAuth();
 
   const userId = user.uid;
@@ -31,7 +31,7 @@ if (coins >= coinsRequired) {
 }else{
   Alert.alert('No tienes suficientes monedas para pagar.');
 }
-  setShowModalRachaPerdida(false);  
+  setModalRachaPerdidaVisible(false);  
 
   };
 
@@ -43,7 +43,7 @@ if (coins >= coinsRequired) {
       Racha: rachaReiniciada
     });
 
-    setShowModalRachaPerdida(false);
+    setModalRachaPerdidaVisible(false);
 
 
   };
@@ -54,7 +54,7 @@ if (coins >= coinsRequired) {
     animationIn="zoomIn"
     animationOut="zoomOut"
     backdropOpacity={0.7}
-    onBackdropPress={() => setShowModalRachaPerdida(false)}
+    onBackdropPress={() => setModalRachaPerdidaVisible(false)}
   >
     <View style={styles.container}>
       <LinearGradient

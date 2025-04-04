@@ -67,7 +67,7 @@ const BibleQuiz = () => {
 
   const retryCount = useRef(0);
 const maxLoadRetries = 3;
-
+// carga de anuncios
 useEffect(() => {
 
 const loadInterstitial = () => {
@@ -397,6 +397,7 @@ useEffect(() => {
               await updateDoc(userDocRef, {
                 Monedas: userInfo.Monedas + totalMonedas,
               });
+              
               const today = new Date().toDateString();
               await AsyncStorage.setItem("lastQuizDate", today);
               setShowModalNotVidas(true);
@@ -436,15 +437,6 @@ useEffect(() => {
       }, 2000);
     }
   };
-  
-  const mostrarModalRacha = () => {
-    setShowModal(false);
-    stopMusic(backgroundMusic); 
-      manejarRachaDiaria(userId, setShowModalRacha, setShowModalRachaPerdida);
-      
-      navigation.replace('(tabs)');
-    
-  };
 
  
   const salir = () => {
@@ -469,7 +461,10 @@ useEffect(() => {
             setShowModal(false);
             setShowNivelModal(false);
             stopMusic(backgroundMusic);
-            navigation.replace('(tabs)');
+            navigation.reset({
+              index: 0,
+              routes: [{ name: '(tabs)' }],
+            });
           }
         },
       },
@@ -486,16 +481,19 @@ useEffect(() => {
   // Manejo del sonido de fondo
   useEffect(() => {
     if (!userId) return;
-    
+    if(isPlaying){
+      stopMusic(backgroundMusic);
+    }
     // Iniciar música cuando el componente se monta
     startMusic(backgroundMusic);
     
     return () => {
+      // Asegurar que la música se detenga cuando el componente se desmonte
       stopMusic(backgroundMusic);
     }
-  
-  }, []); 
+  }, [userId, isFocused]); 
 
+ 
 
 // Animaciones
 useEffect(() => {
@@ -555,19 +553,25 @@ useEffect(() => {
     }
   }
 
+  const mostrarModalRacha = () => {
+    setShowModal(false);
+    stopMusic(backgroundMusic); 
+   //   manejarRachaDiaria(userId, setShowModalRacha, setShowModalRachaPerdida);
+      
+      navigation.replace('(tabs)');
+    
+  };
   const cerrarPuntuacionModal = () => {
     stopMusic(backgroundMusic);
     setShowModal(false);
     setShowModalNotVidas(false);
-    manejarRachaDiaria(userId, setShowModalRacha, setShowModalRachaPerdida);
-    
-
-      navigation.navigate('(tabs)');
-    
+   // manejarRachaDiaria(userId, setShowModalRacha, setShowModalRachaPerdida)
+     
+  navigation.replace('(tabs)');
 
   }
 
-
+// Detener la música cuando se sale del quiz
   useEffect(() => {
     
       if(!isFocused){
@@ -575,7 +579,7 @@ useEffect(() => {
         setShowModalNotVidas(false);
       }
     
-  }, [isFocused]);
+  }, [isFocused,navigation]);
 
 // Verificar si el usuario tiene vidas
   useEffect(() => {
@@ -592,6 +596,7 @@ useEffect(() => {
   // Efecto para el temporizador
   useEffect(() => {
    
+    if(isFocused){
     let timer;
   
     if (tiempoRestante > 0 && 
@@ -622,14 +627,31 @@ useEffect(() => {
       }, 1000);
     }
     return () => clearInterval(timer);
-
-  }, [tiempoRestante, mostrarRespuestaCorrecta, currentQuestion, questions.length, showModal, showModalRacha, showModalRachaPerdida, showModalNotVidas, showNivelModal, isLoading]);
+    }
+  }, [tiempoRestante, mostrarRespuestaCorrecta, currentQuestion, questions.length, showModal, showModalRacha, showModalRachaPerdida, showModalNotVidas, showNivelModal, isLoading,isFocused]);
 
   // Resetear el temporizador cuando cambia la pregunta
   useEffect(() => {
     setTiempoRestante(30);
     setTiempoAgregado(false);
   }, [currentQuestion]);
+
+  // Resetear estados cuando el componente se monta o cuando se inicia un nuevo quiz
+  useEffect(() => {
+    setShowModal(false);
+    setShowModalRacha(false);
+    setShowModalRachaPerdida(false);
+    setShowNivelModal(false);
+    setShowModalNotVidas(false);
+    setResultadoRespuestas(0);
+    setExpGanada(0);
+    setCurrentQuestion(0);
+    setRespuestaSeleccionada(null);
+    setMostrarRespuestaCorrecta(false);
+    if(isPlaying){
+      stopMusic(backgroundMusic);
+    }
+  }, [isFocused]);
 
   if (!interstitial) {
     return null;
@@ -674,7 +696,7 @@ useEffect(() => {
             </TouchableOpacity>
 
             <View style={styles.statusBar}>
-              <AntDesign name="heart" size={24} color="red" />
+            <Text style={styles.heartIcon}>❤️</Text>
               <Text style={styles.statusText}>{userInfo.Vidas}</Text>
               <FontAwesome5 name="coins" size={24} color="yellow" />
               <Text style={styles.statusText}>{userInfo.Monedas}</Text>
@@ -800,9 +822,14 @@ const styles = StyleSheet.create({
   statusBar: {
     flexDirection: 'row',
     alignItems: 'center',
+
+  },
+  heartIcon: {
+    fontSize: 24,
+    color: 'red',
   },
   statusText: {
-    marginHorizontal: 10,
+    marginHorizontal: 7,
     fontSize: 18,
     color: 'white'
   },

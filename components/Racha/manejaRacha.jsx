@@ -3,7 +3,7 @@ import { db } from '../firebase/firebaseConfig';
 import { Alert } from 'react-native';
 
 
-export const manejarRachaDiaria = async (userId,setShowModalRacha,setShowModalRachaPerdida) => {
+export const manejarRachaDiaria = async (userId,setModalRachaVisible,setShowModalRachaPerdida) => {
   try {
     const userDocRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userDocRef);
@@ -40,7 +40,7 @@ export const manejarRachaDiaria = async (userId,setShowModalRacha,setShowModalRa
         Racha: 1,
         RachaMaxima: 1
       });
-      setShowModalRacha(true);  // Mostrar modal de racha inicial
+      setModalRachaVisible(true);  // Mostrar modal de racha inicial
       return;
     }
 // Comparar con la fecha actual
@@ -54,7 +54,7 @@ export const manejarRachaDiaria = async (userId,setShowModalRacha,setShowModalRa
           rachaMaxima = rachaActual;
         }
         // Mostrar modal de racha actualizada
-        setShowModalRacha(true);
+        setModalRachaVisible(true);
       } else {
         //rachaActual = 1;
         // Mostrar modal de racha perdida

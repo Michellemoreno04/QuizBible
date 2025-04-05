@@ -32,7 +32,7 @@ const DailyReading = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
   const [currentTextPosition, setCurrentTextPosition] = useState(0);
-  const userId = user.uid;
+  const userId = user?.uid;
 
    
 
@@ -131,24 +131,23 @@ const DailyReading = () => {
   useEffect(() => {
     if(!userId) return;
 
-    
     const fetchDailyVerse = async () => {
       try {
- const today = getLocalDateString();
-    // Recupera la última fecha guardada (si existe)
-    const lastDate = await AsyncStorage.getItem('lastReadingDate');
+        const today = getLocalDateString();
+        const lastDate = await AsyncStorage.getItem('lastReadingDate');
 
-        // 3. Si ya se leyó el versículo de hoy, no hagas nada
+        // Si ya se leyó el versículo de hoy, no mostrar nada
         if (lastDate === today) {
           console.log('Ya se ha mostrado el texto de hoy.');
-         return;
+          setReadingText([]);
+          return;
         }
 
-        // 4. Referencia al documento del usuario y la subcolección "lecturasVistas"
+        // Referencia al documento del usuario y la subcolección "lecturasVistas"
         const userDocRef = doc(db, 'users', userId);
         const lecturasVistasRef = collection(userDocRef, 'lecturasVistas');
 
-        // 5. Consulta la última lectura vista ordenando por "index" de forma descendente
+        // Consulta la última lectura vista ordenando por "index" de forma descendente
         const lastReadQuery = query(lecturasVistasRef, orderBy('index', 'desc'), limit(1));
         const lastReadSnapshot = await getDocs(lastReadQuery);
 
@@ -157,35 +156,50 @@ const DailyReading = () => {
           lastIndex = lastReadSnapshot.docs[0].data().index;
         }
 
+        // Consulta en la colección dailyRearingContent la lectura cuyo índice sea mayor al último guardado
+        const dailyContentRef = collection(db, 'dailyRearingContent');
+        const dailyQuery = query(
+          dailyContentRef,
+          orderBy('index'),
+          where('index', '>', lastIndex),
+          limit(1)
+        );
+        const dailySnapshot = await getDocs(dailyQuery);
 
-  // Consulta en la colección dailyRearingContent la lectura cuyo índice sea mayor al último guardado
-    const dailyContentRef = collection(db, 'dailyRearingContent');
-    const dailyQuery = query(
-      dailyContentRef,
-      orderBy('index'),
-      where('index', '>', lastIndex),
-      limit(1)
-    );
-    const dailySnapshot = await getDocs(dailyQuery);
-
-    if (!dailySnapshot.empty) {
-      const nextReading = dailySnapshot.docs.map((doc) => ({
-        lecturaId: doc.id,
-        ...doc.data(),
-      }));
-      setReadingText(nextReading);
-      
-    } else {
-      console.log('No hay nuevas lecturas disponibles en dailyRearingContent.');
-    }
-  } catch (error) {
-    console.error('Error al obtener la siguiente lectura:', error);
-  }
-};
+        if (!dailySnapshot.empty) {
+          const nextReading = dailySnapshot.docs.map((doc) => ({
+            lecturaId: doc.id,
+            ...doc.data(),
+          }));
+          setReadingText(nextReading);
+        } else {
+          // Si no hay lecturas nuevas, volver al inicio
+          const firstReadingQuery = query(
+            dailyContentRef,
+            orderBy('index'),
+            limit(1)
+          );
+          const firstReadingSnapshot = await getDocs(firstReadingQuery);
+          
+          if (!firstReadingSnapshot.empty) {
+            const firstReading = firstReadingSnapshot.docs.map((doc) => ({
+              lecturaId: doc.id,
+              ...doc.data(),
+            }));
+            setReadingText(firstReading);
+          } else {
+            console.log('No hay lecturas disponibles.');
+            setReadingText([]);
+          }
+        }
+      } catch (error) {
+        console.error('Error al obtener la siguiente lectura:', error);
+        setReadingText([]);
+      }
+    };
     
-      fetchDailyVerse();
-    
-  }, []);
+    fetchDailyVerse();
+  }, [userId]);
 
 
 
@@ -274,6 +288,7 @@ const DailyReading = () => {
       texto: readingText[0].texto,
     });
 
+    // Actualizar el estado de lectura diaria
     await AsyncStorage.setItem('lastReadingDate', today);
     setIsRead(true);
     showInterstitial();

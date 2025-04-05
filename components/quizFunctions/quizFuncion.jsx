@@ -77,11 +77,11 @@ useEffect(() => {
 
   const handleShowAd = async () => {
     setIsLoading(true);
-      if (rewardedLoaded && !isLoading) {
+      if (rewardedLoaded ) {
           try {
          
+            await newRewarded.show();
             setIsLoading(false);
-        await newRewarded.show();
 
       } catch (error) {
         console.log('Error al mostrar el anuncio:', error);
@@ -109,8 +109,6 @@ useEffect(() => {
   };
 
   
-
- 
 
   const skip = async () => {
     if (userInfo.Monedas < 50) {

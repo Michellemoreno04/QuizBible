@@ -20,6 +20,7 @@ import useAuth from '../components/authContext/authContext';
 import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from 'expo-router';
 import { useToast } from 'react-native-toast-notifications';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 const EditProfileScreen = () => {
   const navigation = useNavigation();  
@@ -31,6 +32,8 @@ const EditProfileScreen = () => {
     FotoPerfil: ''
   });
   const [loading, setLoading] = useState(false);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [imageToUpload, setImageToUpload] = useState(null);
 
   const toast = useToast();
 
@@ -39,131 +42,146 @@ const EditProfileScreen = () => {
     if (user) {
       const userRef = doc(db, 'users', user.uid);
       const unsubscribe = onSnapshot(userRef, (docSnapshot) => {
-        setFormData(docSnapshot.data());
+        const data = docSnapshot.data();
+        setFormData(data);
+        setPreviewImage(data?.FotoPerfil);
       });
       return () => unsubscribe();
     }
   }, [user]);
 
-
   const handleUpdate = async () => {
     try {
       setLoading(true);
       const userRef = doc(db, 'users', user.uid);
-      await updateDoc(userRef, formData);
+
+      // Si hay una nueva imagen para subir
+      if (imageToUpload) {
+        const storage = getStorage();
+        const filename = `profile_${user.uid}_${Date.now()}.png`;
+        const imageRef = ref(storage, `users/${user.uid}/profile/${filename}`);
+
+        // Convertir URI a blob
+        const response = await fetch(imageToUpload);
+        const blob = await response.blob();
+
+        // Subir a Firebase Storage
+        await uploadBytes(imageRef, blob);
+
+        // Obtener URL de descarga
+        const downloadURL = await getDownloadURL(imageRef);
+
+        // Actualizar datos incluyendo la nueva URL de la imagen
+        await updateDoc(userRef, {
+          ...formData,
+          FotoPerfil: downloadURL
+        });
+      } else {
+        // Actualizar solo los datos sin la imagen
+        await updateDoc(userRef, formData);
+      }
+
       toast.show('Perfil actualizado', { type: 'success' });
       navigation.goBack();
     } catch (error) {
-      Alert.alert('Error', 'No se pudo actualizar el perfil');
+      console.error("Error actualizando perfil:", error);
+      toast.show('Error al actualizar el perfil', { type: 'danger' });
     } finally {
       setLoading(false);
     }
   };
 
+  // Función para actualizar la imagen de preview
+  const updatePreviewImage = async (uri) => {
+    setPreviewImage(uri);
+    setImageToUpload(uri);
+  };
 
-// En la función pickImage, se reemplaza el valor de mediaTypes por mediaTypeImages
-const pickImage = async () => {
-  try {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permiso requerido', 'Se necesita acceso a la galería para cambiar la foto');
-      return null;
-    }
+  // Función que muestra el Alert para elegir entre cámara o galería
+  const handleImageSelection = async () => {
+    Alert.alert(
+      "Actualizar foto de perfil",
+      "Selecciona una opción",
+      [
+        {
+          text: "Tomar foto",
+          onPress: async () => {
+            const uri = await takePhoto();
+            if (uri) updatePreviewImage(uri);
+          }
+        },
+        {
+          text: "Elegir de la galería",
+          onPress: async () => {
+            const uri = await pickImage();
+            if (uri) updatePreviewImage(uri);
+          }
+        },
+        { text: "Cancelar", style: "cancel" }
+      ]
+    );
+  };
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 1,
-      }); 
-
-    if (result.canceled) return null;
-    return result.assets[0].uri;
-
-  } catch (error) {
-    console.log("Error al seleccionar imagen:", error);
-    return null;
-  }
-};
-
-const takePhoto = async () => {
-  try {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permiso requerido', 'Se necesita acceso a la cámara');
-      return null;
-    }
-
-     // 2. Abrir la cámara para tomar una foto
-     const result = await ImagePicker.launchCameraAsync({
-      // Se especifica que solo se desean imágenes
-      mediaTypes: ['images'],
-      // Permitir edición de la imagen después de capturarla
-      allowsEditing: true,
-      // Aspecto cuadrado [ancho, alto] para que la imagen se corte en 1:1
-      aspect: [1, 1],
-      // Calidad máxima de la imagen
-      quality: 1,
-    });
-
-    if (result.canceled) return null;
-    return result.assets[0].uri;
-
-  } catch (error) {
-    console.log("Error al tomar foto:", error);
-    return null;
-  }
-};
-
-// Función que muestra el Alert para elegir entre cámara o galería
-const handleImageSelection = async () => {
-  Alert.alert(
-    "Actualizar foto de perfil",
-    "Selecciona una opción",
-    [
-      {
-        text: "Tomar foto",
-        onPress: async () => {
-          // Se llama a la función takePhoto que abrirá la cámara
-          const uri = await takePhoto();
-          if (uri) updateProfileImage(uri);
-        }
-      },
-      {
-        text: "Elegir de la galería",
-        onPress: async () => {
-          const uri = await pickImage();
-          if (uri) updateProfileImage(uri);
-        }
-      },
-      { text: "Cancelar", style: "cancel" }
-    ]
-  );
-};
-
-// Función para actualizar la imagen en Firebase
-const updateProfileImage = async (uri) => {
-  try {
-    const userRef = doc(db, 'users', user.uid);
-    await updateDoc(userRef, { FotoPerfil: uri });
-    setFormData(prev => ({ ...prev, FotoPerfil: uri }));
-  } catch (error) {
-    Alert.alert("Error", "No se pudo actualizar la imagen");
-    console.error("Error actualizando imagen:", error);
-  }
-};
-
-// Función para eliminar la imagen
-const removeImage = async () => {
-  try {
-    const userRef = doc(db, 'users', user.uid);
-    await updateDoc(userRef, { FotoPerfil: null });
+  // Función para eliminar la imagen
+  const removeImage = async () => {
+    setPreviewImage(null);
+    setImageToUpload(null);
     setFormData(prev => ({ ...prev, FotoPerfil: '' }));
-  } catch (error) {
-    Alert.alert("Error", "No se pudo eliminar la imagen");
-    console.error("Error eliminando imagen:", error);
-  }
-};
+  };
+
+  // En la función pickImage, se reemplaza el valor de mediaTypes por mediaTypeImages
+  const pickImage = async () => {
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permiso requerido', 'Se necesita acceso a la galería para cambiar la foto');
+        return null;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+          mediaTypes: ['images'],
+          allowsEditing: true,
+          aspect: [1, 1],
+          quality: 1,
+        }); 
+
+      if (result.canceled) return null;
+      return result.assets[0].uri;
+
+    } catch (error) {
+      console.log("Error al seleccionar imagen:", error);
+      return null;
+    }
+  };
+
+  const takePhoto = async () => {
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permiso requerido', 'Se necesita acceso a la cámara');
+        return null;
+      }
+
+       // 2. Abrir la cámara para tomar una foto
+       const result = await ImagePicker.launchCameraAsync({
+        // Se especifica que solo se desean imágenes
+        mediaTypes: ['images'],
+        // Permitir edición de la imagen después de capturarla
+        allowsEditing: true,
+        // Aspecto cuadrado [ancho, alto] para que la imagen se corte en 1:1
+        aspect: [1, 1],
+        // Calidad máxima de la imagen
+        quality: 1,
+      });
+
+      if (result.canceled) return null;
+      return result.assets[0].uri;
+
+    } catch (error) {
+      console.log("Error al tomar foto:", error);
+      return null;
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -188,13 +206,12 @@ const removeImage = async () => {
       </LinearGradient>
 
       <ScrollView contentContainerStyle={styles.content}>
-        {/* Al presionar se ejecuta handleImageSelection */}
         <Pressable onPress={handleImageSelection}>
           <View style={styles.avatarContainer}>
-            {formData.FotoPerfil ? (
+            {previewImage ? (
               <Avatar
                 rounded
-                source={{ uri: formData.FotoPerfil }}
+                source={{ uri: previewImage }}
                 size="xlarge"
               />
             ) : (
@@ -204,8 +221,7 @@ const removeImage = async () => {
                 </Text>
               </View>
             )}
-            {/* Botón para eliminar foto */}
-            {formData.FotoPerfil && (
+            {previewImage && (
               <Pressable 
                 style={styles.deleteButton} 
                 onPress={removeImage}

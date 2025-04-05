@@ -9,26 +9,23 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import { RewardedAd, RewardedAdEventType, TestIds } from 'react-native-google-mobile-ads';
 import { db } from '../firebase/firebaseConfig';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { BlurView } from 'expo-blur';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
-
-
+import { RewardedAd, RewardedAdEventType, TestIds } from 'react-native-google-mobile-ads';
 
 const adUnitId = __DEV__ 
-? TestIds.REWARDED 
-: Platform.OS === 'ios' ? process.env.EXPO_PUBLIC_REWARDED_ID_IOS 
-: process.env.EXPO_PUBLIC_REWARDED_ID_ANDROID;
+  ? TestIds.REWARDED 
+  : Platform.OS === 'ios' 
+  ? process.env.EXPO_PUBLIC_REWARDED_ID_IOS 
+  : process.env.EXPO_PUBLIC_REWARDED_ID_ANDROID;
 
 export const RewardedAdModal = ({ isVisible,setIsVisible, onClose,userId,vidas,setShowModal }) => {
   const [loaded, setLoaded] = useState(false);
   const [rewardedAd, setRewardedAd] = useState(null);
   const navigation = useNavigation();
   
-  // Cargar y manejar el anuncio cuando el modal se muestra
   useEffect(() => {
     
     if (isVisible) {
@@ -74,48 +71,37 @@ export const RewardedAdModal = ({ isVisible,setIsVisible, onClose,userId,vidas,s
       await updateDoc(userDocRef, {
         Vidas: increment(1),
       });
-      // No llamamos a onClose() aquí, esperamos a que el usuario tenga la vida
-      // antes de cerrar el modal
     } catch (error) {
       console.error('Error al actualizar las vidas:', error);
       Alert.alert('Error', 'No se pudieron actualizar las vidas.');
-    } 
-  }
+    }
+  };
 
   const handleShowAd = () => {
     if (loaded && rewardedAd) {
       rewardedAd.show();
-      // onClose se llamará automáticamente después de ganar la recompensa
-      // a través del evento EARNED_REWARD
     }
   };
 
-  const cerrar = () =>{
-  try {
-    if(vidas === 0){
-      setIsVisible(false)
-      setShowModal(true)
-    
+  const cerrar = () => {
+    try {
+      if(vidas === 0){
+        setIsVisible(false);
+        setShowModal(true);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsVisible(false);
     }
-  } catch (error) {
-    console.log(error)
-  }finally{
-    setIsVisible(false)
-    
-  }
-  
-  }
- 
+  };
 
   return (
     <Modal visible={isVisible} animationType="slide" transparent onRequestClose={onClose}>
       <View style={styles.modalContainer}>
         {/* Fondo con efecto blur (requiere @react-native-community/blur) */}
-        <BlurView
+        <View
           style={styles.absolute}
-          blurType="dark"
-          blurAmount={10}
-          reducedTransparencyFallbackColor="white"
         />
         
         <View style={styles.modalContent}>
@@ -165,8 +151,14 @@ export const RewardedAdModal = ({ isVisible,setIsVisible, onClose,userId,vidas,s
       justifyContent: 'center',
       alignItems: 'center',
     },
-    
-  
+    absolute: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      bottom: 0,
+      right: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    },
     modalContent: {
       backgroundColor: '#FFF',
       width: '85%',

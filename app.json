@@ -19,7 +19,8 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.moreno.dev.QuizBible",
-      "enableProguardInReleaseBuilds": true
+      "enableProguardInReleaseBuilds": true,
+      "softwareKeyboardLayoutMode": "pan"
     },
     "web": {
       "bundler": "metro",
@@ -43,8 +44,15 @@
           "androidAppId": "ca-app-pub-9836483267876320~2353726828",
           "iosAppId": "ca-app-pub-9836483267876320~2514822006"
         }
+      ],
+      [
+        "expo-navigation-bar",
+        {
+          "position": "absolute",
+          "backgroundColor": "#00000088",
+          "visibility": "hidden"
+        }
       ]
-      
     ],
     "experiments": {
       "typedRoutes": true

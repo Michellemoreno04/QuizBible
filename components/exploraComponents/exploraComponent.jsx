@@ -59,6 +59,11 @@ const ExploraComponent = () => {
   };
 
   checkReadingStatus();
+
+  // Agregar un listener para cambios en AsyncStorage
+  const interval = setInterval(checkReadingStatus, 5000); // Verificar cada 5 segundos
+
+  return () => clearInterval(interval);
 }, []);
 
   const menuItems = [

@@ -1,22 +1,13 @@
 import { Text, View, StyleSheet } from 'react-native'
 import React, { useState, useEffect } from 'react'
-import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
-import { Platform } from 'react-native';
-
-// Configuración del ID del anuncio
-const adUnitId = __DEV__
-  ? TestIds.BANNER
-  : Platform.OS === 'ios'
-  ? 'ca-app-pub-9836483267876320/3875170983'  // ID de iOS
-  : 'ca-app-pub-9836483267876320/5879707164'; // ID de Android
-
-
+import { BannerAd, BannerAdSize } from 'react-native-google-mobile-ads';
+import AdService from './adService';
 
 export const AdBanner = () => {
     const [adError, setAdError] = useState(false);
     const [retryCount, setRetryCount] = useState(0);
     const [currentSize, setCurrentSize] = useState(BannerAdSize.ANCHORED_ADAPTIVE_BANNER);
-    const maxRetries = 2; // Aumentamos el número de reintentos
+    const maxRetries = 2;
 
     // Lista de tamaños de banner para probar
     const bannerSizes = [
@@ -41,7 +32,6 @@ export const AdBanner = () => {
     const handleAdFailed = (error) => {
         console.error('Ad failed to load:', error);
         
-
         // Si falla con un tamaño, intentar con el siguiente
         const currentSizeIndex = bannerSizes.indexOf(currentSize);
         const nextSizeIndex = (currentSizeIndex + 1) % bannerSizes.length;
@@ -56,17 +46,16 @@ export const AdBanner = () => {
         }
     };
 
+    const bannerConfig = AdService.getInstance().getBanner();
+
     return (
         <View style={styles.container}>
             <BannerAd
                 key={`${retryCount}-${currentSize}`}
-                unitId={adUnitId}
+                unitId={bannerConfig.unitId}
                 size={currentSize}
-                requestOptions={{
-                    requestNonPersonalizedAdsOnly: true,
-                }}
+                requestOptions={bannerConfig.requestOptions}
                 onAdLoaded={() => {
-                    
                     setRetryCount(0);
                     setAdError(false);
                 }}
@@ -86,6 +75,6 @@ const styles = StyleSheet.create({
         right: 0,
         backgroundColor: 'transparent',
         zIndex: 999,
-        minHeight: 50, // Altura mínima para el banner
+        minHeight: 50,
     },
 });

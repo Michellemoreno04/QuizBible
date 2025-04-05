@@ -9,6 +9,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons,FontAwesome } from '@expo/vector-icons';
 //import { SigninComponents } from '../components/signinComponents/signinComponents';
 import * as ImagePicker from 'expo-image-picker';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 
 
@@ -46,14 +47,29 @@ const SignUp = () => {
 
 
 
-const handleSignUp = () => {
+const handleSignUp = async () => {
   setLoading(true);
-  if (credenciales.name && credenciales.email && credenciales.password ) {
-createUserWithEmailAndPassword(auth, credenciales.email, credenciales.password)
-  .then((userCredential) => {
-    const user = userCredential.user;
-    try{
-      setDoc(doc(db, "users", user.uid), {
+  if (credenciales.name && credenciales.email && credenciales.password) {
+    try {
+      // Subir imagen a Firebase Storage si existe
+      let fotoPerfilUrl = null;
+      if (imageUri) {
+        const storage = getStorage();
+        const filename = `profile_${Date.now()}.png`;
+        const imageRef = ref(storage, `users/profile/${filename}`);
+
+        const response = await fetch(imageUri);
+        const blob = await response.blob();
+        await uploadBytes(imageRef, blob);
+        fotoPerfilUrl = await getDownloadURL(imageRef);
+      }
+
+      // Crear usuario
+      const userCredential = await createUserWithEmailAndPassword(auth, credenciales.email, credenciales.password);
+      const user = userCredential.user;
+
+      // Guardar datos del usuario en Firestore
+      await setDoc(doc(db, "users", user.uid), {
         Name: credenciales.name,
         Email: credenciales.email,
         TiempoRegistrado: Timestamp.now(),
@@ -64,33 +80,22 @@ createUserWithEmailAndPassword(auth, credenciales.email, credenciales.password)
         Racha: racha,
         RachaMaxima: rachaMaxima,
         modalRachaShow: ayer.toISOString(),
-        FotoPerfil: imageUri
+        FotoPerfil: fotoPerfilUrl
       });
+
+      setCredenciales({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+      });
+
+      navigate.navigate('welcomeScreen');
     } catch (error) {
-  
-      console.log(error);
-      return error
+      handleFirebaseError(error);
+    } finally {
+      setLoading(false);
     }
-    }).finally(() => {
-      
-    setLoading(false);
-    setCredenciales({
-      name: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-    });
-
-    navigate.navigate('welcomeScreen');
-
-  })
-  .catch((error) => {
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    handleFirebaseError(error);
-    // ..
-  });
-
   } else {
     Alert.alert('Por favor, complete todos los campos.');
     setLoading(false);

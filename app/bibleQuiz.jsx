@@ -19,19 +19,7 @@ import { InterstitialAd, AdEventType, TestIds } from 'react-native-google-mobile
 import {RewardedAdModal} from '../components/Modales/modalNotVidas';
 import QuizActions from '@/components/quizFunctions/quizFuncion';
 import { useIsFocused } from '@react-navigation/native';
-
-
-
-const adUnitId = __DEV__
- ? TestIds.INTERSTITIAL
- : Platform.OS === 'ios'
- ? process.env.EXPO_PUBLIC_INTERSTITIAL_ID_IOS
- : process.env.EXPO_PUBLIC_INTERSTITIAL_ID_ANDROID; 
-
-// Crea la instancia del anuncio
-const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
-  keywords: ['religion', 'bible']// esto es para anuncios personalizados
-});
+import AdService from '@/components/ads/adService';
 
 const { width, height } = Dimensions.get('window');
 
@@ -55,7 +43,6 @@ const BibleQuiz = () => {
   const [preguntasRespondidas, setPreguntasRespondidas] = useState([]);
   const [showNivelModal, setShowNivelModal] = useState(false);
   const [nivelAnterior, setNivelAnterior] = useState(null);
-  const [interstitialLoaded, setInternitialLoaded] = useState(false);
   const [showModalNotVidas, setShowModalNotVidas] = useState(false);
   const [tiempoRestante, setTiempoRestante] = useState(20); 
   const [tiempoAgregado, setTiempoAgregado] = useState(false);
@@ -69,89 +56,36 @@ const BibleQuiz = () => {
 const maxLoadRetries = 3;
 // carga de anuncios
 useEffect(() => {
+  const adService = AdService.getInstance();
+  
+  const loadAds = async () => {
+    try {
+      await adService.loadInterstitial();
+    } catch (error) {
+      console.error('Error loading ads:', error);
+    }
+  };
 
-const loadInterstitial = () => {
-      interstitial.load();
-    };
-
-    const handleError = (error) => {
-      console.log('Error cargando interstitial:', error);
-      if (retryCount.current < maxLoadRetries) {
-        retryCount.current += 1;
-        setTimeout(loadInterstitial, 3000);
-      }
-    };
-
-    const unsubscribeLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
-      setInternitialLoaded(true);
-      retryCount.current = 0;
-      console.log('Interstitial cargado');
-    });
-
-    const unsubscribeOpened = interstitial.addAdEventListener(AdEventType.OPENED, () => {
-      if (Platform.OS === 'ios') {
-        StatusBar.setHidden(true);
-      }
-    });
-
-    const unsubscribeClosed = interstitial.addAdEventListener(AdEventType.CLOSED, async () => {
-      if (Platform.OS === 'ios') {
-        StatusBar.setHidden(false);
-      }
-      try {
-        if (isPlaying) {
-          await stopMusic(backgroundMusic);
-        }
-        setShowModalNotVidas(false);
-        setShowModal(false);
-        mostrarModalRacha();
-        // Se reinicia la pila de navegación para desmontar el componente actual
-        navigation.reset({
-          index: 0,
-          routes: [{ name: '(tabs)' }],
-        });
-      } catch (error) {
-        console.error('Error al cerrar anuncio:', error);
-        setShowModal(false);
-        navigation.reset({
-          index: 0,
-          routes: [{ name: '(tabs)' }],
-        });
-      }
-    });
-
-    const unsubscribeError = interstitial.addAdEventListener(AdEventType.ERROR, handleError);
-
-    loadInterstitial();
-
-    return () => {
-      unsubscribeLoaded();
-      unsubscribeOpened();
-      unsubscribeClosed();
-      unsubscribeError();
-    };
-  }, []);
+  loadAds();
+}, []);
 
   const showAds = async () => {
     try {
       if (isPlaying) {
         await stopMusic(backgroundMusic);
-        // Pequeña pausa para asegurar que la música se detuvo
         await new Promise(resolve => setTimeout(resolve, 100));
       }
-      if (interstitialLoaded) {
-        await interstitial.show();
-      } else {
-        console.log('Anuncio no cargado, navegando directamente');
-        setShowModal(false);
-        navigation.reset({
-          index: 0,
-          routes: [{ name: '(tabs)' }],
-        });
-      }
+      
+      const adService = AdService.getInstance();
+      await adService.showInterstitial();
+      
+      setShowModal(false);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: '(tabs)' }],
+      });
     } catch (error) {
-      console.error('Error al mostrar anuncio:', error);
-      // Asegurar que el usuario siempre pueda salir
+      console.error('Error showing ad:', error);
       setShowModal(false);
       navigation.replace('(tabs)');
     }
@@ -653,9 +587,6 @@ useEffect(() => {
     }
   }, [isFocused]);
 
-  if (!interstitial) {
-    return null;
-  } 
   if (!userId) {
     return <ActivityIndicator size="large" />
    }

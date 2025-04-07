@@ -4,3 +4,9 @@
 1. google login
 2. hacer el pull down refresh
 4. compartir los versiculos con todo e imagen
+5. ponerle sonidos a todos los modales 
+
+
+# cosas hecha 
+
+1. cambiar la funciond de subir foto y hacer que elija avatares male o female

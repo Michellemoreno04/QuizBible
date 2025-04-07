@@ -6,7 +6,7 @@ import {auth,db} from '../components/firebase/firebaseConfig'
 import { useNavigation } from '@react-navigation/native';
 import { doc, setDoc, Timestamp } from 'firebase/firestore';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialIcons,FontAwesome } from '@expo/vector-icons';
+import { MaterialIcons,FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 //import { SigninComponents } from '../components/signinComponents/signinComponents';
 import * as ImagePicker from 'expo-image-picker';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -28,8 +28,7 @@ const SignUp = () => {
   const [nivel,setNivel] = useState(0);
   const [racha, setRacha] = useState(0);
   const [rachaMaxima, setRachaMaxima] = useState(0);
-  const [avatarType, setAvatarType] = useState(null);
-  const [imageUri, setImageUri] = useState(null);
+  const [selectedAvatar, setSelectedAvatar] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigation();
@@ -38,6 +37,7 @@ const SignUp = () => {
     hoy.setHours(0, 0, 0, 0); // Establecer solo la fecha (sin hora)
     const ayer = new Date(hoy);
       ayer.setDate(hoy.getDate() - 1); // Restar un día para setear la racha
+
  const handlerOnChange = (field, value) => {
   setCredenciales((prevCredenciales) => ({
     ...prevCredenciales,
@@ -51,24 +51,9 @@ const handleSignUp = async () => {
   setLoading(true);
   if (credenciales.name && credenciales.email && credenciales.password) {
     try {
-      // Subir imagen a Firebase Storage si existe
-      let fotoPerfilUrl = null;
-      if (imageUri) {
-        const storage = getStorage();
-        const filename = `profile_${Date.now()}.png`;
-        const imageRef = ref(storage, `users/profile/${filename}`);
-
-        const response = await fetch(imageUri);
-        const blob = await response.blob();
-        await uploadBytes(imageRef, blob);
-        fotoPerfilUrl = await getDownloadURL(imageRef);
-      }
-
-      // Crear usuario
       const userCredential = await createUserWithEmailAndPassword(auth, credenciales.email, credenciales.password);
       const user = userCredential.user;
 
-      // Guardar datos del usuario en Firestore
       await setDoc(doc(db, "users", user.uid), {
         Name: credenciales.name,
         Email: credenciales.email,
@@ -80,7 +65,7 @@ const handleSignUp = async () => {
         Racha: racha,
         RachaMaxima: rachaMaxima,
         modalRachaShow: ayer.toISOString(),
-        FotoPerfil: fotoPerfilUrl
+        Genero: selectedAvatar
       });
 
       setCredenciales({
@@ -90,7 +75,7 @@ const handleSignUp = async () => {
         confirmPassword: '',
       });
 
-      navigate.navigate('welcomeScreen');
+      navigate.replace('welcomeScreen');
     } catch (error) {
       handleFirebaseError(error);
     } finally {
@@ -127,108 +112,17 @@ const handleFirebaseError = (error) => {
           break;
           
     default:
-      errorMessage = "Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo más tarde.";
+      errorMessage = "Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo más tarde.",error;
   }
 
   // Muestra el mensaje de error con una alerta
-  Alert.alert("Error de inicio de sesión", errorMessage, [{ text: "Entendido" }]);
+  Alert.alert("Error de registro", errorMessage, [{ text: "Entendido" }]);
 };
 
-// Función para manejar la selección de imagen
-const pickImage = async () => {
-  try {
-    // Solicitar permisos primero
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
 
-    // Manejar diferentes estados de permisos
-    if (status !== 'granted') {
-      if (status === 'denied') {
-        Alert.alert(
-          'Permiso requerido',
-          'Para seleccionar una imagen, necesitas habilitar el acceso a la galería en la configuración de la aplicación.',
-          [
-            { text: 'Cancelar', style: 'cancel' },
-            { text: 'Abrir Configuración', onPress: () => Linking.openSettings() }
-          ]
-        );
-      } else {
-        Alert.alert(
-          'Permiso requerido',
-          'Necesitas permitir el acceso a la galería para seleccionar una imagen.'
-        );
-      }
-      return null;
-    }
 
-    // Lanzar el selector de imágenes con configuraciones actualizadas
-    const result = await ImagePicker.launchImageLibraryAsync({
-            mediaTypes: ['images'],
-            allowsEditing: true,
-            aspect: [1, 1],
-            quality: 1,
-          });
-
-    // Manejar resultado
-    if (!result.canceled && result.assets?.length > 0) { // Usar canceled con una 'l'
-      const selectedUri = result.assets[0].uri;
-      setImageUri(selectedUri);
-      setAvatarType(null);
-      return selectedUri;
-    }
-    return null;
-
-  } catch (error) {
-    console.error("Error en selección de imagen:", error);
-    Alert.alert("Error", "Ocurrió un error al seleccionar la imagen");
-    return null;
-  }
-};
-
-const takePhoto = async () => {
-  try {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    
-    if (status !== 'granted') {
-      Alert.alert(
-        'Permiso requerido',
-        'Necesitas habilitar el acceso a la cámara en la configuración del dispositivo',
-        [{ text: 'OK', onPress: () => Linking.openSettings() }]
-      );
-      return null;
-    }
-
-    const result = await ImagePicker.launchCameraAsync({
-            mediaTypes: ['images'],
-            allowsEditing: true,
-            aspect: [1, 1],
-            quality: 1,
-          });
-    if (!result.canceled && result.assets?.length > 0) {
-      const photoUri = result.assets[0].uri;
-      setImageUri(photoUri);
-      setAvatarType(null);
-      return photoUri;
-    }
-    return null;
-
-  } catch (error) {
-    console.error("Error al tomar foto:", error);
-    Alert.alert("Error", "Falló la captura de imagen");
-    return null;
-  }
-};
-
-// Función para mostrar selector de origen
-const handleImageSource = () => {
-  Alert.alert(
-    "Seleccionar imagen",
-    "Elige el origen de la imagen",
-    [
-      { text: "Cámara", onPress: takePhoto },
-      { text: "Galería", onPress: pickImage },
-      { text: "Cancelar", style: "cancel" }
-    ]
-  );
+const handleAvatarSelection = (avatarType) => {
+  setSelectedAvatar(avatarType);
 };
 
 return (
@@ -250,21 +144,31 @@ return (
         <View style={styles.container}>
           {/* Sección de Logo y Título */}
           <View style={styles.header}>
-            <Text style={styles.title}>BibleBrain</Text>
+            <Text style={styles.title}>QuizBible</Text>
             <Text style={styles.subtitle}>Regístrate para continuar</Text>
           </View>
 
-          {/* Selección de imagen de perfil */}
-          <Pressable
-            onPress={handleImageSource}
-            style={[styles.avatarContainer, (imageUri || avatarType) && styles.avatarSelected]}
-          >
-            {imageUri ? (
-              <Image source={{ uri: imageUri }} style={styles.avatarImage} />
-            ) : (
-              <MaterialIcons name="add-a-photo" size={28} color="#FFF" />
-            )}
-          </Pressable>
+          {/* Selección de Avatar */}
+          <View style={styles.avatarContainer}>
+           
+            <View style={styles.avatarOptions}>
+              <TouchableOpacity 
+                style={[styles.avatarOption, selectedAvatar === 'masculino' && styles.selectedAvatar]}
+                onPress={() => handleAvatarSelection('masculino')}
+              >
+                <MaterialIcons name="face" size={50} color={selectedAvatar === 'masculino' ? '#f59e0b' : '#FFF'} />
+                <Text style={styles.avatarText}>Masculino</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={[styles.avatarOption, selectedAvatar === 'femenino' && styles.selectedAvatar]}
+                onPress={() => handleAvatarSelection('femenino')}
+              >
+                <MaterialCommunityIcons name="face-woman" size={50} color={selectedAvatar === 'femenino' ? '#f59e0b' : '#FFF'} />
+                <Text style={styles.avatarText}>Femenino</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
 
           {/* Sección de Formulario */}
           <View style={styles.formContainer}>
@@ -404,7 +308,7 @@ container: {
 },
 header: {
   alignItems: 'center',
-  marginBottom: 48
+  marginBottom: 20
 },
 title: {
   fontSize: 48,
@@ -420,24 +324,34 @@ subtitle: {
   color: '#e5e7eb'
 },
 avatarContainer: {
-  width: 112,
-  height: 112,
-  alignSelf: 'center',
-  marginBottom: 20,
-  borderRadius: 56,
-  backgroundColor: 'rgba(255, 255, 255, 0.1)',
   alignItems: 'center',
+  marginBottom: 15
+},
+avatarTitle: {
+  fontSize: 18,
+  color: '#FFF',
+  marginBottom: 10
+},
+avatarOptions: {
+  flexDirection: 'row',
   justifyContent: 'center',
+  gap: 20
+},
+avatarOption: {
+  alignItems: 'center',
+  padding: 16,
+  borderRadius: 12,
+  backgroundColor: 'rgba(255, 255, 255, 0.1)',
   borderWidth: 2,
   borderColor: 'transparent'
 },
-avatarSelected: {
-  borderColor: '#f59e0b'
+selectedAvatar: {
+  borderColor: '#f59e0b',
+  backgroundColor: 'rgba(245, 158, 11, 0.1)'
 },
-avatarImage: {
-  width: '100%',
-  height: '100%',
-  borderRadius: 56
+avatarText: {
+  color: '#FFF',
+  marginTop: 8
 },
 formContainer: {
   gap: 10

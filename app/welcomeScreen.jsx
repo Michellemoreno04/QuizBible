@@ -140,7 +140,7 @@ const WelcomeScreen = () => {
             <View style={styles.navigationButtons}>
               {!isFirstFeature && (
                 <TouchableOpacity 
-                  style={[styles.navButton, styles.prevButton]}
+                  style={{alignContent:'center', alignItems:'center', justifyContent:'center'}}
                   onPress={() => handleNavigation('previous')}
                   activeOpacity={0.7}
                 >
@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   prevButton: {
-    backgroundColor: '#EFF6FF',
+    
   },
   nextButton: {
     backgroundColor: '#5D9DE6',

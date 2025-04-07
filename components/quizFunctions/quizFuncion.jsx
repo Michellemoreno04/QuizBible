@@ -86,8 +86,8 @@ useEffect(() => {
       } catch (error) {
         console.log('Error al mostrar el anuncio:', error);
         if(error){
+          newRewarded.load();
           setIsLoading(true);
-       newRewarded.load();
         
         }
         

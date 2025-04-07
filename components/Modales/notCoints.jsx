@@ -46,7 +46,7 @@ const {user} = useAuth();
         RewardedAdEventType.LOADED,
         () => {
           setLoaded(true);
-          console.log('Anuncio recompensa cargado correctamente');
+          console.log('Anuncio recompensa de vidas cargado');
         }
       );
 

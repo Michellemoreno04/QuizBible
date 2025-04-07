@@ -74,7 +74,7 @@ export const HeaderHome = () => {
           }}
           {...(userAuthenticated?.FotoPerfil
             ? { source: { uri: userAuthenticated?.FotoPerfil } }
-            : { title: userAuthenticated?.Name?.charAt(0) }
+            : { title: userAuthenticated?.Name?.charAt(0).toUpperCase() }
           )}
           avatarStyle={styles.avatar} />
 

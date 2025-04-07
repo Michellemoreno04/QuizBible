@@ -69,9 +69,10 @@ const navigation = useNavigation();
           <Text style={styles.optionText}>Terminos y condiciones</Text>
           <MaterialIcons name="chevron-right" size={24} color="#666" />
         </TouchableOpacity>
-        
-        
-        
+        <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('deleteAccount')}>
+          <Text style={[styles.optionText, { color: '#dc2626' }]}>Eliminar cuenta</Text>
+          <MaterialIcons name="chevron-right" size={24} color="#dc2626" />
+        </TouchableOpacity>
         <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('soporte')}>
           <Text className="text-gray-400">Soporte</Text>
           <MaterialIcons name="chevron-right" size={24} color="#666" />

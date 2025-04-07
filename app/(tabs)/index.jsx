@@ -7,16 +7,20 @@ import ExploraComponent from '@/components/exploraComponents/exploraComponent';
 import GuardadosComponents from '@/components/exploraComponents/guardadosComponents';
 import { StatusBar } from 'expo-status-bar';
 import  useAuth  from '@/components/authContext/authContext';
-import {AdBanner} from '@/components/ads/banner';
 import {NotVidasModal} from '@/components/Modales/recargarVidas';
-import { MobileAds } from 'react-native-google-mobile-ads';
 import { ModalRacha } from '@/components/Modales/modalRacha';
-import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc,getDoc } from 'firebase/firestore';
 import { db } from '@/components/firebase/firebaseConfig';
 import { manejarRachaDiaria } from '@/components/Racha/manejaRacha';
 import { ModalRachaPerdida } from '@/components/Modales/rachaPerdida';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getStorage, storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { BannerAd, TestIds } from 'react-native-google-mobile-ads';
+
+const bannerAdUnitId = __DEV__ 
+  ? TestIds.BANNER 
+  : Platform.OS === 'ios' 
+  ? process.env.EXPO_PUBLIC_BANNER_ID_IOS 
+  : process.env.EXPO_PUBLIC_BANNER_ID_ANDROID;
 
 export default function AppComponent() {
 
@@ -26,31 +30,22 @@ export default function AppComponent() {
   const [isModalRachaVisible, setModalRachaVisible] = useState(false);
   const [isModalRachaPerdidaVisible, setModalRachaPerdidaVisible] = useState(false);
   const [userInfo, setUserInfo] = useState({});
-  
-// carga de anuncios
-useEffect(() => {
-  MobileAds()
-    .initialize()
-   
-}, []);
 
 // obtener los datos del usuario y manejar la racha diaria
-useEffect(() => { // pending to check
+useEffect(() => {
   if (!userId) return;
 
-  manejarRachaDiaria(userId,setModalRachaVisible,setModalRachaPerdidaVisible)
   const userRef = doc(db, 'users', userId);
   const unsubscribe = onSnapshot(userRef, (snapshot) => {
     const userData = snapshot.data() || {};
     
     if (userData) {
       setUserInfo(userData);
-     
     }
   });
 
   return () => unsubscribe();
-}, [userId]); 
+}, [userId]);
 
 // aqui vamos a mostrar el modal de not vidas si es un nievo dia y el usuario tiene menos de 2 vidas
 useEffect(() => {
@@ -58,7 +53,7 @@ useEffect(() => {
 
   const checkAndUpdateVidas = async () => {
     try {
-      
+
       const hoy = new Date();
       const hoyString = hoy.toISOString().split('T')[0];
       const fechaGuardada = await AsyncStorage.getItem('hoy');
@@ -88,6 +83,30 @@ useEffect(() => {
 
 }, [userId]);
 
+
+
+// aqui vamos a verificar si el usuario ha completado el quiz
+useEffect(() => {
+  if (!userId) return;
+
+  const checkQuizCompletion = async () => {
+    try {
+      const quizCompleted = await AsyncStorage.getItem("quizCompleted");
+      
+      if (quizCompleted === "true") {
+        // Ejecutar manejarRachaDiaria
+        await manejarRachaDiaria(userId, setModalRachaVisible, setModalRachaPerdidaVisible);
+        // Limpiar el estado de quiz completado
+        await AsyncStorage.removeItem("quizCompleted");
+      }
+    } catch (error) {
+      console.error("Error verificando la finalización del quiz:", error);
+    }
+  };
+
+  checkQuizCompletion();
+}, [userId]);
+
   if(!userId){
     return <ActivityIndicator size="large" color="white" />
   }
@@ -113,7 +132,17 @@ useEffect(() => {
            
             <ExploraComponent />
             <GuardadosComponents />
-             <AdBanner/>
+            <View style={styles.bannerContainer}>
+            <BannerAd
+              unitId={bannerAdUnitId}
+              size="BANNER"
+              requestOptions={{
+                keywords: ['religion', 'bible'],
+              }}
+              onAdLoaded={() => console.log('Banner cargado')}
+              onAdFailedToLoad={(error) => console.log('Error cargando banner:', error)}
+            />
+            </View>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -133,5 +162,7 @@ const styles = StyleSheet.create({
     height: '100%',
     padding: 10,
   },
-  
+  bannerContainer: {
+    alignItems: 'center',
+  }
 });

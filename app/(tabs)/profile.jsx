@@ -5,28 +5,37 @@ import {
   ScrollView,
   Pressable,
   StyleSheet,
-  
+  TouchableOpacity,
+  Image,
+  Platform
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialCommunityIcons, Feather, FontAwesome5 } from '@expo/vector-icons';
+import { MaterialCommunityIcons, Feather, FontAwesome5, MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import useAuth from '../../components/authContext/authContext';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { db } from '../../components/firebase/firebaseConfig';
 import { niveles } from '@/components/Niveles/niveles';
 import { Avatar, Icon } from '@rneui/themed';
 import {InsigniasComponent} from '@/components/insigniasComponents/insigniasComponents';
-import { AdBanner } from '@/components/ads/banner';
+import { BannerAd, TestIds } from 'react-native-google-mobile-ads';
+
+const bannerAdUnitId = __DEV__ 
+  ? TestIds.BANNER 
+  : Platform.OS === 'ios' 
+  ? process.env.EXPO_PUBLIC_BANNER_ID_IOS 
+  : process.env.EXPO_PUBLIC_BANNER_ID_ANDROID;
 
 export default function Profile() {
   const navigation = useNavigation();
-  const { user, signOut } = useAuth();
+  const { user, logout } = useAuth();
+  const userId = user?.uid;
   const [userInfo, setUserInfo] = useState({});
 
   useEffect(() => {
     if (!user) return;
-    const userRef = doc(db, 'users', user.uid);
+    const userRef = doc(db, 'users', userId);
     const unsubscribe = onSnapshot(userRef, (doc) => {
       setUserInfo(doc.data());
     });
@@ -135,7 +144,17 @@ export default function Profile() {
               </Text>
             </View>
           </View>
-      <AdBanner />
+          <View style={styles.bannerContainer}>
+            <BannerAd
+              unitId={bannerAdUnitId}
+              size="BANNER"
+              requestOptions={{
+                keywords: ['religion', 'bible'],
+              }}
+              onAdLoaded={() => console.log('Banner cargado')}
+              onAdFailedToLoad={(error) => console.log('Error cargando banner:', error)}
+            />
+          </View>
         </ScrollView>
       </SafeAreaView>
     </LinearGradient>
@@ -282,5 +301,10 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.9)',
     fontSize: 14,
     lineHeight: 22,
+  },
+  bannerContainer: {
+   
+    alignItems: 'center',
+   
   },
 });

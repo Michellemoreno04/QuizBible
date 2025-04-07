@@ -52,32 +52,44 @@ const BibleQuiz = () => {
   const { user } = useAuth();
   const userId = user?.uid;
 
-  const retryCount = useRef(0);
-const maxLoadRetries = 3;
-// carga de anuncios
-useEffect(() => {
-  const adService = AdService.getInstance();
-  
-  const loadAds = async () => {
-    try {
-      await adService.loadInterstitial();
-    } catch (error) {
-      console.error('Error loading ads:', error);
-    }
-  };
+  useEffect(() => {
+    const initAds = async () => {
+      const adService = AdService.getInstance();
+      await adService.initialize();
+      await adService.preloadAllAds();
+    };
+    initAds();
+  }, [ ]);
 
-  loadAds();
-}, []);
+  // carga de anuncios intersticiales
+  useEffect(() => {
+    const adService = AdService.getInstance();
+    
+    const loadAds = async () => {
+      console.log('cargando anuncios en quiz')
+      try {
+        await adService.loadInterstitial();
+      } catch (error) {
+        console.error('Error loading ads:', error);
+      }
+    };
+
+    loadAds();
+  }, []);
 
   const showAds = async () => {
     try {
       if (isPlaying) {
         await stopMusic(backgroundMusic);
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 100)); // espera 100ms para que el sonido se detenga
       }
       
       const adService = AdService.getInstance();
-      await adService.showInterstitial();
+      const adShown = await adService.showInterstitial();
+      
+      if (!adShown) {
+        console.log('No se pudo mostrar el anuncio, continuando con la navegación');
+      }
       
       setShowModal(false);
       navigation.reset({
@@ -464,9 +476,9 @@ useEffect(() => {
   
         return;
       }
-      // Si el usuario tiene vidas (después de ver el anuncio o tenía más de 0)
+      // Si el usuario tiene vidas (después de ver el anuncio)
       setShowModalNotVidas(false);
-      
+    
       // Solo mostrar modal de puntuación si no quedan más preguntas
       if (currentQuestion >= questions.length - 1) {
         stopMusic(backgroundMusic);
@@ -482,28 +494,27 @@ useEffect(() => {
       console.log('Error al cerrar el modal de recompensa:', error);
     }finally{
     
-        setShowModalNotVidas(false);
+       setShowModalNotVidas(false);
       
     }
   }
-
+  
   const mostrarModalRacha = () => {
     setShowModal(false);
     stopMusic(backgroundMusic); 
-   //   manejarRachaDiaria(userId, setShowModalRacha, setShowModalRachaPerdida);
-      
-      navigation.replace('(tabs)');
-    
+    navigation.replace('(tabs)');
   };
-  const cerrarPuntuacionModal = () => {
+  
+  const cerrarPuntuacionModal = async () => {
     stopMusic(backgroundMusic);
     setShowModal(false);
     setShowModalNotVidas(false);
-   // manejarRachaDiaria(userId, setShowModalRacha, setShowModalRachaPerdida)
-     
-  navigation.replace('(tabs)');
-
-  }
+    
+    const today = new Date().toDateString();
+    await AsyncStorage.setItem("lastQuizDate", today);
+    
+    navigation.replace('(tabs)');
+  };
 
 // Detener la música cuando se sale del quiz
   useEffect(() => {
@@ -593,7 +604,19 @@ useEffect(() => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ModalPuntuacion userInfo={userInfo} mostrarModalRacha={mostrarModalRacha} expGanada={expGanada} monedasGanadas={resultadoRespuestas * 10} respuestasCorrectas={resultadoRespuestas} isVisible={showModal} onClose={mostrarModalRacha} cerrar={cerrarPuntuacionModal}/>
+      <ModalPuntuacion 
+        userInfo={userInfo} 
+        mostrarModalRacha={mostrarModalRacha} 
+        expGanada={expGanada} 
+        monedasGanadas={resultadoRespuestas * 10} 
+        respuestasCorrectas={resultadoRespuestas} 
+        isVisible={showModal} 
+        onClose={mostrarModalRacha} 
+        cerrar={cerrarPuntuacionModal}
+        isPlaying={isPlaying}
+        stopMusic={stopMusic}
+        backgroundMusic={backgroundMusic}
+      />
       <ModalRacha userInfo={userInfo} isVisible={showModalRacha} setShowModalRacha={setShowModalRacha} />
       <ModalRachaPerdida userInfo={userInfo} isVisible={showModalRachaPerdida} setShowModalRachaPerdida={setShowModalRachaPerdida} />
       <NivelModal 

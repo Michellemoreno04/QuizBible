@@ -3,7 +3,7 @@ import { db } from '../firebase/firebaseConfig';
 import { Alert } from 'react-native';
 
 
-export const manejarRachaDiaria = async (userId,setModalRachaVisible,setShowModalRachaPerdida) => {
+export const manejarRachaDiaria = async (userId, setModalRachaVisible, setShowModalRachaPerdida) => {
   try {
     const userDocRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userDocRef);
@@ -25,47 +25,49 @@ export const manejarRachaDiaria = async (userId,setModalRachaVisible,setShowModa
     } else { 
       await updateDoc(userDocRef, {
          modalRachaShow: hoy.toISOString()
-         });
+      });
       ultimaFecha = hoy;
-      
     }
 
     let rachaActual = Number(userData?.Racha || 0);
     let rachaMaxima = Number(userData?.RachaMaxima || 0);
 
-     // Si es la primera vez del usuario (no tiene fecha registrada)
-     if (!userData.modalRachaShow) {
+    // Si es la primera vez del usuario
+    if (!userData.modalRachaShow) {
       await updateDoc(userDocRef, {
         modalRachaShow: hoy.toISOString(),
         Racha: 1,
         RachaMaxima: 1
       });
-      setModalRachaVisible(true);  // Mostrar modal de racha inicial
+      setModalRachaVisible(true);
       return;
     }
-// Comparar con la fecha actual
+
+    // Comparar con la fecha actual
     if (ultimaFecha < hoy) { 
       const ayer = new Date(hoy);
       ayer.setDate(hoy.getDate() - 1);
 
       if (ultimaFecha.getTime() === ayer.getTime()) {
+        // Incrementar racha
         rachaActual += 1;
         if (rachaActual > rachaMaxima) {
           rachaMaxima = rachaActual;
         }
-        // Mostrar modal de racha actualizada
+        await updateDoc(userDocRef, {
+          modalRachaShow: hoy.toISOString(),
+          Racha: rachaActual,
+          RachaMaxima: rachaMaxima,
+        });
         setModalRachaVisible(true);
       } else {
-        //rachaActual = 1;
-        // Mostrar modal de racha perdida
+        // Racha perdida
+        await updateDoc(userDocRef, {
+          modalRachaShow: hoy.toISOString(),
+          Racha: 1
+        });
         setShowModalRachaPerdida(true);
       }
-
-      await updateDoc(userDocRef, {
-        modalRachaShow: hoy.toISOString(),
-        Racha: rachaActual,
-        RachaMaxima: rachaMaxima,
-      });
     }
   } catch (error) {
     console.error('Error al manejar la racha diaria:', error);

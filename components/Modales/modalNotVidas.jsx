@@ -27,40 +27,32 @@ export const RewardedAdModal = ({ isVisible,setIsVisible, onClose,userId,vidas,s
   const navigation = useNavigation();
   
   useEffect(() => {
-    
     if (isVisible) {
-      // Crear nueva instancia cada vez que se abre el modal
       const newRewarded = RewardedAd.createForAdRequest(adUnitId, {
         keywords: ['religion', 'bible'],
       });
-      
-      const unsubscribeLoaded = newRewarded.addAdEventListener(
-        RewardedAdEventType.LOADED,
-        () => {
-          setLoaded(true);
-          console.log('Anuncio cargado correctamente');
-        }
-      );
 
-      const unsubscribeEarned = newRewarded.addAdEventListener(
-        RewardedAdEventType.EARNED_REWARD,
-        (reward) => {
-          console.log('Recompensa obtenida:', reward);
-          addLife();// rewards no le hemos pasado los 
-          onClose();
-        }
-      );
-    
-      // Cargar el anuncio
+      const unsubscribeLoaded = newRewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
+        setLoaded(true);
+        console.log('Anuncio cargado correctamente');
+      });
+
+
+      const unsubscribeEarned = newRewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, () => {
+        console.log('Recompensa obtenida');
+        addLife();
+        setIsVisible(false);
+        onClose();
+      });
+
       newRewarded.load();
       setRewardedAd(newRewarded);
 
-      // Limpiar al cerrar
       return () => {
         unsubscribeLoaded();
         unsubscribeEarned();
-        setLoaded(false);
         setRewardedAd(null);
+        setLoaded(false);
       };
     }
   }, [isVisible]);
@@ -79,15 +71,28 @@ export const RewardedAdModal = ({ isVisible,setIsVisible, onClose,userId,vidas,s
 
   const handleShowAd = () => {
     if (loaded && rewardedAd) {
-      rewardedAd.show();
+      try {
+        rewardedAd.show();
+      } catch (error) {
+        console.error('Error al mostrar el anuncio:', error);
+        // Si hay error al mostrar el anuncio, damos la recompensa igualmente
+        addLife();
+        setIsVisible(false);
+        onClose();
+      }
+    } else {
+      // Si el anuncio no está cargado, damos la recompensa igualmente
+      addLife();
+      setIsVisible(false);
+      onClose();
     }
   };
 
   const cerrar = () => {
     try {
       if(vidas === 0){
-        setIsVisible(false);
-        setShowModal(true);
+     setIsVisible(false);
+      setShowModal(true);
       }
     } catch (error) {
       console.log(error);
@@ -136,7 +141,7 @@ export const RewardedAdModal = ({ isVisible,setIsVisible, onClose,userId,vidas,s
           <TouchableOpacity 
             style={styles.closeButton} 
             onPress={cerrar}
-            hitSlop={{top: 20, bottom: 20, left: 20, right: 20}}
+            
           >
             <Ionicons name="close-circle" size={30} color="#666" />
           </TouchableOpacity>
@@ -217,6 +222,7 @@ export const RewardedAdModal = ({ isVisible,setIsVisible, onClose,userId,vidas,s
       opacity: 0.6,
     },
     closeButton: {
+      
       position: 'absolute',
       top: 15,
       right: 15,

@@ -127,7 +127,7 @@ const DailyReading = () => {
       .padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
   };
   
-// Efecto para obtener el texto de lectura
+// obtener el texto de lectura
   useEffect(() => {
     if(!userId) return;
 
@@ -147,16 +147,19 @@ const DailyReading = () => {
         const userDocRef = doc(db, 'users', userId);
         const lecturasVistasRef = collection(userDocRef, 'lecturasVistas');
 
-        // Consulta la última lectura vista ordenando por "index" de forma descendente
+        // Consulta la última lectura vista
         const lastReadQuery = query(lecturasVistasRef, orderBy('index', 'desc'), limit(1));
         const lastReadSnapshot = await getDocs(lastReadQuery);
+
+       
 
         let lastIndex = 0;
         if (!lastReadSnapshot.empty) {
           lastIndex = lastReadSnapshot.docs[0].data().index;
         }
+        console.log('lastIndex', lastIndex)
 
-        // Consulta en la colección dailyRearingContent la lectura cuyo índice sea mayor al último guardado
+        // Consulta la siguiente lectura disponible
         const dailyContentRef = collection(db, 'dailyRearingContent');
         const dailyQuery = query(
           dailyContentRef,
@@ -173,7 +176,7 @@ const DailyReading = () => {
           }));
           setReadingText(nextReading);
         } else {
-          // Si no hay lecturas nuevas, volver al inicio
+          // Solo si no hay más lecturas nuevas, volvemos al inicio
           const firstReadingQuery = query(
             dailyContentRef,
             orderBy('index'),
@@ -272,8 +275,8 @@ const DailyReading = () => {
     
     // Verificar si ya existe la lectura de hoy
     const lecturasVistasRef = collection(doc(db, 'users', userId), 'lecturasVistas');
-    const q = query(lecturasVistasRef, where('fechaStr', '==', today));
-    const snapshot = await getDocs(q);
+    const q = query(lecturasVistasRef, where('fechaStr', '==', today)); 
+    const snapshot = await getDocs(q); 
     
     if (!snapshot.empty) {
       Alert.alert('¡Ya guardaste esta lectura hoy!');
@@ -284,8 +287,9 @@ const DailyReading = () => {
     await addDoc(lecturasVistasRef, {
       titulo: readingText[0].titulo,
       fechaStr: today,
-      date: new Date(), // Agregar timestamp para ordenamiento
+      date: new Date(),
       texto: readingText[0].texto,
+      index: readingText[0].index
     });
 
     // Actualizar el estado de lectura diaria

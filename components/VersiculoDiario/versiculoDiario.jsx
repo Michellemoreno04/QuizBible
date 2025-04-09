@@ -1,13 +1,10 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
   Pressable,
   StyleSheet,
-  Alert,
   Share,
-  ImageBackground,
-  Animated,
   ActivityIndicator,
   Platform,
 } from "react-native";
@@ -19,13 +16,10 @@ import {
   getDoc,
   query,
   limit,
-  where,
   serverTimestamp,
   doc,
   setDoc,
   writeBatch,
-  addDoc,
-  updateDoc,
   orderBy,
   startAfter,
   onSnapshot,

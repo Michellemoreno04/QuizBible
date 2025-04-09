@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ImageBackground, Animated,Platform, ActivityIndicator,Dimensions, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ImageBackground, Animated,Platform, ActivityIndicator,Dimensions, ScrollView, StatusBar } from 'react-native';
 import { AntDesign, FontAwesome5, MaterialCommunityIcons, Octicons } from '@expo/vector-icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -17,12 +17,27 @@ import { niveles } from '@/components/Niveles/niveles';
 import {RewardedAdModal} from '../components/Modales/modalNotVidas';
 import QuizActions from '@/components/quizFunctions/quizFuncion';
 import { useIsFocused } from '@react-navigation/native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { InterstitialAd, AdEventType, TestIds } from 'react-native-google-mobile-ads';
+import { useToast } from 'react-native-toast-notifications';
 
+const adUnitId = __DEV__ 
+  ? TestIds.INTERSTITIAL
+  : Platform.OS === 'ios' 
+  ? process.env.EXPO_PUBLIC_INTERSTITIAL_ID_IOS 
+  : process.env.EXPO_PUBLIC_INTERSTITIAL_ID_ANDROID;
+
+// Crea la instancia del anuncio
+const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
+  keywords: ['religion', 'bible']
+});
 
 const { width, height } = Dimensions.get('window');
 
 const responsiveWidth = width * 0.9; // 90% del ancho de pantalla
-const responsiveHeight = height * 0.07; // 7% del alto
+
+
+
 
 const BibleQuiz = () => {
   const navigation = useNavigation();
@@ -45,11 +60,12 @@ const BibleQuiz = () => {
   const [tiempoRestante, setTiempoRestante] = useState(20); 
   const [tiempoAgregado, setTiempoAgregado] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [interstitialLoaded, setInternitialLoaded] = useState(false);
   const backgroundMusic = require('../assets/sound/quiz-music1.mp3');
   const isFocused = useIsFocused();
   const { user } = useAuth();
   const userId = user?.uid;
-
+  const toast = useToast();
 
   // Cierra los modales al salir
   useFocusEffect(
@@ -215,7 +231,18 @@ useEffect(() => {
   const comprobarRespuesta = async () => {
     // Primero verificamos si se seleccionó alguna respuesta.
     if (respuestaSeleccionada === null) {
-      Alert.alert('Por favor, selecciona una respuesta.');
+      toast.show('Por favor, selecciona una respuesta.', {
+        type: 'info',
+        placement: 'top',
+        duration: 2000,
+        style: {
+          borderRadius: 25,
+          backgroundColor: 'rgba(0, 255, 100, 0.8)',
+          borderWidth: 1,
+          borderColor: '#00f7ff33',
+        },
+        
+      });
       return;
     }
   
@@ -332,7 +359,9 @@ useEffect(() => {
     }
   };
 
- 
+  
+
+   
   const salir = () => {
     Alert.alert('Salir', '¿Seguro que deseas salir?', [
       {
@@ -348,7 +377,7 @@ useEffect(() => {
               // Pequeña pausa para asegurar que la música se detuvo
               await new Promise(resolve => setTimeout(resolve, 100));
             }
-            showAds();
+            showInterstitial();
           } catch (error) {
             console.error('Error al salir:', error);
             // En caso de error, asegurar que el usuario pueda salir
@@ -546,6 +575,89 @@ useEffect(() => {
     }
   }, [isFocused]);
 
+  // Cargar el anuncio intersticial
+  useEffect(() => {
+    let isMounted = true;
+    let loadAttempts = 0;
+    const MAX_LOAD_ATTEMPTS = 3;
+
+    const loadAd = () => {
+      try {
+        interstitial.load();
+        console.log('Intento de carga de interstitial');
+      } catch (error) {
+        console.log('Error al cargar interstitial:', error);
+        if (loadAttempts < MAX_LOAD_ATTEMPTS) {
+          loadAttempts++;
+          setTimeout(loadAd, 3000);
+        }
+      }
+    };
+
+    const onAdLoaded = () => {
+      if (isMounted) {
+        console.log('Anuncio cargado con éxito');
+        setInternitialLoaded(true);
+      }
+    };
+
+    const onAdFailed = (error) => {
+      console.log('Error al cargar anuncio:', error);
+      if (isMounted && loadAttempts < MAX_LOAD_ATTEMPTS) {
+        loadAttempts++;
+        setTimeout(loadAd, 3000);
+      }
+    };
+
+    const onAdClosed = () => {
+      if (isMounted) {
+        if (Platform.OS === 'ios') {
+          StatusBar.setHidden(false);
+        }
+        // Recargar un nuevo anuncio para la próxima vez
+        interstitial.load();
+        navigation.reset({
+          index: 0,
+          routes: [{ name: '(tabs)' }],
+        });
+      }
+    };
+
+    if (isMounted) {
+      // Configurar event listeners
+      const unsubscribeLoaded = interstitial.addAdEventListener(AdEventType.LOADED, onAdLoaded);
+      const unsubscribeOpened = interstitial.addAdEventListener(AdEventType.OPENED, () => {
+        if (Platform.OS === 'ios') StatusBar.setHidden(true);
+      });
+      const unsubscribeClosed = interstitial.addAdEventListener(AdEventType.CLOSED, onAdClosed);
+      const unsubscribeError = interstitial.addAdEventListener(AdEventType.ERROR, onAdFailed);
+
+      // Cargar primer anuncio
+      loadAd();
+
+      return () => {
+        isMounted = false;
+        unsubscribeLoaded();
+        unsubscribeOpened();
+        unsubscribeClosed();
+        unsubscribeError();
+      };
+    }
+  }, [navigation]);
+
+  // Función para mostrar el anuncio intersticial
+  const showInterstitial = () => {
+    if (interstitialLoaded) {
+      interstitial.show();
+    } else {
+      // Si el anuncio no está cargado, navegar directamente
+      navigation.reset({
+        index: 0,
+        routes: [{ name: '(tabs)' }],
+      });
+    }
+  };
+
   if (!userId) {
     return <ActivityIndicator size="large" />
    }
@@ -578,7 +690,7 @@ useEffect(() => {
       />
       <RewardedAdModal isVisible={showModalNotVidas} setIsVisible={setShowModalNotVidas} setShowModal={setShowModal} onClose={cerrarRewardModal} userId={userId} vidas={userInfo.Vidas} />
 <ImageBackground 
-        source={require('../assets/images/bg-quiz.png')} 
+        source={require('../assets/images/bg-quiz2.png')} 
          resizeMode="cover" 
         style={styles.backgroundImage}
       >
@@ -627,7 +739,9 @@ useEffect(() => {
                   {tiempoRestante}s
                 </Text>
               </View>
-              <Text style={styles.questionText}>{pregunta}</Text>
+              <Text style={[styles.questionText, { fontFamily: 'poppins-bold' }]}>
+                                    {pregunta}
+              </Text>
             </Animated.View>
 
 
@@ -659,12 +773,19 @@ useEffect(() => {
             </View>
 
             <TouchableOpacity
-              style={styles.checkButton}
-              onPress={comprobarRespuesta}
-            >
-              <Text style={styles.checkButtonText}>Comprobar</Text>
-              <AntDesign name="rightcircleo" size={24} color="white" />
-            </TouchableOpacity>
+  style={styles.checkButton}
+  onPress={comprobarRespuesta}
+>
+  <LinearGradient
+    colors={['#0066ff', '#4facfe']}
+    style={styles.gradient}
+    start={{ x: 0, y: 0 }}
+    end={{ x: 1, y: 0 }}
+  >
+    <Text style={styles.checkButtonText}>Comprobar</Text>
+    
+  </LinearGradient>
+</TouchableOpacity>
 
             <QuizActions 
               currentQuestion={currentQuestion}
@@ -700,7 +821,7 @@ const styles = StyleSheet.create({
   },
   backgroundImage: {
     flex: 1,
-    
+    opacity: 0.9,
   },
   mainContainer: {
     alignItems: 'center'
@@ -724,16 +845,23 @@ const styles = StyleSheet.create({
   statusBar: {
     flexDirection: 'row',
     alignItems: 'center',
-
-  },
-  heartIcon: {
-    fontSize: 24,
-    color: 'red',
+    backgroundColor: 'rgba(0, 16, 61, 0.7)',
+    borderWidth: 1,
+    borderColor: '#00f7ff33',
+    borderRadius: 25,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginRight: 10
   },
   statusText: {
     marginHorizontal: 7,
     fontSize: 18,
-    color: 'white'
+    color: 'white',
+    fontWeight: '600'
+  },
+  heartIcon: {
+    fontSize: 24,
+    color: 'red',
   },
   contentContainer: {
     width: '100%',
@@ -758,12 +886,17 @@ const styles = StyleSheet.create({
     width: responsiveWidth,
     minHeight: height * 0.25,
     maxHeight: height * 0.4,
-    borderRadius: 20,
-    padding: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
+    borderRadius: 30,
+    padding: 15,
     marginBottom: 15,
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 10, 41, 0.7)',
+    borderColor: '#00f7ff55',
+    shadowColor: '#00f7ff',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4,
+    shadowRadius: 15,
   },
   referenceText: {
     color: 'white',
@@ -781,35 +914,47 @@ const styles = StyleSheet.create({
   },
   answersContainer: {
     width: '100%',
-    alignItems: 'center'
+    alignItems: 'center',
+    
   },
   answerButton: {
-    width: responsiveWidth,
-    height: responsiveHeight,
-    minHeight: 60,
-    borderRadius: 50,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 2,
-    borderWidth: 2,
-  
-  
+    width: responsiveWidth,
+    minHeight: 60,
+    marginVertical: 5,
+    borderRadius: 25,
+    backgroundColor: 'rgba(0, 16, 61, 0.7)',
+    borderColor: '#00f7ff33',
+    shadowColor: '#00f7ff',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    borderWidth: 1,
+    borderColor: '#00f7ff55',
+  },
+  answerText: {
+    fontSize: width * 0.045,
+    color: 'white',
+    fontWeight: '600'
   },
   selectedAnswer: {
-    borderWidth: 4,
-    borderColor: '#00FF00',
-    backgroundColor: 'rgba(0, 255, 0, 0.3)'
+    backgroundColor: 'rgba(0, 255, 100, 0.5)',
+    borderColor: '#00ff88',
+    borderWidth: 3,
+    borderRadius: 25,
+    shadowColor: '#00ff88',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 8,
   },
   correctAnswer: {
-    borderWidth: 2,
-    borderColor: '#00FF00',
-    backgroundColor: 'rgba(0, 255, 0, 0.3)'
+    backgroundColor: 'rgba(0, 255, 0, 0.5)',
+    borderColor: '#00FF00'
   },
   incorrectAnswer: {
-    borderWidth: 2,
-    borderColor: '#FF0000',
-    backgroundColor:'rgba(255, 0, 0, 0.3)'
+    backgroundColor: 'rgba(255, 0, 0, 0.2)',
+    borderColor: '#FF0000'
   },
   answerText: {
     
@@ -819,23 +964,35 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   checkButton: {
-    width: '100%',
-    height: responsiveHeight,
-    marginVertical: height * 0.03,
-    borderRadius: 50,
-    borderWidth: 5,
-    borderColor: 'rgba(0, 0, 255, 0.8)',
-    backgroundColor: 'rgba(0, 0, 255, 0.8)',
+    width: '80%',
+   
+    marginVertical: height * 0.02,
+    borderRadius: 30,
+    borderWidth: 2,
+    borderColor: '#00f7ff',
+    backgroundColor: '#0066ff',
+    overflow: 'hidden',
+    shadowColor: '#00f7ff',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.8,
+    shadowRadius: 15,
+    elevation: 20,
+  },
+  gradient: {
+    flex: 1,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
-    
+    padding: 10,
   },
   checkButtonText: {
     fontSize: 18,
     color: 'white',
-    fontWeight: 'bold'
+    fontWeight: 'bold',
+    
+    textShadowColor: 'rgba(0, 247, 255, 0.8)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 10,
   },
   actionsContainer: {
     width: '100%',
@@ -863,10 +1020,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 8,
     right: 8,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    padding: 8,
-    borderRadius: 15,
-    zIndex: 1,
+    backgroundColor: 'rgba(0, 16, 61, 0.9)',
+    borderWidth: 2,
+    borderColor: '#00f7ff55',
+    borderRadius: 25,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
   },
   timerText: {
     color: 'white',

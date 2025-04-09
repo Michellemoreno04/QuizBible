@@ -4,7 +4,7 @@ import { AntDesign, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-ic
 import { RewardedAd, TestIds, RewardedAdEventType } from 'react-native-google-mobile-ads';
 import { doc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
-
+import { LinearGradient } from 'expo-linear-gradient';
 
 const { width, height } = Dimensions.get('window');
 
@@ -192,74 +192,109 @@ useEffect(() => {
 
   return (
     <View style={styles.actionsContainer}>
-      <TouchableOpacity
-        onPress={skip}
-        style={styles.actionButton}
-      >
-        <MaterialCommunityIcons name="skip-next" size={24} color="white" />
-        <Text style={styles.actionText}>50</Text>
+   
+      <TouchableOpacity onPress={skip} style={styles.actionButton}>
+        <LinearGradient
+          colors={['#6a11cb', '#2575fc']}
+          style={styles.gradientButton}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          <MaterialCommunityIcons name="skip-next" size={24} color="white" />
+          <Text style={styles.actionText}>50</Text>
+        </LinearGradient>
       </TouchableOpacity>
-      
+  
       <TouchableOpacity
         style={[styles.actionButton, respuestas.length <= 2 && styles.disabledButton]}
         onPress={removeTwo}
         disabled={respuestas.length <= 2}
       >
-        <FontAwesome5 name="eraser" size={20} color="white" />
-        <Text style={styles.actionText}>50</Text>
+        <LinearGradient
+          colors={respuestas.length <= 2 ? ['#555', '#888'] : ['#ff6b6b', '#ff4757']}
+          style={styles.gradientButton}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          <FontAwesome5 name="eraser" size={20} color="white" />
+          <Text style={styles.actionText}>50</Text>
+        </LinearGradient>
       </TouchableOpacity>
-
+  
       <TouchableOpacity
         style={[styles.actionButton, tiempoAgregado && styles.disabledButton]}
         onPress={addTime}
         disabled={tiempoAgregado}
       >
-        <MaterialCommunityIcons name="timer" size={24} color="white" />
-        <Text style={styles.actionText}>15</Text>
+        <LinearGradient
+          colors={tiempoAgregado ? ['#555', '#888'] : ['#4CAF50', '#45a049']}
+          style={styles.gradientButton}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          <MaterialCommunityIcons name="timer" size={24} color="white" />
+          <Text style={styles.actionText}>15</Text>
+        </LinearGradient>
       </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.actionButton}
-        onPress={handleShowAd}
-      >
-        <AntDesign name="videocamera" size={24} color="white" />
-        <Text style={styles.actionText}>{isLoading
-        ? <ActivityIndicator size="small" color="white" />
-        : rewardedAd ? '+50' : ''
-        }
-        </Text>
+  
+      <TouchableOpacity style={styles.actionButton} onPress={handleShowAd}>
+        <LinearGradient
+          colors={['#2196F3', '#1976D2']}
+          style={styles.gradientButton}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          <AntDesign name="videocamera" size={24} color="white" />
+          <Text style={styles.actionText}>
+            {isLoading 
+              ? <ActivityIndicator size="small" color="white" /> 
+              : rewardedAd ? '+50' : ''
+            }
+          </Text>
+        </LinearGradient>
       </TouchableOpacity>
-    </View>
+    
+  </View>
   );
 };
 
 const styles = StyleSheet.create({
-  actionsContainer: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: 10,
-    paddingHorizontal: 10,
-  },
-  actionButton: {
-    width: width * 0.18,
-    height: height * 0.08,
-    borderRadius: 50,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-    gap: 5,
-  },
-  disabledButton: {
-    opacity: 0.5
-  },
-  actionText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 14,
-  }
-});
+    actionsContainer: {
+      width: '100%',
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      paddingHorizontal: 10,
+      
+    },
+   
+    actionButton: {
+      width: width * 0.18,
+      height: height * 0.08,
+      borderRadius: 30,
+      overflow: 'hidden',
+    },
+    gradientButton: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      flexDirection: 'row',
+      gap: 5,
+    },
+    disabledButton: {
+      opacity: 0.6,
+      // Para Android
+      elevation: 0,
+      // Para iOS
+      shadowOpacity: 0,
+    },
+    actionText: {
+      color: 'white',
+      fontWeight: 'bold',
+      fontSize: 14,
+      textShadowColor: 'rgba(0, 0, 0, 0.3)',
+      textShadowOffset: { width: 1, height: 1 },
+      textShadowRadius: 2,
+    },
+  });
 
 export default QuizActions;

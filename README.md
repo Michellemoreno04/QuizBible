@@ -9,3 +9,4 @@
 
 # cosas hecha 
 
+1. diseño del quiz cambiado

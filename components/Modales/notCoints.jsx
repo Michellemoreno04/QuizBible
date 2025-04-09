@@ -12,12 +12,10 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { RewardedAd, RewardedAdEventType, TestIds } from 'react-native-google-mobile-ads';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import  useAuth  from '../authContext/authContext';
 import {doc,updateDoc,increment} from 'firebase/firestore';
 import {db} from '../../components/firebase/firebaseConfig';
-
-
 
 const adUnitId = __DEV__ 
 ? TestIds.REWARDED 
@@ -29,73 +27,66 @@ export const NoCoinsModal = ({ visible, onClose }) => {
   const translateY = React.useRef(new Animated.Value(0)).current;
   const [isVisible, setIsVisible] = React.useState(visible);
   const [loaded, setLoaded] = useState(false);
-  const [rewardedAd, setRewardedAd] = useState(null);
+  const rewardedAd = useRef(null);
 
-const {user} = useAuth();
- const userId = user?.uid;
+  const {user} = useAuth();
+  const userId = user?.uid;
 
-// aquicargamos el anuncio
   useEffect(() => {
-    
-      // Crear nueva instancia cada vez que se abre el modal
-      const newRewarded = RewardedAd.createForAdRequest(adUnitId, {
-        keywords: ['religion', 'bible'],
-      });
-      
-      const unsubscribeLoaded = newRewarded.addAdEventListener(
-        RewardedAdEventType.LOADED,
-        () => {
-          setLoaded(true);
-          console.log('Anuncio recompensa de vidas cargado');
-        }
-      );
-
-      const unsubscribeEarned = newRewarded.addAdEventListener(
-        RewardedAdEventType.EARNED_REWARD,
-        (reward) => {
-          console.log('Recompensa obtenida:', reward);
-          
-           
-        }
-      );
-      // Cargar el anuncio
-      newRewarded.load();
-      setRewardedAd(newRewarded);
-
-      // Limpiar al cerrar
-      return () => {
-        unsubscribeLoaded();
-        unsubscribeEarned();
-        setLoaded(false);
-        setRewardedAd(null);
-      };
-    
-  }, [isVisible]);
-
-  
-  const addCoin = async () => {
-    const userDocRef = doc(db, 'users', userId);
-    await updateDoc(userDocRef, {
-      Monedas: increment(100),
+    // Crear nueva instancia del anuncio cuando el componente se monta
+    rewardedAd.current = RewardedAd.createForAdRequest(adUnitId, {
+      keywords: ['religion', 'bible'],
     });
+
+    const unsubscribeLoaded = rewardedAd.current.addAdEventListener(
+      RewardedAdEventType.LOADED,
+      () => {
+        setLoaded(true);
+        console.log('Anuncio recompensa de monedas cargado');
+      }
+    );
+
+    const unsubscribeEarned = rewardedAd.current.addAdEventListener(
+      RewardedAdEventType.EARNED_REWARD,
+      (reward) => {
+        console.log('Recompensa obtenida:', reward);
+        addCoin();
+      }
+    );
+
+   
+    // Cargar el anuncio
+    rewardedAd.current.load();
+
+    // Limpiar al desmontar
+    return () => {
+      unsubscribeLoaded();
+      unsubscribeEarned();
+      setLoaded(false);
+      rewardedAd.current = null;
+    };
+  }, []);
+
+  const addCoin = async () => {
+    try {
+      const userDocRef = doc(db, 'users', userId);
+      await updateDoc(userDocRef, {
+        Monedas: increment(100),
+      });
+    } catch (error) {
+      console.log('Error al agregar monedas:', error);
+    }
   };
 
-  
   const handleShowAd = async () => {
-    if (loaded && rewardedAd) {
+    if (loaded && rewardedAd.current) {
       try {
-        await rewardedAd.show();
-
-      } catch (error) {
-        console.log('Error al mostrar el anuncio:', error);
-        
-      } finally {
-        addCoin();
+        await rewardedAd.current.show();
         setIsVisible(false);
         onClose();
-        
+      } catch (error) {
+        console.log('Error al mostrar el anuncio:', error);
       }
-
     }
   };
 
@@ -131,8 +122,6 @@ const {user} = useAuth();
       ]).start(() => setIsVisible(false));
     }
   }, [visible]);
-
- 
 
   return (
     <Modal
@@ -177,9 +166,9 @@ const {user} = useAuth();
             </Text>
 
             <TouchableOpacity 
-              style={styles.primaryButton}
+              style={[styles.primaryButton, loaded ? {opacity: 1} : {opacity: 0.9}]}
               onPress={handleShowAd}
-              activeOpacity={0.9}>
+              >
               <LinearGradient
                 colors={['#4CAF50', '#45A049']}
                 style={styles.buttonGradient}

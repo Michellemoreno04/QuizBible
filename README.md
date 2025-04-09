@@ -9,4 +9,3 @@
 
 # cosas hecha 
 
-1. cambiar la funciond de subir foto y hacer que elija avatares male o female

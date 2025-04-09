@@ -9,17 +9,15 @@ import { db } from '../components/firebase/firebaseConfig';
 import { ModalPuntuacion } from '@/components/Modales/modalPuntuacion';
 import { ModalRacha } from '@/components/Modales/modalRacha';
 import { ModalRachaPerdida } from '@/components/Modales/rachaPerdida';
-import { manejarRachaDiaria } from '@/components/Racha/manejaRacha';
 import { useSound } from '@/components/soundFunctions/soundFunction';
 import { useBackgroundMusic } from '@/components/soundFunctions/soundFunction';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NivelModal from '@/components/Modales/modalNivel';
 import { niveles } from '@/components/Niveles/niveles';
-import { InterstitialAd, AdEventType, TestIds } from 'react-native-google-mobile-ads';
 import {RewardedAdModal} from '../components/Modales/modalNotVidas';
 import QuizActions from '@/components/quizFunctions/quizFuncion';
 import { useIsFocused } from '@react-navigation/native';
-import AdService from '@/components/ads/adService';
+
 
 const { width, height } = Dimensions.get('window');
 
@@ -52,56 +50,6 @@ const BibleQuiz = () => {
   const { user } = useAuth();
   const userId = user?.uid;
 
-  useEffect(() => {
-    const initAds = async () => {
-      const adService = AdService.getInstance();
-      await adService.initialize();
-      await adService.preloadAllAds();
-    };
-    initAds();
-  }, [ ]);
-
-  // carga de anuncios intersticiales
-  useEffect(() => {
-    const adService = AdService.getInstance();
-    
-    const loadAds = async () => {
-      console.log('cargando anuncios en quiz')
-      try {
-        await adService.loadInterstitial();
-      } catch (error) {
-        console.error('Error loading ads:', error);
-      }
-    };
-
-    loadAds();
-  }, []);
-
-  const showAds = async () => {
-    try {
-      if (isPlaying) {
-        await stopMusic(backgroundMusic);
-        await new Promise(resolve => setTimeout(resolve, 100)); // espera 100ms para que el sonido se detenga
-      }
-      
-      const adService = AdService.getInstance();
-      const adShown = await adService.showInterstitial();
-      
-      if (!adShown) {
-        console.log('No se pudo mostrar el anuncio, continuando con la navegación');
-      }
-      
-      setShowModal(false);
-      navigation.reset({
-        index: 0,
-        routes: [{ name: '(tabs)' }],
-      });
-    } catch (error) {
-      console.error('Error showing ad:', error);
-      setShowModal(false);
-      navigation.replace('(tabs)');
-    }
-  };
 
   // Cierra los modales al salir
   useFocusEffect(

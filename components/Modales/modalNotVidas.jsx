@@ -26,15 +26,17 @@ export const RewardedAdModal = ({ isVisible,setIsVisible, onClose,userId,vidas,s
   const [rewardedAd, setRewardedAd] = useState(null);
   const navigation = useNavigation();
   
+
+  
   useEffect(() => {
-    if (isVisible) {
+console.log('anuncio not vidas iniciado')
       const newRewarded = RewardedAd.createForAdRequest(adUnitId, {
         keywords: ['religion', 'bible'],
       });
 
       const unsubscribeLoaded = newRewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
         setLoaded(true);
-        console.log('Anuncio cargado correctamente');
+        console.log('Anuncio no vidas cargado ');
       });
 
 
@@ -54,7 +56,7 @@ export const RewardedAdModal = ({ isVisible,setIsVisible, onClose,userId,vidas,s
         setRewardedAd(null);
         setLoaded(false);
       };
-    }
+    
   }, [isVisible]);
 
   const addLife = async () => {
@@ -69,11 +71,12 @@ export const RewardedAdModal = ({ isVisible,setIsVisible, onClose,userId,vidas,s
     }
   };
 
-  const handleShowAd = () => {
+  const handleShowAd = async () => {
     if (loaded && rewardedAd) {
       try {
-        rewardedAd.show();
+      await rewardedAd.show();
       } catch (error) {
+        await rewardedAd.load();
         console.error('Error al mostrar el anuncio:', error);
         // Si hay error al mostrar el anuncio, damos la recompensa igualmente
         addLife();
@@ -81,7 +84,9 @@ export const RewardedAdModal = ({ isVisible,setIsVisible, onClose,userId,vidas,s
         onClose();
       }
     } else {
-      // Si el anuncio no está cargado, damos la recompensa igualmente
+      // si el anuncio no ha cargado 
+      await rewardedAd.load();
+    
       addLife();
       setIsVisible(false);
       onClose();
@@ -127,7 +132,8 @@ export const RewardedAdModal = ({ isVisible,setIsVisible, onClose,userId,vidas,s
           >
             <TouchableOpacity
               onPress={handleShowAd}
-              disabled={!loaded}
+              
+            
               style={styles.buttonTouchable}
             >
               <MaterialIcons name="play-circle-outline" size={24} color="white" />

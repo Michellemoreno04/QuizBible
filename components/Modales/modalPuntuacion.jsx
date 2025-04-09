@@ -6,7 +6,6 @@ import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
 import { Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSound } from '../soundFunctions/soundFunction';
-import AdService from '../ads/adService';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RewardedAd, RewardedAdEventType, TestIds } from 'react-native-google-mobile-ads';
@@ -42,7 +41,7 @@ export function ModalPuntuacion({
 
 // aquicargamos el anuncio
 useEffect(() => {
-  if (isVisible) {
+  console.log('anuncio de puntuacion iniciado')
     // Crear nueva instancia cada vez que se abre el modal
     const newRewarded = RewardedAd.createForAdRequest(adUnitId, {
       keywords: ['religion', 'bible'],
@@ -52,7 +51,7 @@ useEffect(() => {
       RewardedAdEventType.LOADED,
       () => {
         setLoaded(true);
-        console.log('Anuncio recompensa de vidas cargado');
+        console.log('Anuncio puntuacion listo');
       }
     );
 
@@ -75,7 +74,7 @@ useEffect(() => {
       setLoaded(false);
       setRewardedAd(null);
     };
-  }
+  
 }, [isVisible]);
 
 const showAd = async () => { 
@@ -186,7 +185,7 @@ const showAd = async () => {
             </View>
           </View>
 
-          <Pressable onPress={showAd} disabled={loading} style={[styles.buttonContainer, { opacity: loaded || loading ? 1 : 0.5 }  ]}>
+          <Pressable onPress={showAd}  style={[styles.buttonContainer, { opacity: loaded || loading ? 1 : 0.5 }  ]}>
             <LinearGradient
               colors={['#ff6b6b', '#ff8e53']}
               style={[styles.buttonGradient, { opacity: loading ? 0.5 : 1 }]}

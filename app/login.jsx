@@ -8,8 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 //import { SigninComponents } from '../components/signinComponents/signinComponents';
 import  {StatusBar} from 'expo-status-bar'
-import { TouchableOpacity } from 'react-native';
-
+import { TouchableOpacity } from 'react-native'
 
 function Login() {
  

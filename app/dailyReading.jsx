@@ -271,6 +271,9 @@ const DailyReading = () => {
   // Función para guardar la lectura en la subcolección "lecturasVistas"
  const handleReading = async () => {
   try {
+    if(isSpeaking){
+      Speech.stop();
+    }
     const today = getLocalDateString();
     
     // Verificar si ya existe la lectura de hoy

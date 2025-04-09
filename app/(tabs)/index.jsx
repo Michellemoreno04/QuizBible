@@ -1,4 +1,4 @@
-import { View, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, Platform,  StatusBar as RNStatusBar} from 'react-native';
+import { View, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, Platform,  StatusBar as RNStatusBar, Alert} from 'react-native';
 import React, { useEffect, useState } from 'react';
 import {VersiculosDiarios} from '@/components/VersiculoDiario/versiculoDiario';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -16,11 +16,13 @@ import { ModalRachaPerdida } from '@/components/Modales/rachaPerdida';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BannerAd, TestIds } from 'react-native-google-mobile-ads';
 
+
 const bannerAdUnitId = __DEV__ 
   ? TestIds.BANNER 
   : Platform.OS === 'ios' 
   ? process.env.EXPO_PUBLIC_BANNER_ID_IOS 
   : process.env.EXPO_PUBLIC_BANNER_ID_ANDROID;
+
 
 export default function AppComponent() {
 
@@ -30,6 +32,8 @@ export default function AppComponent() {
   const [isModalRachaVisible, setModalRachaVisible] = useState(false);
   const [isModalRachaPerdidaVisible, setModalRachaPerdidaVisible] = useState(false);
   const [userInfo, setUserInfo] = useState({});
+
+
 
 // obtener los datos del usuario y manejar la racha diaria
 useEffect(() => {

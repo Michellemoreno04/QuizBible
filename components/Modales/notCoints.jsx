@@ -36,7 +36,7 @@ const {user} = useAuth();
 
 // aquicargamos el anuncio
   useEffect(() => {
-    if (isVisible) {
+    
       // Crear nueva instancia cada vez que se abre el modal
       const newRewarded = RewardedAd.createForAdRequest(adUnitId, {
         keywords: ['religion', 'bible'],
@@ -69,7 +69,7 @@ const {user} = useAuth();
         setLoaded(false);
         setRewardedAd(null);
       };
-    }
+    
   }, [isVisible]);
 
   

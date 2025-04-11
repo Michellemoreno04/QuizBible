@@ -54,7 +54,7 @@ const ExploraComponent = () => {
   useEffect(() => {
     const checkReadingStatus = async () => {
       const lastReadingDate = await AsyncStorage.getItem("lastReadingDate");
-      const today = new Date().toISOString().split('T')[0]; // Formato YYYY-MM-DD
+      const today = new Date().toDateString(); // Cambiamos al mismo formato que usa el quiz
 
       setHasReadTheDailyVerse(lastReadingDate === today);
     };

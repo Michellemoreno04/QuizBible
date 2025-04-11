@@ -4,7 +4,7 @@ export const niveles = (experiencia) => {
     // Niveles y insignias
     const insignias = {
       1: {
-        name: "Iniciado",
+        name: "Iniciador",
         animation: animation,
         description: "¡Has encendido la llama del conocimiento! Esta insignia celebra tu decisión de comenzar el camino del aprendizaje bíblico. ¡Cada gran jornada comienza con un primer paso!"
       },

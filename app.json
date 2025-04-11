@@ -20,7 +20,14 @@
       },
       "package": "com.moreno.dev.QuizBible",
       "enableProguardInReleaseBuilds": true,
-      "softwareKeyboardLayoutMode": "pan"
+      "softwareKeyboardLayoutMode": "pan",
+      "permissions": [
+       
+        "com.google.android.gms.permission.AD_ID",
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE"
+      ],
+      "usesAdvertisingId": true
     },
     "web": {
       "bundler": "metro",

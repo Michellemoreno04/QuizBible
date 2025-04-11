@@ -700,12 +700,12 @@ useEffect(() => {
     showsVerticalScrollIndicator={false}
   >
           <View style={styles.header}>
-            <TouchableOpacity onPress={salir} style={styles.homeButton}>
+            <TouchableOpacity onPress={salir} style={{backgroundColor: 'rgba(0, 16, 61, 0.7)', borderRadius: 50, padding: 5}}>
               <MaterialCommunityIcons 
                 name="home" 
                 color="blue" 
                 size={40} 
-                style={styles.homeIcon} 
+                
               />
             </TouchableOpacity>
 
@@ -723,7 +723,7 @@ useEffect(() => {
               <TouchableOpacity onPress={toggleMute}>
                 <Octicons
                   name={isMuted ? 'mute' : 'unmute'}
-                  size={24}
+                  size={30}
                   color={isMuted ? 'blue' : 'blue'}
                 />
               </TouchableOpacity>
@@ -833,15 +833,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
  
   },
-  homeButton: {
-    
-    padding: 10,
-  },
-  homeIcon: {
-    width: 40,
-    height: 40,
-    
-  },
+  
   statusBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -879,6 +871,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   position: 'relative',
   bottom: 5,
+  
   
   },
  

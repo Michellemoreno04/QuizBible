@@ -71,6 +71,13 @@ const handleFirebaseError = (error) => {
     default:
       errorMessage = "Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo más tarde.";
       break;
+      case "auth/network-request-failed":
+        errorMessage = "No hay conexión a internet. Por favor, verifica tu conexión y vuelve a intentarlo.";
+        break;
+        case "auth/too-many-requests":
+          errorMessage = "Demasiadas solicitudes. Por favor, espera un momento antes de intentar nuevamente.";
+          break;
+          
 
     }
     Alert.alert("Error de inicio de sesión", errorMessage);

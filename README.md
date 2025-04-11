@@ -9,4 +9,5 @@
 
 # cosas hecha 
 
-1. diseño del quiz cambiado
+1. el permiso com.google.android.gms.permission.AD_ID fue añadido por play console 
+2. algunos bugs arreglados 

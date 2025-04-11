@@ -110,6 +110,19 @@ const handleFirebaseError = (error) => {
         case "auth/weak-password":
           errorMessage = "La contraseña debe tener al menos 6 caracteres.";
           break;
+          case "auth/network-request-failed":
+            errorMessage = "No hay conexión a internet. Por favor, verifica tu conexión y vuelve a intentarlo.";
+            break;
+            case "auth/too-many-requests":
+              errorMessage = "Demasiadas solicitudes. Por favor, espera un momento antes de intentar nuevamente.";
+              break;
+              case "auth/user-disabled":
+                errorMessage = "Tu cuenta ha sido deshabilitada. Por favor, contacta al soporte.";
+                break;
+                case "auth/user-not-found":
+                  errorMessage = "No se encontró una cuenta con este correo. Regístrate primero.";
+                  break;
+                  
           
     default:
       errorMessage = "Ha ocurrido un error inesperado. Por favor, inténtalo de nuevo más tarde.",error;
@@ -157,7 +170,7 @@ return (
                 onPress={() => handleAvatarSelection('masculino')}
               >
                 <MaterialIcons name="face" size={50} color={selectedAvatar === 'masculino' ? '#f59e0b' : '#FFF'} />
-                <Text style={styles.avatarText}>Masculino</Text>
+                <Text style={styles.avatarText}>Hombre</Text>
               </TouchableOpacity>
 
               <TouchableOpacity 
@@ -165,7 +178,7 @@ return (
                 onPress={() => handleAvatarSelection('femenino')}
               >
                 <MaterialCommunityIcons name="face-woman" size={50} color={selectedAvatar === 'femenino' ? '#f59e0b' : '#FFF'} />
-                <Text style={styles.avatarText}>Femenino</Text>
+                <Text style={styles.avatarText}>Mujer</Text>
               </TouchableOpacity>
             </View>
           </View>

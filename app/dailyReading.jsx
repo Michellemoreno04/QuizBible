@@ -119,12 +119,9 @@ const DailyReading = () => {
     }
   };
 
-  // Efecto para obtener el texto de lectura
+  // Modificar la función getLocalDateString para usar el mismo formato que handleReading
   const getLocalDateString = () => {
-    const date = new Date();
-    return `${date.getFullYear()}-${(date.getMonth() + 1)
-      .toString()
-      .padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+    return new Date().toDateString();
   };
   
 // obtener el texto de lectura
@@ -133,7 +130,7 @@ const DailyReading = () => {
 
     const fetchDailyVerse = async () => {
       try {
-        const today = getLocalDateString();
+        const today = getLocalDateString(); 
         const lastDate = await AsyncStorage.getItem('lastReadingDate');
 
         // Si ya se leyó el versículo de hoy, no mostrar nada
@@ -151,13 +148,10 @@ const DailyReading = () => {
         const lastReadQuery = query(lecturasVistasRef, orderBy('index', 'desc'), limit(1));
         const lastReadSnapshot = await getDocs(lastReadQuery);
 
-       
-
         let lastIndex = 0;
         if (!lastReadSnapshot.empty) {
           lastIndex = lastReadSnapshot.docs[0].data().index;
         }
-        console.log('lastIndex', lastIndex)
 
         // Consulta la siguiente lectura disponible
         const dailyContentRef = collection(db, 'dailyRearingContent');
@@ -274,7 +268,7 @@ const DailyReading = () => {
     if(isSpeaking){
       Speech.stop();
     }
-    const today = getLocalDateString();
+    const today = new Date().toDateString(); // Este formato es el correcto
     
     // Verificar si ya existe la lectura de hoy
     const lecturasVistasRef = collection(doc(db, 'users', userId), 'lecturasVistas');
@@ -289,8 +283,7 @@ const DailyReading = () => {
     // Guardar nueva lectura
     await addDoc(lecturasVistasRef, {
       titulo: readingText[0].titulo,
-      fechaStr: today,
-      date: new Date(),
+      fechaStr: today, 
       texto: readingText[0].texto,
       index: readingText[0].index
     });
@@ -325,11 +318,10 @@ if(isLoading){
 }
 
   if (readingText.length === 0) {
-    
     return (
       <View style={styles.emptyContainer}>
-         <Feather name="book-open" size={60} color="gray" />
-          <Text style={styles.emptySubtext}>No hay lecturas  por hoy</Text>
+        <Feather name="book-open" size={60} color="gray" />
+        <Text style={styles.emptySubtext}>No hay lecturas por hoy</Text>
       </View>
     );
   }
@@ -503,6 +495,7 @@ if(isLoading){
       flexDirection: 'row',
       justifyContent: 'center',
       gap: 15,
+      marginBottom: 20,
     },
     actionButton: {
       flexDirection: 'row',

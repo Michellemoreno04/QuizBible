@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import Modal from 'react-native-modal';
 import LottieView from 'lottie-react-native';
 import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
@@ -19,7 +19,7 @@ const adUnitId = __DEV__
 : Platform.OS === 'ios' ? process.env.EXPO_PUBLIC_REWARDED_ID_IOS 
 : process.env.EXPO_PUBLIC_REWARDED_ID_ANDROID;
 
-
+const { width, height } = Dimensions.get('screen');
 export function ModalPuntuacion({ 
   isVisible, 
   respuestasCorrectas, 
@@ -202,14 +202,14 @@ const showAd = async () => {
 const styles = StyleSheet.create({
   gradientContainer: {
     width: '100%',
-    
+    maxHeight: height * 0.8,
     borderRadius: 25,
     overflow: 'hidden',
   },
   contentContainer: {
     alignItems: 'center',
     padding: 15,
-    paddingTop: 35,
+    paddingTop: 25,
   },
   subtitle: {
     fontSize: 18,
@@ -224,8 +224,8 @@ const styles = StyleSheet.create({
   },
   titleBackground: {
     position: 'absolute',
-    width: '120%',
-    height: '150%',
+    width: '100%',
+    height: '100%',
     top: -5,
     left: -25,
     borderRadius: 20,
@@ -258,11 +258,11 @@ const styles = StyleSheet.create({
 
   },
   animation: {
-    width: 220,
-    height: 220,
+    width: 200,
+    height: 200,
   },
   congratsText: {
-    fontSize: 32,
+    fontSize: 26,
     fontWeight: '800',
     color: '#4a148c',
     marginTop: -30,

@@ -133,7 +133,7 @@ console.log('anuncio not vidas iniciado')
             <TouchableOpacity
               onPress={handleShowAd}
               
-            
+            disabled={!loaded}
               style={styles.buttonTouchable}
             >
               <MaterialIcons name="play-circle-outline" size={24} color="white" />

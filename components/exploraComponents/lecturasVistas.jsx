@@ -94,8 +94,10 @@ export default function Lecturas() {
     >
       <Text style={styles.itemTitle}>{item.titulo || 'Lectura diaria'}</Text>
       <Text style={styles.itemDate}>
-        {item.fecha.split('T')[0]}
+        {item.date.toDate().toDateString()}
+        
       </Text>
+    
     </TouchableOpacity>
   );
 
@@ -132,7 +134,7 @@ export default function Lecturas() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-        <ScrollView>
+        <ScrollView style={{height: '100%'}}>
             {selectedTema && (
               <>
                 <Text style={styles.modalTitle}>{selectedTema.titulo || 'Titulo aqui'}</Text>

@@ -94,7 +94,7 @@ export default function Lecturas() {
     >
       <Text style={styles.itemTitle}>{item.titulo || 'Lectura diaria'}</Text>
       <Text style={styles.itemDate}>
-        {item.date.toDate().toDateString()}
+        {item.fechaStr}
         
       </Text>
     

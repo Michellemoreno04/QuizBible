@@ -286,9 +286,11 @@ useEffect(() => {
         });
         // Guardamos la fecha del quiz en AsyncStorage.
         const today = new Date().toDateString();
-        await AsyncStorage.setItem("lastQuizDate", today);
         // Mostramos el modal final.
         stopMusic(backgroundMusic);
+        // Guardamos la fecha del quiz para ejecutar la racha antes del modal
+        await AsyncStorage.setItem("lastQuizDate", today);
+        await AsyncStorage.setItem("quizCompleted", "true");
         setShowModal(true);
       }
     } else {
@@ -357,6 +359,7 @@ useEffect(() => {
         }
       }, 2000);
     }
+
   };
 
   
@@ -446,7 +449,7 @@ useEffect(() => {
 
 
   // Función para cerrar el modal de recompensade vidas
-  const cerrarRewardModal = () => {
+  const cerrarRewardModal = async () => {
     try {
       // Si el usuario tiene 0 vidas y no ha visto el anuncio, mantener el modal abierto
       if (userInfo.Vidas === 0) {
@@ -459,6 +462,9 @@ useEffect(() => {
       // Solo mostrar modal de puntuación si no quedan más preguntas
       if (currentQuestion >= questions.length - 1) {
         stopMusic(backgroundMusic);
+        const today = new Date().toDateString();
+        await AsyncStorage.setItem("lastQuizDate", today);
+        await AsyncStorage.setItem("quizCompleted", "true");
         setShowModal(true);
       } else {
         // Continuar con la siguiente pregunta
@@ -540,6 +546,7 @@ useEffect(() => {
               setTiempoRestante(30);
               setTiempoAgregado(false);
             } else {
+              
               setShowModal(true);
             }
             return 0;

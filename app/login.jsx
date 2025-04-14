@@ -6,7 +6,6 @@ import { auth } from '../components/firebase/firebaseConfig';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
-//import { SigninComponents } from '../components/signinComponents/signinComponents';
 import  {StatusBar} from 'expo-status-bar'
 import { TouchableOpacity } from 'react-native'
 
@@ -169,13 +168,13 @@ return (
 
             {/* Social Login */}
             <View style={styles.socialContainer}>
-              {/*<View style={styles.dividerContainer}>
+              <View style={styles.dividerContainer}>
                 <View style={styles.dividerLine} />
                 <Text style={styles.dividerText}>Continúa con</Text>
                 <View style={styles.dividerLine} />
               </View>
 
-              {/*<SigninComponents />*/}
+             
             </View>
 
             {/* Signup Link */}

@@ -22,7 +22,6 @@
       "enableProguardInReleaseBuilds": true,
       "softwareKeyboardLayoutMode": "pan",
       "permissions": [
-       
         "com.google.android.gms.permission.AD_ID",
         "android.permission.INTERNET",
         "android.permission.ACCESS_NETWORK_STATE"
@@ -36,6 +35,7 @@
     },
     "plugins": [
       "expo-router",
+      "expo-sharing",
       [
         "expo-splash-screen",
         {

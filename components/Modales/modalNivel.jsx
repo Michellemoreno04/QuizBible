@@ -4,7 +4,7 @@ import Modal from 'react-native-modal';
 import LottieView from 'lottie-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { niveles } from '../Niveles/niveles';
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get('screen');
 
 export default function NivelModal({ nivel, isVisible, onClose, Exp }) {
   
@@ -52,7 +52,14 @@ export default function NivelModal({ nivel, isVisible, onClose, Exp }) {
             <View style={styles.levelBadge}>
               <Text style={styles.levelText}>Nivel {nivel}</Text>
             </View>
+            <LinearGradient
+    colors={['#FFD700', '#D4AF37', '#FFD700']}
+    start={{ x: 0, y: 0 }}
+    end={{ x: 1, y: 1 }}
+    style={styles.gradientBadge}
+  >
             <Text style={styles.insigniaName}>{insignia}</Text>
+            </LinearGradient>
             <Text style={styles.description}>{description}</Text>
           </ScrollView>
 
@@ -91,8 +98,9 @@ const styles = StyleSheet.create({
   gradientContainer: {
     
     width: width * 0.9,
+    height: height * 0.8,
     borderRadius: 30,
-    padding: 25,
+    padding: width * 0.04,
     alignItems: 'center',
     borderWidth: 4,
     borderColor: '#FFB80299',
@@ -106,13 +114,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   
-    gap: 10,
+    gap: 2,
   },
   title: {
-    fontSize: 22,
+    fontSize: width * 0.04,
     fontWeight: '800',
     color: '#FFD700',
     textTransform: 'uppercase',
+    transform: [{ perspective: 1000 }],
     letterSpacing: 1.2,
     textAlign: 'center',
     textShadowColor: 'rgba(255, 184, 2, 0.4)',
@@ -120,17 +129,14 @@ const styles = StyleSheet.create({
     textShadowRadius: 15,
   },
   modalContainer: {
-    width: 200,
-    
-   // height: 200,
-    //marginVertical: 20,
+    width: width * 0.45,
     justifyContent: 'center',
     alignItems: 'center',
    
   },
   modalAnimation: {
-    width: 200,
-    height: 200,
+    width: width * 0.45,
+    height: width * 0.45,
     zIndex: 5,
    // backgroundColor: '#00000022',
     borderRadius: 20,
@@ -139,67 +145,74 @@ const styles = StyleSheet.create({
   },
 
   infoContainer: {
+    width:'100%',
     
-    width: '100%',
   },
   insigniaName: {
-    fontSize: 28,
+    fontSize: width * 0.065,
     fontWeight: '900',
-    color: '#FFD700',
+    color: 'white',
     textAlign: 'center',
-    marginBottom: 10,
-    
+    marginBottom: width * 0.01,
     textTransform: 'uppercase',
     letterSpacing: 1.5,
     textShadowColor: 'rgba(255, 184, 2, 0.4)',
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 15,
-    backgroundColor: '#00000022',
-    padding: 10,
+    
+    padding: width * 0.01,
     borderRadius: 20,
+  },
+  gradientBadge: {
+    width: width * 0.45,
+    alignSelf: 'center',
+    padding: width * 0.01,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: '#CCAA00',
+    margin: 10,
   },
   levelBadge: {
     backgroundColor: '#00E0FF22',
     borderWidth: 2,
     borderColor: '#00E0FF',
     borderRadius: 20,
-    paddingVertical: 5,
-    paddingHorizontal: 15,
+    paddingVertical: width * 0.02,
+    paddingHorizontal: width * 0.05,
     alignSelf: 'center',
-    marginBottom: 15,
-    marginTop: 15,
+    marginBottom: width * 0.02,
+    marginTop: width * 0.02,
   },
   levelText: {
     color: '#00E0FF',
-    fontSize: 18,
+    fontSize: width * 0.04,
     fontWeight: '700',
     letterSpacing: 1.1,
   },
   description: {
     color: '#EEE',
-    fontSize: 16,
-    lineHeight: 24,
+    fontSize: width * 0.045,
+    lineHeight: width * 0.055,
     textAlign: 'center',
     letterSpacing: 0.3,
   },
   button: {
     width: '100%',
     borderRadius: 25,
-    overflow: 'hidden',
-    marginTop: 10,
+    overflow: 'hidden', 
   },
   buttonGradient: {
-    paddingVertical: 15,
+    paddingVertical: width * 0.04,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 12,
-    padding: 10,
+    gap: width * 0.03,
+    padding: width * 0.02,
     borderRadius: 25,
   },
   buttonText: {
     color: 'white',
-    fontSize: 18,
+    fontSize: width * 0.045,
     fontWeight: '700',
     letterSpacing: 0.8,
   },

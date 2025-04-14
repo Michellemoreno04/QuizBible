@@ -7,17 +7,20 @@ import { Pressable } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSound } from '../soundFunctions/soundFunction';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { RewardedAd, RewardedAdEventType, TestIds } from 'react-native-google-mobile-ads';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Platform } from 'react-native';
-
+import { InterstitialAd, AdEventType, TestIds } from 'react-native-google-mobile-ads';
 
 
 
 const adUnitId = __DEV__ 
-? TestIds.REWARDED 
-: Platform.OS === 'ios' ? process.env.EXPO_PUBLIC_REWARDED_ID_IOS 
-: process.env.EXPO_PUBLIC_REWARDED_ID_ANDROID;
+? TestIds.INTERSTITIAL 
+: Platform.OS === 'ios' ? process.env.EXPO_PUBLIC_INTERSTITIAL_ID_IOS 
+: process.env.EXPO_PUBLIC_INTERSTITIAL_ID_ANDROID;
+
+const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
+  keywords: ['bible', 'religion'],
+});
 
 const { width, height } = Dimensions.get('screen');
 export function ModalPuntuacion({ 
@@ -27,91 +30,81 @@ export function ModalPuntuacion({
   monedasGanadas, 
   userInfo, 
   isPlaying,
-  stopMusic,
-  backgroundMusic
+  stopMusic
 }) {
   const [loaded, setLoaded] = useState(false);
-  const [rewardedAd, setRewardedAd] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigation = useNavigation();
 
 
 
   const playSound = useSound();
 
-// aquicargamos el anuncio
+// Cargar el anuncio intersticial
 useEffect(() => {
-  console.log('anuncio de puntuacion iniciado')
-    // Crear nueva instancia cada vez que se abre el modal
-    const newRewarded = RewardedAd.createForAdRequest(adUnitId, {
-      keywords: ['religion', 'bible'],
-    });
+  // Guardar la fecha del quiz en AsyncStorage para ejecutar la racha antes del modal
+  const today = new Date().toDateString();
+   AsyncStorage.setItem("lastQuizDate", today);
+   AsyncStorage.setItem("quizCompleted", "true");
+
+  const unsubscribeLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
+    setLoaded(true);
+    setError(null);
+  });
+
+  const unsubscribeError = interstitial.addAdEventListener(AdEventType.ERROR, (error) => {
+    setError(error.message);
+    setLoaded(false);
+  });
+
     
-    const unsubscribeLoaded = newRewarded.addAdEventListener(
-      RewardedAdEventType.LOADED,
-      () => {
-        setLoaded(true);
-        console.log('Anuncio puntuacion listo');
-      }
-    );
 
-    const unsubscribeEarned = newRewarded.addAdEventListener(
-      RewardedAdEventType.EARNED_REWARD,
-      (reward) => {
-        console.log('Recompensa obtenida:', reward);
-        
-         
-      }
-    );
-    // Cargar el anuncio
-    newRewarded.load();
-    setRewardedAd(newRewarded);
+  const unsubscribeOpened = interstitial.addAdEventListener(AdEventType.OPENED, () => {
+    if (Platform.OS === 'ios') {
+      // Prevent the close button from being unreachable by hiding the status bar on iOS
+      StatusBar.setHidden(true);
+    }
+  });
 
-    // Limpiar al cerrar
-    return () => {
-      unsubscribeLoaded();
-      unsubscribeEarned();
-      setLoaded(false);
-      setRewardedAd(null);
-    };
-  
+  const unsubscribeClosed = interstitial.addAdEventListener(AdEventType.CLOSED, () => {
+    if (Platform.OS === 'ios') {
+      StatusBar.setHidden(false);
+    }
+    navigation.reset({
+      index: 0,
+      routes: [{ name: '(tabs)' }],
+    });
+  });
+
+  // Start loading the interstitial straight away
+  interstitial.load();
+
+  // Unsubscribe from events on unmount
+  return () => {
+    unsubscribeLoaded();
+    unsubscribeError();
+    unsubscribeOpened();
+    unsubscribeClosed();
+  };
+
 }, [isVisible]);
 
-const showAd = async () => { 
 
-  if(loaded && rewardedAd){
-    try {
-      await rewardedAd.show();
-
-      const today = new Date().toDateString();
-      await AsyncStorage.setItem("lastQuizDate", today);
-      await AsyncStorage.setItem("quizCompleted", "true");
-      
-      if (isPlaying && stopMusic) {
-        await stopMusic(backgroundMusic);
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-    } catch (error) {
-      console.log('Error al mostrar el anuncio:', error);
-
-      const today = new Date().toDateString();
-      await AsyncStorage.setItem("lastQuizDate", today);
-      await AsyncStorage.setItem("quizCompleted", "true");
-      
-      if (isPlaying && stopMusic) {
-        await stopMusic(backgroundMusic);
-        await new Promise(resolve => setTimeout(resolve, 100));
-      }
-    } finally {
-
-      navigation.reset({
-        index: 0,
-        routes: [{ name: '(tabs)' }],
-      });
-    }
+const showAd = () => {
+  if(isPlaying){
+    stopMusic();
   }
-
-  
+  if(loaded){
+    interstitial.show();
+  }
+  else{
+    console.log('Anuncio no cargado:', error);
+    navigation.reset({
+      index: 0,
+      routes: [{ name: '(tabs)' }],
+    });
+  }
 }
 
 // para que suene el audio de la puntuacion

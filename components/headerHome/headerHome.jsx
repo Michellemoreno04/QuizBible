@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, Platform, TouchableOpacity } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { Avatar } from '@rneui/base';
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -7,14 +7,21 @@ import { doc, onSnapshot, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../components/firebase/firebaseConfig';
 import { niveles } from '../Niveles/niveles';
 import { LinearGradient } from 'expo-linear-gradient';
-
+import { ModalRacha } from '../Modales/modalRacha';
 
 export const HeaderHome = () => {
  const { user } = useAuth();
  const userId = user?.uid;
-    const [userAuthenticated, setUserAuthenticated] = useState({});
+const [userAuthenticated, setUserAuthenticated] = useState({});
+const [isModalRachaVisible, setIsModalRachaVisible] = useState(false);
    
   
+  const openModalRacha = () => {
+    setIsModalRachaVisible(true);
+  }
+  const closeModalRacha = () => {
+    setIsModalRachaVisible(false);
+  }
 
       useEffect(() => {
         if (!userId) return;
@@ -65,6 +72,7 @@ export const HeaderHome = () => {
         
     return (
         <View style={styles.headerContainer}>
+        <ModalRacha isVisible={isModalRachaVisible} setModalRachaVisible={closeModalRacha} />
         <View style={styles.leftContainer}>
         <Avatar
           size={60}
@@ -99,15 +107,18 @@ export const HeaderHome = () => {
           </View>
         </View>
 
+        <TouchableOpacity onPress={openModalRacha}>
         <LinearGradient
     colors={['#FFD700', '#D4AF37', '#FFD700']}
     start={{ x: 0, y: 0 }}
     end={{ x: 1, y: 1 }}
-     style={styles.rachaContainer}>
+     style={styles.rachaContainer}
+     
+     >
           <Text style={styles.rachaText}>{userAuthenticated?.Racha || 0}</Text>
           <FontAwesome5 name="fire-alt" size={24} color="white" />
         </LinearGradient>
-      
+        </TouchableOpacity>
       </View>
     )
 }

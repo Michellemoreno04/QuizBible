@@ -11,7 +11,7 @@ import useAuth from '../authContext/authContext';
 import { useSound } from '../soundFunctions/soundFunction';
 import { LinearGradient } from 'expo-linear-gradient';
 
-const { width, height } = Dimensions.get('window');
+const { width, height } = Dimensions.get('screen');
 
 export function ModalRacha({ isVisible, setModalRachaVisible }) {
   const { user } = useAuth();
@@ -131,12 +131,13 @@ export function ModalRacha({ isVisible, setModalRachaVisible }) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    height: height * 0.8,
     justifyContent: 'center',
     alignItems: 'center',
   },
   gradientContainer: {
     width: width * 0.9,
+    height: height * 0.8,
     borderRadius: 30,
     padding: 25,
     alignItems: 'center',

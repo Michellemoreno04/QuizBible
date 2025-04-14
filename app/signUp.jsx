@@ -7,10 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import { doc, setDoc, Timestamp } from 'firebase/firestore';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons,FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
-//import { SigninComponents } from '../components/signinComponents/signinComponents';
-import * as ImagePicker from 'expo-image-picker';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-
+import { SigninComponents } from '../components/authContext/signInComponents';
 
 
 const SignUp = () => {
@@ -279,7 +276,7 @@ return (
             }
 
             {/* Sección de Redes Sociales */}
-            {/*<View >
+          { /* <View>
               <View style={styles.divider}>
                 <View style={styles.dividerLine} />
                 <Text style={styles.dividerText}>Continúa con</Text>

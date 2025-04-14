@@ -9,5 +9,6 @@
 
 # cosas hecha 
 
-1. el permiso com.google.android.gms.permission.AD_ID fue añadido por play console 
-2. algunos bugs arreglados 
+1. añadi el permiso de billing en el archivo /AndroidManifest.xml para incluir los pagos
+2. use diseño responsivo para los modales 
+2. cambie el modal de reward que habia en modal puntuacion por un intersticial(era muy lago segun los users)

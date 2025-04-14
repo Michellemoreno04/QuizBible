@@ -132,32 +132,29 @@ export const VersiculosDiarios = () => {
   // Función para compartir la imagen capturada sin botones
   const share = async () => {
     try {
-      // Ocultar los botones antes de capturar
       setHideButtons(true);
       toast.show("⭐ Compartiendo...",{
         type: "success",
         placement: "top",
       });
-      // Esperar un momento para que se actualice el renderizado
       await new Promise(resolve => setTimeout(resolve, 200));
-  
-      // Capturar la imagen usando el viewRef
+
       const uri = await captureRef(viewRef, {
         format: "png",
-        quality: 0.8,
+        quality: 0.9,
+        result: "tmpfile"
       });
-  
-      // Compartir la imagen
+
       await Share.share({
-        url: Platform.OS === 'ios' ? uri : uri,
-        message: `${versiculo?.versiculo}\n${versiculo?.texto}`,
-        appLink: 'https://play.google.com/store/apps/details?id=com.app.QuizBible', // pentiendte para cambiar al link real
+        url: uri,
+        message: `${versiculo?.versiculo}\n${versiculo?.texto}\n\nDescarga QuizBible: https://play.google.com/store/apps/details?id=com.app.QuizBible`,
+        title: "Versículo del día",
+        type: "image/png"
       });
     } catch (error) {
       console.error("Error al compartir:", error);
       toast.show("😢 Error al compartir", { type: "danger" });
     } finally {
-      // Mostrar los botones nuevamente
       setHideButtons(false);
     }
   };

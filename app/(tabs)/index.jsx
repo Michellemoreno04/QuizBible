@@ -35,7 +35,7 @@ export default function AppComponent() {
 
 
 
-// obtener los datos del usuario y manejar la racha diaria
+// obtener los datos del usuario
 useEffect(() => {
   if (!userId) return;
 
@@ -51,7 +51,7 @@ useEffect(() => {
   return () => unsubscribe();
 }, [userId]);
 
-// aqui vamos a mostrar el modal de not vidas si es un nievo dia y el usuario tiene menos de 2 vidas
+// aqui vamos a mostrar el modal de not vidas si es un nuevo dia y el usuario tiene menos de 2 vidas
 useEffect(() => {
   if (!userId ) return;
 

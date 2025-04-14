@@ -39,6 +39,8 @@ const VersiculosFavoritos = () => {
     return unsubscribe;
   }, [user?.uid]);
 
+  
+
   const handleDelete = async (item) => {
     Alert.alert(
       'Eliminar Versículo',
@@ -74,11 +76,15 @@ const VersiculosFavoritos = () => {
 
   const handleShare = async (imageUrl) => {
     try {
+      if (!imageUrl) {
+        toast.show('No hay imagen para compartir', { type: 'warning' });
+        return;
+      }
       const appLink = 'https://play.google.com/store/apps/details?id=com.app.QuizBible';
       await Share.share({
-        url: imageUrl,
-        title: 'Versículo Inspirador',
-        message: `Mira este hermoso versículo que encontré:\n\n${selectedVerse.versiculo}\n\n${selectedVerse.texto}\n\nDescarga la app aquí: ${appLink}`,
+        message: `${selectedVerse?.texto}\n\n${selectedVerse?.versiculo}\n\nDescarga QuizBible: ${appLink}`,
+        
+        
       });
     } catch (error) {
       toast.show('Error al compartir', { type: 'danger' });

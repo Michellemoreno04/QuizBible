@@ -9,7 +9,7 @@ import { StatusBar } from 'expo-status-bar';
 import  useAuth  from '@/components/authContext/authContext';
 import {NotVidasModal} from '@/components/Modales/recargarVidas';
 import { ModalRacha } from '@/components/Modales/modalRacha';
-import { doc, onSnapshot, updateDoc,getDoc } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc,getDoc, increment } from 'firebase/firestore';
 import { db } from '@/components/firebase/firebaseConfig';
 import { manejarRachaDiaria } from '@/components/Racha/manejaRacha';
 import { ModalRachaPerdida } from '@/components/Modales/rachaPerdida';
@@ -70,7 +70,10 @@ useEffect(() => {
 
         // Paso 2: Actualizar solo si tiene menos de 2 vidas
         if (currentVidas < 2) {
-          await updateDoc(userRef, { Vidas: 2 });
+          await updateDoc(userRef, {
+             Vidas: 2,
+            Monedas: increment(200),
+            });
           setNotVidasModalVisible(true); // Mostrar modal solo si se actualizó
         }
 

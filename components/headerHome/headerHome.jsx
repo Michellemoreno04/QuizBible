@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Platform, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, Platform, TouchableOpacity, Pressable, Image } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { Avatar } from '@rneui/base';
 import { FontAwesome5 } from '@expo/vector-icons';
@@ -8,13 +8,16 @@ import { db } from '../../components/firebase/firebaseConfig';
 import { niveles } from '../Niveles/niveles';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ModalRacha } from '../Modales/modalRacha';
+import Modal from 'react-native-modal';
+
+
 
 export const HeaderHome = () => {
  const { user } = useAuth();
  const userId = user?.uid;
 const [userAuthenticated, setUserAuthenticated] = useState({});
 const [isModalRachaVisible, setIsModalRachaVisible] = useState(false);
-   
+const [isImageOpen, setIsImageOpen] = useState(false);
   
   const openModalRacha = () => {
     setIsModalRachaVisible(true);
@@ -22,6 +25,19 @@ const [isModalRachaVisible, setIsModalRachaVisible] = useState(false);
   const closeModalRacha = () => {
     setIsModalRachaVisible(false);
   }
+
+  const openImage = () => {
+    if(userAuthenticated?.FotoPerfil){
+      setIsImageOpen(true);
+    }
+  }
+
+  const closeImage = () => {
+    setIsImageOpen(false);
+  }
+
+
+
 
       useEffect(() => {
         if (!userId) return;
@@ -73,7 +89,38 @@ const [isModalRachaVisible, setIsModalRachaVisible] = useState(false);
     return (
         <View style={styles.headerContainer}>
         <ModalRacha isVisible={isModalRachaVisible} setModalRachaVisible={closeModalRacha} />
+        <Modal 
+  isVisible={isImageOpen} 
+  animationIn="zoomIn"
+  animationOut="zoomOut"
+  backdropTransitionOutTiming={0}
+  backdropOpacity={0.7}
+  onBackdropPress={closeImage}
+  style={styles.modal}
+>
+  <LinearGradient
+    colors={[ '#1E3A5F', '#3C6E9F']}
+    start={{ x: 0, y: 0 }}
+    end={{ x: 1, y: 1 }}
+    style={styles.modalContent}
+  >
+    <TouchableOpacity 
+      style={styles.closeButton} 
+      onPress={closeImage}
+      activeOpacity={0.7}
+    >
+      <FontAwesome5 name="times" size={24} color="white" />
+    </TouchableOpacity>
+    
+    <Image 
+      source={{ uri: userAuthenticated?.FotoPerfil }}
+      style={styles.modalImage}  
+      resizeMode="stretch"
+    />
+  </LinearGradient>
+</Modal>
         <View style={styles.leftContainer}>
+        <TouchableOpacity onPress={openImage}>
         <Avatar
           size={60}
           rounded
@@ -85,6 +132,7 @@ const [isModalRachaVisible, setIsModalRachaVisible] = useState(false);
             : { title: userAuthenticated?.Name?.charAt(0).toUpperCase() }
           )}
           avatarStyle={styles.avatar} />
+          </TouchableOpacity>
 
           <View style={styles.userInfo}>
             <Text style={styles.greeting}>
@@ -132,6 +180,45 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         marginBottom: 15,
       },
+      modal: {
+        margin: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
+    
+      },
+      modalContent: {
+        width: '90%',
+        height: '60%',
+        position: 'relative',
+       // backgroundColor: 'rgba(255, 215, 0, 0.8)',
+      },
+      closeButton: {
+        width: 50,
+        height: 50,
+        position: 'absolute',
+        top: -30,
+        right: -15,
+        zIndex: 1,
+        backgroundColor: 'red',
+        borderRadius: 50,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 2,
+        borderColor: 'white',
+        padding: 5,
+      },
+      modalImage: {
+        width: '100%',
+        height: '100%',
+        borderRadius: 15,
+        position: 'relative',
+        borderWidth: 2,
+        borderColor: 'rgba(255, 215, 0, 0.8)',
+        padding: 5,
+       // backgroundColor: 'rgba(255, 215, 0, 0.8)',
+
+      },
+     
       avatar: {
         width: 60,
         height: 60,

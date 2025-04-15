@@ -18,11 +18,12 @@
         "foregroundImage": "./assets/images/quizBible-logo.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.moreno.dev.QuizBible",
+      
+      "package": "com.moreno.dev.Bible_game1",
       "enableProguardInReleaseBuilds": true,
       "softwareKeyboardLayoutMode": "pan",
       "permissions": [
-       
+        
         "com.google.android.gms.permission.AD_ID",
         "android.permission.INTERNET",
         "android.permission.ACCESS_NETWORK_STATE"
@@ -36,6 +37,7 @@
     },
     "plugins": [
       "expo-router",
+      
       [
         "expo-splash-screen",
         {

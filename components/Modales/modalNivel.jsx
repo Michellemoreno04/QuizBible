@@ -5,11 +5,19 @@ import LottieView from 'lottie-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { niveles } from '../Niveles/niveles';
 const { width, height } = Dimensions.get('screen');
+import { useEffect } from 'react';
+import { useSound } from '../soundFunctions/soundFunction';
 
 export default function NivelModal({ nivel, isVisible, onClose, Exp }) {
   
       const { insignia,animation, description } = niveles(Exp);
+      const playSound = useSound();
 
+useEffect(() => {
+  if(isVisible){
+    playSound(require('../../assets/sound/levelUpSound.mp3'));
+  }
+}, [isVisible])
 
   return (
     <Modal

@@ -20,6 +20,7 @@ import { niveles } from '@/components/Niveles/niveles';
 import { Avatar, Icon } from '@rneui/themed';
 import {InsigniasComponent} from '@/components/insigniasComponents/insigniasComponents';
 import { BannerAd, TestIds } from 'react-native-google-mobile-ads';
+import Modal from 'react-native-modal';
 
 const bannerAdUnitId = __DEV__ 
   ? TestIds.BANNER 
@@ -32,6 +33,17 @@ export default function Profile() {
   const { user, logout } = useAuth();
   const userId = user?.uid;
   const [userInfo, setUserInfo] = useState({});
+  const [isImageOpen, setIsImageOpen] = useState(false);
+
+  const openImage = () => {
+    if(userInfo?.FotoPerfil){
+      setIsImageOpen(true);
+    }
+  }
+
+  const closeImage = () => {
+    setIsImageOpen(false);
+  }
 
   useEffect(() => {
     if (!user) return;
@@ -68,24 +80,57 @@ export default function Profile() {
             end={{ x: 1, y: 1 }}
           >
             <View style={styles.avatarContainer}>
-              {userInfo?.FotoPerfil ? (
-                <Avatar
-                  size={120}
-                  rounded
-                  source={{ uri: userInfo.FotoPerfil }}
-                  containerStyle={styles.avatar}
-                />
-              ) : (
-                <Avatar
-                  size={120}
-                  rounded
-                  title={userInfo?.Name?.charAt(0)}
-                  containerStyle={styles.avatar}
-                  titleStyle={styles.avatarText}
-                />
-              )}
-              
+              <TouchableOpacity onPress={openImage}>
+                {userInfo?.FotoPerfil ? (
+                  <Avatar
+                    size={120}
+                    rounded
+                    source={{ uri: userInfo.FotoPerfil }}
+                    containerStyle={styles.avatar}
+                  />
+                ) : (
+                  <Avatar
+                    size={120}
+                    rounded
+                    title={userInfo?.Name?.charAt(0)}
+                    containerStyle={styles.avatar}
+                    titleStyle={styles.avatarText}
+                  />
+                )}
+              </TouchableOpacity>
             </View>
+
+            {/* Modal para la foto de perfil */}
+            <Modal 
+              isVisible={isImageOpen} 
+              animationIn="zoomIn"
+              animationOut="zoomOut"
+              backdropTransitionOutTiming={0}
+              backdropOpacity={0.7}
+              onBackdropPress={closeImage}
+              style={styles.modal}
+            >
+              <LinearGradient
+                colors={[ '#1E3A5F', '#3C6E9F']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.modalContent}
+              >
+                <TouchableOpacity 
+                  style={styles.closeButton} 
+                  onPress={closeImage}
+                  activeOpacity={0.7}
+                >
+                  <FontAwesome5 name="times" size={24} color="white" />
+                </TouchableOpacity>
+                
+                <Image 
+                  source={{ uri: userInfo?.FotoPerfil }}
+                  style={styles.modalImage}  
+                  resizeMode="stretch"
+                />
+              </LinearGradient>
+            </Modal>
 
             <Text style={styles.userName}>{userInfo?.Name || 'Usuario'}</Text>
             <Text style={styles.userHandle}>@{userInfo?.username || 'usuario123'}</Text>
@@ -306,5 +351,39 @@ const styles = StyleSheet.create({
    
     alignItems: 'center',
    
+  },
+  modal: {
+    margin: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '90%',
+    height: '60%',
+    position: 'relative',
+  },
+  closeButton: {
+    width: 50,
+    height: 50,
+    position: 'absolute',
+    top: -30,
+    right: -15,
+    zIndex: 1,
+    backgroundColor: 'red',
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'white',
+    padding: 5,
+  },
+  modalImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 15,
+    position: 'relative',
+    borderWidth: 2,
+    borderColor: 'rgba(255, 215, 0, 0.8)',
+    padding: 5,
   },
 });

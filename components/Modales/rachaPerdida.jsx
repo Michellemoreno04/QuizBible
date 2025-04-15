@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Pressable, Alert, Dimensions } from 'react-native'
-import React from 'react'
+import React, { useEffect } from 'react'
 import Modal from 'react-native-modal' // Nota: Se recomienda usar "react-native-modal" para los props isVisible, animationIn, etc.
 import { FontAwesome5 } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
@@ -8,16 +8,22 @@ import { doc, updateDoc } from 'firebase/firestore'
 import { db } from '../../components/firebase/firebaseConfig'
 import useAuth from '../authContext/authContext'
 import { MaterialIcons } from '@expo/vector-icons'
-
+import { useSound } from '../soundFunctions/soundFunction'
 
 const { width, height } = Dimensions.get('window');
 
 export function ModalRachaPerdida({ userInfo,isVisible, setModalRachaPerdidaVisible }) {
   const { user } = useAuth();
-
+  const playSound = useSound();
   const userId = user.uid;
   const coinsRequired = 1000;
 
+  // para que suene el audio de la racha perdida
+  useEffect(() => {
+    if(isVisible){
+      playSound(require('../../assets/sound/rachaPerdidaSound.mp3'));
+    }
+  }, [isVisible])
   // Funciones dummy para manejar las acciones de los botones.
   const userDocRef = doc(db, 'users', userId);
 

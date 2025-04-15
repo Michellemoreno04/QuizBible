@@ -42,7 +42,7 @@ export function ModalRacha({ isVisible, setModalRachaVisible }) {
   };
 
   return (
-    <Modal
+     <Modal
       isVisible={isVisible}
       onBackdropPress={closeModal}
       backdropOpacity={0.80}
@@ -59,7 +59,6 @@ export function ModalRacha({ isVisible, setModalRachaVisible }) {
           <View style={styles.header}>
             <MaterialIcons name="stars" size={28} color="#FFB802" />
             <Text style={styles.title}>🔥 Récord Diario 🔥</Text>
-            <MaterialIcons name="stars" size={28} color="#FFB802" />
           </View>
 
           {/* Animación de fuego */}
@@ -75,7 +74,9 @@ export function ModalRacha({ isVisible, setModalRachaVisible }) {
           <Text style={styles.highlightedText}>
             ¡Estás en llamas!{'\n'}Sigue así 🔥
           </Text>
-
+     <Text style={{color: '#EEE', fontSize: 14, textAlign: 'center', marginTop: 10}}>
+      Sigue jugandos todos los dias para que aumentes y mantenga tu racha 😊
+      </Text>
           {/* Estadísticas */}
           <View style={styles.statsContainer}>
             <LinearGradient

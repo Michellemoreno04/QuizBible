@@ -1,13 +1,13 @@
 import { Link } from 'expo-router';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, TextInput, KeyboardAvoidingView, Text, Platform, Pressable, Alert, ScrollView,StyleSheet, Image, Linking, SafeAreaView,StatusBar as RNStatusBar, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import {auth,db} from '../components/firebase/firebaseConfig'
 import { useNavigation } from '@react-navigation/native';
-import { doc, setDoc, Timestamp } from 'firebase/firestore';
+import { doc, setDoc, Timestamp, getDoc } from 'firebase/firestore';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons,FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
-import { SigninComponents } from '../components/authContext/signInComponents';
+import SignInComponents, { onGoogleButtonPress, initGoogleSignIn } from '../components/authContext/signInComponents';
 
 
 const SignUp = () => {
@@ -34,6 +34,10 @@ const SignUp = () => {
     hoy.setHours(0, 0, 0, 0); // Establecer solo la fecha (sin hora)
     const ayer = new Date(hoy);
       ayer.setDate(hoy.getDate() - 1); // Restar un día para setear la racha
+
+  useEffect(() => {
+    initGoogleSignIn();
+  }, []);
 
  const handlerOnChange = (field, value) => {
   setCredenciales((prevCredenciales) => ({
@@ -80,6 +84,40 @@ const handleSignUp = async () => {
     }
   } else {
     Alert.alert('Por favor, complete todos los campos.');
+    setLoading(false);
+  }
+};
+
+const handleGoogleSignIn = async () => {
+  setLoading(true);
+  try {
+    const result = await onGoogleButtonPress();
+    const user = result.user;
+
+    // Verificar si el usuario ya existe en Firestore
+    const userDoc = await getDoc(doc(db, "users", user.uid));
+    
+    if (!userDoc.exists()) {
+      // Si el usuario no existe, crear su perfil
+      await setDoc(doc(db, "users", user.uid), {
+        Name: user.displayName || 'Usuario',
+        Email: user.email,
+        TiempoRegistrado: Timestamp.now(),
+        Vidas: vidas,
+        Monedas: monedas,
+        Exp: exp,
+        Nivel: nivel,
+        Racha: racha,
+        RachaMaxima: rachaMaxima,
+        modalRachaShow: ayer.toISOString(),
+        Genero: selectedAvatar || 'masculino'
+      });
+    }
+
+    navigate.replace('welcomeScreen');
+  } catch (error) {
+    handleFirebaseError(error);
+  } finally {
     setLoading(false);
   }
 };
@@ -276,14 +314,14 @@ return (
             }
 
             {/* Sección de Redes Sociales */}
-          { /* <View>
+         <View>
               <View style={styles.divider}>
                 <View style={styles.dividerLine} />
                 <Text style={styles.dividerText}>Continúa con</Text>
                 <View style={styles.dividerLine} />
               </View>
-              <SigninComponents />
-            </View>*/}
+             <SignInComponents />
+            </View>
 
             {/* Enlace a Login */}
             <View style={styles.loginLink}>
@@ -433,6 +471,21 @@ goToLogin: {
   color: '#fbbf24',
   fontWeight: '600',
   textDecorationLine: 'underline'
+},
+googleButton: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  backgroundColor: '#4285F4',
+  borderRadius: 12,
+  padding: 16,
+  marginTop: 10,
+  gap: 10
+},
+googleButtonText: {
+  color: '#FFF',
+  fontSize: 16,
+  fontWeight: '600'
 }
 });
 

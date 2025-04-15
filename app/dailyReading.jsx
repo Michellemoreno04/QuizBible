@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Share, Alert,ActivityIndicator, Platform } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Share, Alert,ActivityIndicator, Platform, SafeAreaView, StatusBar } from 'react-native';
 import * as Speech from 'expo-speech';
 import { FontAwesome6, FontAwesome, MaterialIcons, Feather } from '@expo/vector-icons';
 import useAuth from  '../components/authContext/authContext';
@@ -8,6 +8,8 @@ import { addDoc, collection, doc, getDoc, getDocs, query, where, orderBy, startA
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { InterstitialAd, AdEventType, TestIds } from 'react-native-google-mobile-ads';
+import { LinearGradient } from 'expo-linear-gradient';
+import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
 
 
 const adUnitId = __DEV__ 
@@ -311,226 +313,229 @@ const DailyReading = () => {
     }
   };
 
-  
+    
 
-if(isLoading){
-  return <ActivityIndicator size="large" color="gray" />
-}
-
-  if (readingText.length === 0) {
-    return (
-      <View style={styles.emptyContainer}>
-        <Feather name="book-open" size={60} color="gray" />
-        <Text style={styles.emptySubtext}>No hay lecturas por hoy</Text>
-      </View>
-    );
-  }
-
-
-
-  return (
-    <View style={styles.container}>
-      <ScrollView 
-        contentContainerStyle={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        {readingText.map((item) => (
-          <View key={item.lecturaId} style={styles.card}>
-            <Text style={styles.title}>{item.titulo}</Text>
-            <Text style={styles.text}>{item.texto}</Text>
+    if(isLoading){
+      return <ActivityIndicator size="large" color="gray" />
+    }
+    
+      if (readingText.length === 0) {
+        return (
+          <LinearGradient  colors={[ '#1E3A5F', '#3C6E9F']} style={{flex: 1}}>
+          <StatusBar barStyle="dark-content" />
+          <View style={styles.emptyContainer}>
+            <Feather name="book-open" size={60} color="gray" />
+            <Text style={styles.emptySubtext}>No hay lecturas por hoy</Text>
           </View>
-        ))}
-
-        {/* Controlador de audio */}
-        <View style={styles.audioControls}>
-          <TouchableOpacity 
-            style={[styles.audioButton, isSpeaking && styles.activeAudioButton]}
-            onPress={handleSpeak}
-            activeOpacity={0.8}
+          </LinearGradient>
+        );
+      }
+    
+    
+    
+      return (
+        <LinearGradient  colors={[ '#1E3A5F', '#3C6E9F']} style={styles.card}>
+          <StatusBar barStyle="dark-content" />
+          <ScrollView 
+            contentContainerStyle={styles.scrollContainer}
+            showsVerticalScrollIndicator={false}
           >
-            {isLoadingAudio ? (
-              <ActivityIndicator size="small" color="white" style={styles.audioIcon} />
-            ) : (
-              <FontAwesome6 
-                name={isSpeaking ? "pause" : "play"} 
-                size={28} 
-                color="white" 
-                style={styles.audioIcon}
-              />
-            )}
-            <Text style={styles.audioButtonText}>
-              {isLoadingAudio ? 'Cargando...' : isSpeaking ? 'Reproduciendo...' : 'Reproducir'}
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Checkbox para marcar como leído */}
-        <TouchableOpacity 
-          style={styles.checkboxContainer}
-          onPress={handleCheckbox}
-          activeOpacity={0.8}
-        >
-          <View style={[styles.checkbox, isChecked && styles.checked]}>
-            {isChecked && <Feather name="check" size={18} color="white" />}
-          </View>
-          <Text style={styles.checkboxText}>Marcar como leído</Text>
-        </TouchableOpacity>
-
-        {/* Botones adicionales */}
-        <View style={styles.actionsContainer}>
-          <TouchableOpacity 
-            style={[styles.actionButton, styles.shareButton]}
-            onPress={handleShareReading}
-            activeOpacity={0.8}
-          >
-            <MaterialIcons name="share" size={22} color="white" />
-            <Text style={styles.actionButtonText}>Compartir</Text>
-          </TouchableOpacity>
-          
-          {isChecked && !isRead && (
+            {readingText.map((item) => (
+                <View key={item.lecturaId}>
+                <Text style={styles.title}>{item.titulo}</Text>
+                <Text style={styles.text}>{item.texto}</Text>
+                </View>
+            ))}
+    
+            {/* Controlador de audio */}
+            <View style={styles.audioControls}>
+              <TouchableOpacity 
+                style={[styles.audioButton, isSpeaking && styles.activeAudioButton]}
+                onPress={handleSpeak}
+                activeOpacity={0.8}
+              >
+                {isLoadingAudio ? (
+                  <ActivityIndicator size="small" color="white" style={styles.audioIcon} />
+                ) : (
+                  <FontAwesome6 
+                    name={isSpeaking ? "pause" : "play"} 
+                    size={28} 
+                    color="white" 
+                    style={styles.audioIcon}
+                  />
+                )}
+                <Text style={styles.audioButtonText}>
+                  {isLoadingAudio ? 'Cargando...' : isSpeaking ? 'Reproduciendo...' : 'Reproducir'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+    
+            {/* Checkbox para marcar como leído */}
             <TouchableOpacity 
-              style={[styles.actionButton, styles.readButton]}
-              onPress={handleReading}
+              style={styles.checkboxContainer}
+              onPress={handleCheckbox}
               activeOpacity={0.8}
             >
-              <FontAwesome name="check" size={18} color="white" />
-              <Text style={styles.actionButtonText}>Leído</Text>
+              <View style={[styles.checkbox, isChecked && styles.checked]}>
+                {isChecked && <Feather name="check" size={18} color="white" />}
+              </View>
+              <Text style={styles.checkboxText}>Marcar como leído</Text>
             </TouchableOpacity>
-          )}
-        </View>
-      </ScrollView>
-    </View>
-  );
-};
-
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#F9F9F9',
-      paddingHorizontal: 16,
-    },
-    scrollContainer: {
-      paddingVertical: 10,
-    },
-    card: {
-      backgroundColor: 'white',
-      borderRadius: 16,
-      padding: 10,
-      marginBottom: 30,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 6,
-      elevation: 3,
-    },
-    title: {
-      fontSize: 28,
-      fontWeight: '800',
-      color: '#1A1A1A',
-      marginBottom: 20,
-      textAlign: 'center',
-      lineHeight: 34,
-    },
-    text: {
-      fontSize: 17,
-      color: '#444',
-      lineHeight: 28,
-      textAlign: 'justify',
-    },
-    audioControls: {
-      marginBottom: 25,
-      alignItems: 'center',
-    },
-    audioButton: {
-      backgroundColor: '#2196F3',
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: 14,
-      paddingHorizontal: 24,
-      borderRadius: 50,
-      shadowColor: '#2196F3',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.2,
-      shadowRadius: 10,
-      elevation: 3,
-    },
-    activeAudioButton: {
-      backgroundColor: '#1976D2',
-    },
-    audioIcon: {
-      marginRight: 12,
-    },
-    audioButtonText: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: 'white',
-    },
-    checkboxContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: 30,
-      alignSelf: 'center',
-    },
-    checkbox: {
-      width: 24,
-      height: 24,
-      borderRadius: 6,
-      borderWidth: 2,
-      borderColor: '#DDD',
-      marginRight: 12,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'white',
-    },
-    checked: {
-      backgroundColor: '#4CAF50',
-      borderColor: '#4CAF50',
-    },
-    checkboxText: {
-      fontSize: 16,
-      color: '#444',
-      fontWeight: '500',
-    },
-    actionsContainer: {
-      flexDirection: 'row',
-      justifyContent: 'center',
-      gap: 15,
-      marginBottom: 20,
-    },
-    actionButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: 12,
-      paddingHorizontal: 20,
-      borderRadius: 50,
-      minWidth: 120,
-      justifyContent: 'center',
-    },
-    shareButton: {
-      backgroundColor: '#6200EE',
-    },
-    readButton: {
-      backgroundColor: '#4CAF50',
-    },
-    actionButtonText: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: 'white',
-      marginLeft: 10,
-    },
-    emptyContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
     
-    },
-    emptySubtext: {
-      color: 'rgba(255,255,255,0.4)',
-      fontSize: 14,
-      marginTop: 8,
-      textAlign: 'center',
-      color: 'gray',
-    },
-  });
+            {/* Botones adicionales */}
+            <View style={styles.actionsContainer}>
+              <TouchableOpacity 
+                style={[styles.actionButton, styles.shareButton]}
+                onPress={handleShareReading}
+                activeOpacity={0.8}
+              >
+                <MaterialIcons name="share" size={22} color="white" />
+                <Text style={styles.actionButtonText}>Compartir</Text>
+              </TouchableOpacity>
+              
+              {isChecked && !isRead && (
+                <TouchableOpacity 
+                  style={[styles.actionButton, styles.readButton]}
+                  onPress={handleReading}
+                  activeOpacity={0.8}
+                >
+                  <FontAwesome name="check" size={18} color="white" />
+                  <Text style={styles.actionButtonText}>Leído</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </ScrollView>
+        </LinearGradient>
+        
+      );
+    };
+    
+      const styles = StyleSheet.create({
+        container: {
+          flex: 1,
+          backgroundColor: '#F9F9F9',
+          
+        },
+        
+        card: {
+          padding: 15,
+          
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 6,
+          elevation: 3,
+        },
+        title: {
+          fontSize: 28,
+          fontWeight: '800',
+          color: '#FFFFFF',
+          marginBottom: 20,
+          textAlign: 'center',
+          lineHeight: 34,
+        },
+        text: {
+          fontSize: 17,
+          color: '#FFFFFF',
+          lineHeight: 23,
+          textAlign: 'justify',
+        },
+        audioControls: {
+          marginBottom: 25,
+          alignItems: 'center',
+        },
+        audioButton: {
+          
+          backgroundColor: '#2196F3',
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingVertical: 14,
+          paddingHorizontal: 24,
+          borderRadius: 50,
+          shadowColor: '#2196F3',
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.2,
+          shadowRadius: 10,
+          elevation: 3,
+        },
+        activeAudioButton: {
+          backgroundColor: '#1976D2',
+        },
+        audioIcon: {
+          marginRight: 12,
+        },
+        audioButtonText: {
+          fontSize: 16,
+          fontWeight: '600',
+          color: 'white',
+        },
+        checkboxContainer: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          marginBottom: 30,
+          alignSelf: 'center',
+        },
+        checkbox: {
+          width: 24,
+          height: 24,
+          borderRadius: 6,
+          borderWidth: 2,
+          borderColor: '#DDD',
+          marginRight: 12,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: 'white',
+        },
+        checked: {
+          backgroundColor: '#4CAF50',
+          borderColor: '#4CAF50',
+        },
+        checkboxText: {
+          fontSize: 16,
+          color: '#FFFFFF',
+          fontWeight: '500',
+        },
+        actionsContainer: {
+          flexDirection: 'row',
+          justifyContent: 'center',
+          gap: 15,
+          marginBottom: 20,
+        },
+        actionButton: {
+          flexDirection: 'row',
+          alignItems: 'center',
+          paddingVertical: 12,
+          paddingHorizontal: 20,
+          borderRadius: 50,
+          minWidth: 120,
+          justifyContent: 'center',
+        },
+        shareButton: {
+          backgroundColor: '#6200EE',
+        },
+        readButton: {
+          backgroundColor: '#4CAF50',
+        },
+        actionButtonText: {
+          fontSize: 16,
+          fontWeight: '600',
+          color: 'white',
+          marginLeft: 10,
+        },
+        emptyContainer: {
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        
+        },
+        emptySubtext: {
+          color: 'rgba(255,255,255,0.4)',
+          fontSize: 14,
+          marginTop: 8,
+          textAlign: 'center',
+          color: 'gray',
+        },
+      });
+    
   
   export default DailyReading;

@@ -14,7 +14,7 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { RewardedAd, RewardedAdEventType, TestIds } from 'react-native-google-mobile-ads';
-
+import { useSound } from '../soundFunctions/soundFunction';
 const adUnitId = __DEV__ 
   ? TestIds.REWARDED 
   : Platform.OS === 'ios' 
@@ -24,12 +24,14 @@ const adUnitId = __DEV__
 export const RewardedAdModal = ({ isVisible,setIsVisible, onClose,userId,vidas,setShowModal }) => {
   const [loaded, setLoaded] = useState(false);
   const [rewardedAd, setRewardedAd] = useState(null);
-  const navigation = useNavigation();
-  
+const navigation = useNavigation();
+const playSound = useSound();
 
   
   useEffect(() => {
-console.log('anuncio not vidas iniciado')
+if(isVisible){
+  playSound(require('../../assets/sound/notVidasSoundModal.mp3'));
+}
       const newRewarded = RewardedAd.createForAdRequest(adUnitId, {
         keywords: ['religion', 'bible'],
       });

@@ -16,6 +16,7 @@ import { useState, useEffect, useRef } from 'react';
 import  useAuth  from '../authContext/authContext';
 import {doc,updateDoc,increment} from 'firebase/firestore';
 import {db} from '../../components/firebase/firebaseConfig';
+import { useSound } from '../soundFunctions/soundFunction';
 
 const adUnitId = __DEV__ 
 ? TestIds.REWARDED 
@@ -28,11 +29,15 @@ export const NoCoinsModal = ({ visible, onClose }) => {
   const [isVisible, setIsVisible] = React.useState(visible);
   const [loaded, setLoaded] = useState(false);
   const rewardedAd = useRef(null);
+  const playSound = useSound();
 
   const {user} = useAuth();
   const userId = user?.uid;
 
   useEffect(() => {
+    if(visible){
+      playSound(require('../../assets/sound/notVidasSoundModal.mp3'));
+    }
     // Crear nueva instancia del anuncio cuando el componente se monta
     rewardedAd.current = RewardedAd.createForAdRequest(adUnitId, {
       keywords: ['religion', 'bible'],

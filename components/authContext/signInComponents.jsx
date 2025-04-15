@@ -1,94 +1,78 @@
-import { View, Text, Pressable, StyleSheet } from "react-native";
-import React, { useState } from "react";
-import { AntDesign, FontAwesome6 } from "@expo/vector-icons";
-/*import { GoogleSignin,statusCodes,} from "@react-native-google-signin/google-signin";
-import { useNavigation } from "expo-router";
-import { auth } from "../firebase/firebaseConfig";
-import {GoogleAuthProvider, signInWithCredential} from "firebase/auth";
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { auth } from '../firebase/firebaseConfig';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { GoogleSigninButton } from '@react-native-google-signin/google-signin';
 
-
-GoogleSignin.configure({
-  webClientId: process.env.EXPO_PUBLIC_WEB_TOKEN_GOOGLE_SIGN_IN , // client ID of type WEB for your server. Required to get the `idToken` on the user object, and for offline access.
-  scopes: ["https://www.googleapis.com/auth/userinfo.profile"],
-  offlineAccess: true, // if you want to access Google API on behalf of the user FROM YOUR SERVER
-  forceCodeForRefreshToken: true, // [Android] related to `serverAuthCode`, read the docs link below *.
-  //iosClientId: '<FROM DEVELOPER CONSOLE>', // [iOS] if you want to specify the client ID of type iOS (otherwise, it is taken from GoogleService-Info.plist)
-});
-*/
-export function SigninComponents() {
-  // const navigation = useNavigation();
-  //const [state, setState] = useState({ userInfo: null });
-
-  // Somewhere in your code
-  const signIn = async () => {
- /*   try {
-      // Verifica si hay Play Services en el dispositivo (importante para Android)
-      await GoogleSignin.hasPlayServices();
-       // Inicia el proceso de inicio de sesión con Google
-      await GoogleSignin.signIn();
-// Obtiene la información del usuario actualmente autenticado
-      const response = await GoogleSignin.getCurrentUser();
-
-      console.log(response, "USERRR");
-       // Crea una credencial de Google a partir del idToken recibido
-      const googleCredential = await GoogleAuthProvider.credential(
-        response.idToken
-      );
-      console.log(googleCredential, "SDDSFjjhj");
-      // Sign-in to Firebase with the Google credential
-      const signInWithCredentia = await signInWithCredential(
-        auth,
-        googleCredential
-      );
+// Función para inicializar Google Sign In
+export const initGoogleSignIn = async () => {
+  const has = await GoogleSignin.hasPlayServices();
+  if(has){
+    GoogleSignin.configure({
       
-      console.log(signInWithCredentia, "SDFSDF");
-     
-    } catch (error) {
-      // Aquí se verifica si el error tiene una propiedad 'code' que se puede usar para manejar errores específicos
-      console.log("el error es:", error);
-      if (isErrorWithCode(error)) {
-        switch (error.code) {
-          case statusCodes.IN_PROGRESS:
-            // La operación de inicio de sesión ya se encuentra en progreso
+      webClientId: '1001847642825-rh05l1e0ed7avev5mvdkdgugrk0ejea5.apps.googleusercontent.com',
+    });
+  }
+};
 
-            break;
-          case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
-            // Android only, play services not available or outdated
-            break;
-          default:
-           // Manejo de otros errores relacionados con Google Signin
-        }
-      } else {
-        // an error that's not related to google sign in occurred
-        console.log("el error no relacionado con google:", error);
-      }
-    }*/
-  };
+// Función para manejar el login con Google
+export const onGoogleButtonPress = async () => {
+  try {
+    // Check if your device supports Google Play
+    await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
+    // Get the users ID token
+    const signInResult = await GoogleSignin.signIn();
+
+    // Try the new style of google-sign in result, from v13+ of that module
+    let idToken = signInResult.data?.idToken;
+    if (!idToken) {
+      // if you are using older versions of google-signin, try old style result
+      idToken = signInResult.idToken;
+    }
+    if (!idToken) {
+      throw new Error('No ID token found');
+    }
+
+    // Create a Google credential with the token
+    const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+
+    // Sign-in the user with the credential
+    return auth().signInWithCredential(googleCredential);
+  } catch (error) {
+    console.error('Error en Google Sign In:', error);
+    throw error;
+  }
+};
+
+export default function SignInComponents() {
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState();
+
+  useEffect(() => {
+    initGoogleSignIn();
+  }, []);
+
+  // Handle user state changes
+  function onAuthStateChanged(user) {
+    setUser(user);
+    if (initializing) setInitializing(false);
+  }
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(onAuthStateChanged);
+    return unsubscribe;
+  }, []);
+
+  if (initializing) return null;
 
   return (
-    <View style={styles.container}>
-      <Pressable
-        onPress={signIn}
-        className="w-full-white p-5 bg-white rounded-full"
-      >
-        <AntDesign name="google" size={24} color="black" />
-      </Pressable>
-      <Pressable className="w-full-white p-5 bg-white rounded-full">
-        <FontAwesome6 name="facebook" size={24} color="black" />
-      </Pressable>
-      <Pressable className="w-full-white p-5 bg-white rounded-full">
-        <AntDesign name="apple1" size={24} color="black" />
-      </Pressable>
+    <View>
+      <GoogleSigninButton
+        style={{ width: 192, height: 48 }}
+        size={GoogleSigninButton.Size.Wide}
+        color={GoogleSigninButton.Color.Dark}
+        onPress={onGoogleButtonPress}
+      />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 20,
-    marginTop: 20,
-  },
-});

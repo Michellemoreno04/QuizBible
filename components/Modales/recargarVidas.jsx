@@ -1,13 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet, Animated, Easing } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSound } from '../soundFunctions/soundFunction';
 
 export const NotVidasModal = ({ visible, setNotVidasModalVisible }) => {
   const scaleValue = new Animated.Value(0);
   const pulseAnim = new Animated.Value(1);
+  const playSound = useSound();
 
-  React.useEffect(() => {
+
+  useEffect(() => {
     if (visible) {
+      playSound(require('../../assets/sound/vidasYmonedasCargadas.mp3'));
       Animated.spring(scaleValue, {
         toValue: 1,
         friction: 4,
@@ -72,9 +76,20 @@ export const NotVidasModal = ({ visible, setNotVidasModalVisible }) => {
                 start={{ x: 0, y: 0.5 }}
                 end={{ x: 1, y: 0.5 }}
               >
+                <View style={styles.rewardsContainer}>
+                <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
                 <Text style={styles.heart}>❤️</Text>
                 <Text style={styles.lifeText}>2</Text>
+                </View>
+                <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+                  <Text style={styles.heart}>💰</Text>
+                  <Text style={styles.lifeText}>+200</Text>
+                </View>
+
+                </View>
               </LinearGradient>
+             
+
             </View>
 
             <Text style={styles.message}>
@@ -183,7 +198,7 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: '900',
     color: '#FFF',
-    marginLeft: 12,
+    marginLeft: 5,
     textShadowColor: 'rgba(255, 215, 0, 0.8)',
     textShadowRadius: 10
   },
@@ -192,6 +207,11 @@ const styles = StyleSheet.create({
     color: '#FF0000',
     textShadowColor: 'rgba(255, 215, 0, 0.8)',
     textShadowRadius: 15
+  },
+  rewardsContainer: {
+    flexDirection: 'colum',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   message: {
     fontSize: 15,

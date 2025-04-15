@@ -7,7 +7,7 @@ import { useNavigation } from '@react-navigation/native';
 import { doc, setDoc, Timestamp, getDoc } from 'firebase/firestore';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons,FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
-import SignInComponents, { onGoogleButtonPress, initGoogleSignIn } from '../components/authContext/signInComponents';
+//import SignInComponents, { onGoogleButtonPress, initGoogleSignIn } from '../components/authContext/signInComponents';
 
 
 const SignUp = () => {
@@ -35,9 +35,9 @@ const SignUp = () => {
     const ayer = new Date(hoy);
       ayer.setDate(hoy.getDate() - 1); // Restar un día para setear la racha
 
-  useEffect(() => {
+ {/* useEffect(() => {
     initGoogleSignIn();
-  }, []);
+  }, []);*/}
 
  const handlerOnChange = (field, value) => {
   setCredenciales((prevCredenciales) => ({
@@ -88,7 +88,7 @@ const handleSignUp = async () => {
   }
 };
 
-const handleGoogleSignIn = async () => {
+/*const handleGoogleSignIn = async () => {
   setLoading(true);
   try {
     const result = await onGoogleButtonPress();
@@ -120,7 +120,7 @@ const handleGoogleSignIn = async () => {
   } finally {
     setLoading(false);
   }
-};
+};*/
 
 // Función para manejar los errores de Firebase
 const handleFirebaseError = (error) => {
@@ -314,14 +314,14 @@ return (
             }
 
             {/* Sección de Redes Sociales */}
-         <View>
+        {/* <View>
               <View style={styles.divider}>
                 <View style={styles.dividerLine} />
                 <Text style={styles.dividerText}>Continúa con</Text>
                 <View style={styles.dividerLine} />
               </View>
              <SignInComponents />
-            </View>
+            </View>*/}
 
             {/* Enlace a Login */}
             <View style={styles.loginLink}>

@@ -340,6 +340,7 @@ useEffect(() => {
               const today = new Date().toDateString();
               await AsyncStorage.setItem("lastQuizDate", today);
               stopMusic(backgroundMusic);
+              setShowModal(true);
             }
           } catch (error) {
             console.error('Error al actualizar las vidas:', error);

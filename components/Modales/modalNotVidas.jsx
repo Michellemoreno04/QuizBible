@@ -15,6 +15,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { RewardedAd, RewardedAdEventType, TestIds } from 'react-native-google-mobile-ads';
 import { useSound } from '../soundFunctions/soundFunction';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+
 const adUnitId = __DEV__ 
   ? TestIds.REWARDED 
   : Platform.OS === 'ios' 
@@ -32,6 +36,10 @@ const playSound = useSound();
 if(isVisible){
   playSound(require('../../assets/sound/notVidasSoundModal.mp3'));
 }
+// Guardar la fecha del quiz en AsyncStorage para ejecutar la racha antes del modal
+const today = new Date().toDateString();
+AsyncStorage.setItem("lastQuizDate", today);
+AsyncStorage.setItem("quizCompleted", "true");
       const newRewarded = RewardedAd.createForAdRequest(adUnitId, {
         keywords: ['religion', 'bible'],
       });

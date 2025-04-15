@@ -167,7 +167,7 @@ return (
            }
 
             {/* Social Login */}
-            <View style={styles.socialContainer}>
+           {/* <View style={styles.socialContainer}>
               <View style={styles.dividerContainer}>
                 <View style={styles.dividerLine} />
                 <Text style={styles.dividerText}>Continúa con</Text>
@@ -175,7 +175,7 @@ return (
               </View>
 
              
-            </View>
+            </View>*/}
 
             {/* Signup Link */}
             <View style={styles.signupContainer}>

@@ -1,13 +1,37 @@
-import { Link } from 'expo-router';
-import React, { useState, useEffect } from 'react';
-import { View, TextInput, KeyboardAvoidingView, Text, Platform, Pressable, Alert, ScrollView,StyleSheet, Image, Linking, SafeAreaView,StatusBar as RNStatusBar, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import {auth,db} from '../components/firebase/firebaseConfig'
-import { useNavigation } from '@react-navigation/native';
-import { doc, setDoc, Timestamp, getDoc } from 'firebase/firestore';
-import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialIcons,FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
-import SignInComponents, { onGoogleButtonPress, initGoogleSignIn } from '../components/authContext/signInComponents';
+import { Link } from "expo-router";
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  TextInput,
+  KeyboardAvoidingView,
+  Text,
+  Platform,
+  Pressable,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Image,
+  Linking,
+  SafeAreaView,
+  StatusBar as RNStatusBar,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
+import {
+  GoogleAuthProvider,
+  createUserWithEmailAndPassword,
+  signInWithCredential,
+} from "firebase/auth";
+import { auth, db } from "../components/firebase/firebaseConfig";
+import { useNavigation } from "@react-navigation/native";
+import { doc, setDoc, Timestamp, getDoc } from "firebase/firestore";
+import { LinearGradient } from "expo-linear-gradient";
+import {
+  MaterialIcons,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
+import SignInComponents from "../components/authContext/signInComponents";
+import  useAuth  from "../components/authContext/authContext";
 
 
 const SignUp = () => {
@@ -26,17 +50,15 @@ const SignUp = () => {
   const [rachaMaxima, setRachaMaxima] = useState(0);
   const [selectedAvatar, setSelectedAvatar] = useState(null);
   const [loading, setLoading] = useState(false);
-
   const navigate = useNavigation();
+  const { user } = useAuth();
+  const userId = user?.uid;
 
-  const hoy = new Date(); 
-    hoy.setHours(0, 0, 0, 0); // Establecer solo la fecha (sin hora)
-    const ayer = new Date(hoy);
-      ayer.setDate(hoy.getDate() - 1); // Restar un día para setear la racha
-
-  useEffect(() => {
-    initGoogleSignIn();
-  }, []);
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0); // Establecer solo la fecha (sin hora)
+  const ayer = new Date(hoy);
+  ayer.setDate(hoy.getDate() - 1); // Restar un día para setear la racha
+ 
 
   const handlerOnChange = (field, value) => {
     setCredenciales((prevCredenciales) => ({
@@ -77,51 +99,20 @@ const SignUp = () => {
           confirmPassword: "",
         });
 
-      navigate.replace('welcomeScreen');
-    } catch (error) {
-      handleFirebaseError(error);
-    } finally {
+        navigate.replace("welcomeScreen");
+      } catch (error) {
+        console.log(error, "ERRRORORO");
+        handleFirebaseError(error);
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      Alert.alert("Por favor, complete todos los campos.");
       setLoading(false);
     }
-  } else {
-    Alert.alert('Por favor, complete todos los campos.');
-    setLoading(false);
-  }
-};
+  };
 
-const handleGoogleSignIn = async () => {
-  setLoading(true);
-  try {
-    const result = await onGoogleButtonPress();
-    const user = result.user;
-
-      // Verificar si el usuario ya existe en Firestore
-      const userDoc = await getDoc(doc(db, "users", user.uid));
-
-      if (!userDoc.exists()) {
-        // Si el usuario no existe, crear su perfil
-        await setDoc(doc(db, "users", user.uid), {
-          Name: user.displayName || "Usuario",
-          Email: user.email,
-          TiempoRegistrado: Timestamp.now(),
-          Vidas: vidas,
-          Monedas: monedas,
-          Exp: exp,
-          Nivel: nivel,
-          Racha: racha,
-          RachaMaxima: rachaMaxima,
-          modalRachaShow: ayer.toISOString(),
-          Genero: selectedAvatar || "masculino",
-        });
-      }
-
-    navigate.replace('welcomeScreen');
-  } catch (error) {
-    handleFirebaseError(error);
-  } finally {
-    setLoading(false);
-  }
-};
+ 
 
   // Función para manejar los errores de Firebase
   const handleFirebaseError = (error) => {
@@ -337,15 +328,15 @@ const handleGoogleSignIn = async () => {
                 </TouchableOpacity>
               )}
 
-            {/* Sección de Redes Sociales */}
-         <View>
-              <View style={styles.divider}>
-                <View style={styles.dividerLine} />
-                <Text style={styles.dividerText}>Continúa con</Text>
-                <View style={styles.dividerLine} />
+              {/* Sección de Redes Sociales */}
+              <View>
+                <View style={styles.divider}>
+                  <View style={styles.dividerLine} />
+                  <Text style={styles.dividerText}>Continúa con</Text>
+                  <View style={styles.dividerLine} />
+                </View>
+                <SignInComponents />
               </View>
-             <SignInComponents />
-            </View>
 
               {/* Enlace a Login */}
               <View style={styles.loginLink}>

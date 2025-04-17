@@ -851,7 +851,8 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    marginRight: 10
+    marginRight: 10,
+    marginVertical: 5,
   },
   statusText: {
     marginHorizontal: 7,
@@ -878,7 +879,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
   position: 'relative',
-  bottom: 5,
+  bottom: 0,
+  marginVertical: 5,
+ // backgroundColor:'rgba(0, 16, 61, 0.7)',
+
   
   
   },

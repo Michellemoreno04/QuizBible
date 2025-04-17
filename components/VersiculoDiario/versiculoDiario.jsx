@@ -7,6 +7,7 @@ import {
   Share,
   ActivityIndicator,
   Platform,
+  Image
 } from "react-native";
 import { Feather, AntDesign } from "@expo/vector-icons";
 import { db } from "../firebase/firebaseConfig";
@@ -42,7 +43,7 @@ export const VersiculosDiarios = () => {
 
   // Estado para controlar si se muestran los botones o no.
   const [hideButtons, setHideButtons] = useState(false);
-
+ let imagen = 'https://i.pinimg.com/736x/42/36/fa/4236fa7904d5205150668aa2474d26b6.jpg'
   // Ref para capturar la vista completa (fondo y contenido)
   const viewRef = useRef();
 
@@ -146,10 +147,8 @@ export const VersiculosDiarios = () => {
       });
 
       await Share.share({
-        url: uri,
-        message: `${versiculo?.versiculo}\n${versiculo?.texto}\n\nDescarga QuizBible: https://play.google.com/store/apps/details?id=com.app.QuizBible`,
-        title: "Versículo del día",
-        type: "image/png"
+        
+        url: imagen
       });
     } catch (error) {
       console.error("Error al compartir:", error);
@@ -241,8 +240,9 @@ return (
   >
 
     <View style={styles.card}>
-      <Text style={styles.reference}>- {versiculo?.versiculo}</Text>
-      <Text style={styles.text}>{versiculo?.texto}</Text>
+      <Image source={{uri: imagen}} style={styles.image} />
+     { /*<Text style={styles.reference}>- {versiculo?.versiculo}</Text>
+      <Text style={styles.text}>{versiculo?.texto}</Text>*/}
       {!hideButtons && (
       <View style={styles.actionsContainer}>
         <Pressable style={styles.actionButton} onPress={share}>
@@ -296,12 +296,12 @@ return (
     text: {
       fontSize: 20, // Tamaño de fuente aumentado
       color: "white",
-      fontWeight: "500",
-      lineHeight: 36, // Interlineado mayor
+      //fontWeight: "500",
+      lineHeight: 26, // Interlineado mayor
       textAlign: "center",
-      fontFamily: 'Georgia', // Fuente serif si está disponible
+      //fontFamily: 'serif', // Fuente serif si está disponible
       marginHorizontal: 10,
-      
+      fontStyle: "italic",
      
     },
     reference: {
@@ -338,4 +338,10 @@ return (
       fontWeight: "500",
       
     },
+    image: {
+      width: '100%',
+      height: 300,
+      borderRadius: 20,
+      overflow: "hidden",
+    }
   });

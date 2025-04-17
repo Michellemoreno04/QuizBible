@@ -8,6 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import  {StatusBar} from 'expo-status-bar'
 import { TouchableOpacity } from 'react-native'
+import SignInComponents from '../components/authContext/signInComponents';
 
 function Login() {
  
@@ -167,15 +168,15 @@ return (
            }
 
             {/* Social Login */}
-           {/* <View style={styles.socialContainer}>
+            <View style={styles.socialContainer}>
               <View style={styles.dividerContainer}>
                 <View style={styles.dividerLine} />
                 <Text style={styles.dividerText}>Continúa con</Text>
                 <View style={styles.dividerLine} />
               </View>
 
-             
-            </View>*/}
+              <SignInComponents />
+            </View>
 
             {/* Signup Link */}
             <View style={styles.signupContainer}>
@@ -266,7 +267,7 @@ buttonText: {
 dividerContainer: {
   flexDirection: 'row',
   alignItems: 'center',
-  marginBottom: 24
+  marginBottom: 10
 },
 dividerLine: {
   flex: 1,

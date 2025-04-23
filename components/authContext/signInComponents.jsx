@@ -19,7 +19,6 @@ export default function SignInComponents() {
   const [selectedAvatar, setSelectedAvatar] = useState(null);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
-  const [FotoPerfil, setFotoPerfil] = useState(null);
   const navigate = useNavigation();
 
   const hoy = new Date();
@@ -27,19 +26,22 @@ export default function SignInComponents() {
   const ayer = new Date(hoy);
   ayer.setDate(hoy.getDate() - 1); // Restar un día para setear la racha
 
+
+ //configuracion de google sign in
+ useEffect(() => {
   const initGoogleSignIn = async () => {
     const has = await GoogleSignin.hasPlayServices();
     if (has) {
       GoogleSignin.configure({
-        webClientId:
-          process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
+
+        webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
       });
     }
   };
-  useEffect(() => {
     initGoogleSignIn();
   }, []);
 
+  
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
@@ -82,7 +84,6 @@ export default function SignInComponents() {
           modalRachaShow: ayer.toISOString(),
           Genero: selectedAvatar || "masculino",
           FotoPerfil: result.user.photoURL || '',    
-
         });
         // Usuario nuevo, redirigir a welcomeScreen
         navigate.replace("welcomeScreen");

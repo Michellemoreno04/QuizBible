@@ -104,9 +104,9 @@ const ExploraComponent = () => {
   };
   
   const handleAnimationFinish = async () => {
-    animationRef.current?.play(0, 250); 
-    setShowFullScreen(false);
     navigation.navigate("bibleQuiz");
+    // animationRef.current?.play(0, 150); 
+    setShowFullScreen(false);
   };
 
   return (

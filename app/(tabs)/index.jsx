@@ -15,6 +15,7 @@ import { manejarRachaDiaria } from '@/components/Racha/manejaRacha';
 import { ModalRachaPerdida } from '@/components/Modales/rachaPerdida';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BannerAd, TestIds } from 'react-native-google-mobile-ads';
+import { Colors } from '@/constants/Colors';
 
 
 const bannerAdUnitId = __DEV__ 
@@ -120,7 +121,7 @@ useEffect(() => {
 
   return (
     <LinearGradient
-      colors={[ '#1E3A5F', '#3C6E9F']}
+      colors={Colors.bgApp}
       style={styles.container}
     >
     
@@ -134,7 +135,7 @@ useEffect(() => {
            <ModalRacha userInfo={userInfo} isVisible={isModalRachaVisible} setModalRachaVisible={setModalRachaVisible}  />
            <ModalRachaPerdida userInfo={userInfo} isVisible={isModalRachaPerdidaVisible} setModalRachaPerdidaVisible={setModalRachaPerdidaVisible}  />
            <HeaderHome />
-  
+          
             <VersiculosDiarios />
            
             <ExploraComponent />

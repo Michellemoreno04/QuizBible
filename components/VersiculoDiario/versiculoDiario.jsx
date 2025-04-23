@@ -43,7 +43,6 @@ export const VersiculosDiarios = () => {
 
   // Estado para controlar si se muestran los botones o no.
   const [hideButtons, setHideButtons] = useState(false);
- let imagen = 'https://i.pinimg.com/736x/42/36/fa/4236fa7904d5205150668aa2474d26b6.jpg'
   // Ref para capturar la vista completa (fondo y contenido)
   const viewRef = useRef();
 
@@ -134,7 +133,7 @@ export const VersiculosDiarios = () => {
   const share = async () => {
     try {
       setHideButtons(true);
-      toast.show("⭐ Compartiendo...",{
+      toast.show("⭐ Preparando para compartir...", {
         type: "success",
         placement: "top",
       });
@@ -146,10 +145,22 @@ export const VersiculosDiarios = () => {
         result: "tmpfile"
       });
 
+      // Subir imagen a Firebase Storage
+      const storage = getStorage();
+      const filename = `shared_versiculo_${Date.now()}.png`;
+      const imageRef = storageRef(storage, `shared/${userId}/${filename}`);
+      
+      const response = await fetch(uri);
+      const blob = await response.blob();
+      await uploadBytes(imageRef, blob);
+      
+      const imageUrl = await getDownloadURL(imageRef);
+      // Compartir con la URL de la imagen
       await Share.share({
-        
-        url: imagen
+        url: imageUrl,
+        //message: `¡Mira este versículo de la Biblia! ${versiculo?.versiculo} - ${versiculo?.texto}`
       });
+      console.log('url de la imagen', imageUrl)
     } catch (error) {
       console.error("Error al compartir:", error);
       toast.show("😢 Error al compartir", { type: "danger" });
@@ -240,9 +251,8 @@ return (
   >
 
     <View style={styles.card}>
-      <Image source={{uri: imagen}} style={styles.image} />
-     { /*<Text style={styles.reference}>- {versiculo?.versiculo}</Text>
-      <Text style={styles.text}>{versiculo?.texto}</Text>*/}
+     <Text style={styles.reference}>- {versiculo?.versiculo}</Text>
+      <Text style={styles.text}>{versiculo?.texto}</Text>
       {!hideButtons && (
       <View style={styles.actionsContainer}>
         <Pressable style={styles.actionButton} onPress={share}>

@@ -20,7 +20,7 @@ const ResetPassword = () => {
       await sendPasswordResetEmail(auth, email)
       Alert.alert(
         'Correo enviado',
-        'Revisa tu bandeja de entrada para restablecer tu contraseña',
+        'Revisa tu bandeja de  o tu correo no deseado (spam) para restablecer tu contraseña',
         [{ text: 'OK', onPress: () => router.push('/login') }]
       )
     } catch (error) {

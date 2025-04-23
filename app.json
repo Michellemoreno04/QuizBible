@@ -18,17 +18,15 @@
         "foregroundImage": "./assets/images/quizBible-logo.png",
         "backgroundColor": "#ffffff"
       },
-      
       "package": "com.moreno.dev.Bible_game1",
-      "enableProguardInReleaseBuilds": true,
       "softwareKeyboardLayoutMode": "pan",
       "permissions": [
-        
         "com.google.android.gms.permission.AD_ID",
         "android.permission.INTERNET",
-        "android.permission.ACCESS_NETWORK_STATE"
+        "android.permission.ACCESS_NETWORK_STATE",
+        "com.android.vending.BILLING"
       ],
-      "usesAdvertisingId": true
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "bundler": "metro",
@@ -61,6 +59,14 @@
           "backgroundColor": "#00000088",
           "visibility": "hidden"
         }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/quizBible-logo.png",
+          "color": "#ffffff",
+          "sounds": ["./assets/sound/rachaSound.mp3"]
+        }
       ]
     ],
     "experiments": {
@@ -75,14 +81,5 @@
       }
     },
     "owner": "moreno.dev"
-  },
-  "doctor": {
-    "reactNativeDirectoryCheck": {
-      "exclude": [
-        "react-native-toast-notifications",
-        "firebase"
-      ]
-    },
-    "listUnknownPackages": false
   }
 }

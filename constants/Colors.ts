@@ -23,4 +23,5 @@ export const Colors = {
     tabIconDefault: '#9BA1A6',
     tabIconSelected: tintColorDark,
   },
+  bgApp: ['#1E3A5F', '#3C6E9F']
 };

@@ -228,26 +228,12 @@ useEffect(() => {
 }, []);
 
   // Función para comprobar la respuesta seleccionada
-  const comprobarRespuesta = async () => {
-    // Primero verificamos si se seleccionó alguna respuesta.
-    if (respuestaSeleccionada === null) {
-      toast.show('Por favor, selecciona una respuesta.', {
-        type: 'info',
-        placement: 'top',
-        duration: 2000,
-        style: {
-          borderRadius: 25,
-          backgroundColor: 'rgba(0, 255, 100, 0.8)',
-          borderWidth: 1,
-          borderColor: '#00f7ff33',
-        },
-        
-      });
-      return;
-    }
+  const comprobarRespuesta = async (respuesta) => {
+  
   
     // Caso: Respuesta correcta
-    if (respuestaSeleccionada === correcta) {
+    if (respuesta === correcta) {
+      setRespuestaSeleccionada(respuesta);
       // Reproducir sonido de respuesta correcta.
       await playSound(require('../assets/sound/correct-choice.mp3'));
   
@@ -296,7 +282,8 @@ useEffect(() => {
     } else {
       // Caso: Respuesta incorrecta.
       
-      setMostrarRespuestaCorrecta(true);
+      //setMostrarRespuestaCorrecta(true);
+      setRespuestaSeleccionada(respuesta);
       await playSound(require('../assets/sound/incorrect-choice.mp3'));
   
       setTimeout(async () => {
@@ -358,7 +345,7 @@ useEffect(() => {
           await AsyncStorage.setItem("lastQuizDate", today);
           stopMusic(backgroundMusic);
         }
-      }, 2000);
+      }, 1000);
     }
 
   };
@@ -538,6 +525,11 @@ useEffect(() => {
         !isLoading) {
       timer = setInterval(() => {
         setTiempoRestante((prev) => {
+          // Reproducir sonido cuando quedan 5 segundos o menos
+          if (prev <= 5 && prev > 0) {
+            playSound(require('../assets/sound/timerSound.mp3'));
+          }
+          
           if (prev <= 1) {
             clearInterval(timer);
             // Si se acaba el tiempo, pasar a la siguiente pregunta
@@ -547,7 +539,6 @@ useEffect(() => {
               setTiempoRestante(30);
               setTiempoAgregado(false);
             } else {
-              
               setShowModal(true);
             }
             return 0;
@@ -702,11 +693,8 @@ useEffect(() => {
          resizeMode="cover" 
         style={styles.backgroundImage}
       >
-        <View style={styles.mainContainer}>
-      <ScrollView 
-    contentContainerStyle={styles.scrollContainer}
-    showsVerticalScrollIndicator={false}
-  >
+        
+    
           <View style={styles.header}>
             <TouchableOpacity onPress={salir} style={{backgroundColor: 'rgba(0, 16, 61, 0.7)', borderRadius: 50, padding: 5}}>
               <MaterialCommunityIcons 
@@ -725,7 +713,7 @@ useEffect(() => {
             </View>
 
           </View>
-
+          <View style={styles.mainContainer}>
           <View style={styles.contentContainer}>
             <View style={styles.muteButtonContainer}>
               <TouchableOpacity onPress={toggleMute}>
@@ -766,11 +754,16 @@ useEffect(() => {
                       style={[
                         styles.answerButton,
                         respuestaSeleccionada === respuesta && styles.selectedAnswer,
-                        mostrarRespuestaCorrecta && respuesta === correcta && styles.correctAnswer,
-                        mostrarRespuestaCorrecta && respuesta !== correcta && styles.incorrectAnswer
-                     
+                        //mostrarRespuestaCorrecta && respuesta === correcta && styles.correctAnswer,
+                       // mostrarRespuestaCorrecta && respuesta !== correcta && styles.incorrectAnswer
+                      // respuestaSeleccionada === respuesta && respuesta === correcta && styles.correctAnswer,
+                       respuestaSeleccionada === respuesta && respuesta !== correcta && styles.incorrectAnswer
                     ]}
-                    onPress={() => setRespuestaSeleccionada(respuesta)}
+                    onPress={() => {
+                    
+                      comprobarRespuesta(respuesta);
+                  }}
+                    
                     disabled={mostrarRespuestaCorrecta}
                   >
                     <Text style={styles.answerText}>{respuesta}</Text>
@@ -780,21 +773,12 @@ useEffect(() => {
               })}
             </View>
 
-            <TouchableOpacity
-  style={styles.checkButton}
-  onPress={comprobarRespuesta}
->
-  <LinearGradient
-    colors={['#0066ff', '#4facfe']}
-    style={styles.gradient}
-    start={{ x: 0, y: 0 }}
-    end={{ x: 1, y: 0 }}
-  >
-    <Text style={styles.checkButtonText}>Comprobar</Text>
-    
-  </LinearGradient>
-</TouchableOpacity>
+   
+          </View>
 
+
+        </View>
+<View style={styles.quizActionsWrapper}>
             <QuizActions 
               currentQuestion={currentQuestion}
               questions={questions}
@@ -815,9 +799,6 @@ useEffect(() => {
             />
 
           </View>
-</ScrollView>
-
-        </View>
       </ImageBackground>
     </SafeAreaView>
   );
@@ -832,7 +813,9 @@ const styles = StyleSheet.create({
     opacity: 0.9,
   },
   mainContainer: {
-    alignItems: 'center'
+    height: height * 0.8,
+    alignItems: 'center',
+  justifyContent: 'center',
   },
   header: {
     width: '100%',
@@ -865,15 +848,12 @@ const styles = StyleSheet.create({
     color: 'red',
   },
   contentContainer: {
-    width: '100%',
+    width: responsiveWidth,
     alignItems: 'center',
     paddingHorizontal: 20,
     
   },
-  scrollContainer: {
-    flexGrow: 1,
-    paddingBottom: height * 0.1,
-  },
+ 
   muteButtonContainer: {
     width: '100%',
     flexDirection: 'row',
@@ -896,6 +876,7 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     justifyContent: 'center',
     alignItems: 'center',
+    alignSelf: 'center',
     backgroundColor: 'rgba(0, 10, 41, 0.7)',
     borderColor: '#00f7ff55',
     shadowColor: '#00f7ff',
@@ -919,6 +900,7 @@ const styles = StyleSheet.create({
   },
   answersContainer: {
     width: '100%',
+  
     alignItems: 'center',
     
   },
@@ -958,7 +940,7 @@ const styles = StyleSheet.create({
     borderColor: '#00FF00'
   },
   incorrectAnswer: {
-    backgroundColor: 'rgba(255, 0, 0, 0.2)',
+    backgroundColor: 'rgba(255, 0, 0, 0.6)',
     borderColor: '#FF0000'
   },
   answerText: {
@@ -968,59 +950,8 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold'
   },
-  checkButton: {
-    width: '80%',
-   
-    marginVertical: height * 0.02,
-    borderRadius: 30,
-    borderWidth: 2,
-    borderColor: '#00f7ff',
-    backgroundColor: '#0066ff',
-    overflow: 'hidden',
-    shadowColor: '#00f7ff',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.8,
-    shadowRadius: 15,
-    elevation: 20,
-  },
-  gradient: {
-    flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 10,
-  },
-  checkButtonText: {
-    fontSize: 18,
-    color: 'white',
-    fontWeight: 'bold',
-    
-    textShadowColor: 'rgba(0, 247, 255, 0.8)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 10,
-  },
-  actionsContainer: {
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  actionButton: {
-    width: responsiveWidth * 0.45,
-    height: height * 0.1,
-    margin: width * 0.02,
-    borderRadius: 15,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  disabledButton: {
-    opacity: 0.5
-  },
-  actionText: {
-    color: 'white',
-    fontWeight: 'bold'
-  },
+  
+ 
   timerContainer: {
     position: 'absolute',
     top: 8,
@@ -1039,6 +970,13 @@ const styles = StyleSheet.create({
   },
   timerTextRed: {
     color: 'red',
+  },
+  quizActionsWrapper: {
+    width: '100%',
+    position: 'absolute',
+    bottom: height * 0.05, 
+    paddingHorizontal: 10,
+   // backgroundColor: 'red',
   },
 });
 

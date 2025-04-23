@@ -89,14 +89,7 @@ const [isImageOpen, setIsImageOpen] = useState(false);
     return (
         <View style={styles.headerContainer}>
         <ModalRacha isVisible={isModalRachaVisible} setModalRachaVisible={closeModalRacha} />
-        <Modal 
-  isVisible={isImageOpen} 
-  animationIn="zoomIn"
-  animationOut="zoomOut"
-  backdropTransitionOutTiming={0}
-  backdropOpacity={0.7}
-  onBackdropPress={closeImage}
-  style={styles.modal}
+        <Modal isVisible={isImageOpen} animationIn="zoomIn" animationOut="zoomOut" backdropTransitionOutTiming={0} backdropOpacity={0.7} onBackdropPress={closeImage} style={styles.modal}
 >
   <LinearGradient
     colors={[ '#1E3A5F', '#3C6E9F']}
@@ -113,7 +106,7 @@ const [isImageOpen, setIsImageOpen] = useState(false);
     </TouchableOpacity>
     
     <Image 
-      source={{ uri: userAuthenticated?.FotoPerfil }}
+      source={{ uri: userAuthenticated?.FotoPerfil || '' }}
       style={styles.modalImage}  
       resizeMode="stretch"
     />
@@ -128,7 +121,7 @@ const [isImageOpen, setIsImageOpen] = useState(false);
             backgroundColor: userAuthenticated?.FotoPerfil ? 'transparent' : 'orange',
           }}
           {...(userAuthenticated?.FotoPerfil
-            ? { source: { uri: userAuthenticated?.FotoPerfil } }
+            ? { source: { uri: userAuthenticated?.FotoPerfil} }
             : { title: userAuthenticated?.Name?.charAt(0).toUpperCase() }
           )}
           avatarStyle={styles.avatar} />
@@ -136,7 +129,7 @@ const [isImageOpen, setIsImageOpen] = useState(false);
 
           <View style={styles.userInfo}>
             <Text style={styles.greeting}>
-              {`Hola!, ${userAuthenticated?.Name || 'Anónimo'}`}
+              {`Hola!, ${userAuthenticated?.Name || '...'}`}
             </Text>
             <View style={styles.levelContainer}>
              <LinearGradient
@@ -245,6 +238,9 @@ const styles = StyleSheet.create({
          
       },
       gradientBadge: {
+        width: 'auto',
+        minWidth: 100,
+        alignSelf: 'flex-start', //
         padding: 5,
         borderRadius: 20,
         borderWidth: 2,

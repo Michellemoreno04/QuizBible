@@ -1,6 +1,6 @@
 import { StyleSheet, ScrollView, View, Text, TouchableOpacity, Alert, Linking } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import useAuth from '../components/authContext/authContext';
+import useAuth from '@/components/authContext/authContext';
 import { useNavigation } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 const MenuScreen = () => {
@@ -52,12 +52,12 @@ const navigation = useNavigation();
   return (
     <SafeAreaView style={styles.container}>
     <ScrollView style={styles.container}>
-      <Text className="text-2xl text-center font-bold pb-10"> Ajustes y Privacidad</Text>
+      <Text style={styles.title}> Ajustes y Privacidad</Text>
       {/* Sección Principal */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Cuenta</Text>
         
-        <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('editProfile')}>
+        <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('settingMenu/editProfile')}>
           <Text style={styles.optionText}>Editar perfil</Text>
           <MaterialIcons name="chevron-right" size={24} color="#666" />
         </TouchableOpacity>
@@ -69,11 +69,11 @@ const navigation = useNavigation();
           <Text style={styles.optionText}>Terminos y condiciones</Text>
           <MaterialIcons name="chevron-right" size={24} color="#666" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('deleteAccount')}>
+        <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('settingMenu/deleteAccount')}>
           <Text style={[styles.optionText, { color: '#dc2626' }]}>Eliminar cuenta</Text>
           <MaterialIcons name="chevron-right" size={24} color="#dc2626" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('soporte')}>
+        <TouchableOpacity style={styles.option} onPress={() => navigation.navigate('settingMenu/soporte')}>
           <Text className="text-gray-400">Soporte</Text>
           <MaterialIcons name="chevron-right" size={24} color="#666" />
         </TouchableOpacity>
@@ -143,6 +143,13 @@ const styles = StyleSheet.create({
     color: 'red',
     fontSize: 16,
     fontWeight: '500',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginTop: 10,
+    marginBottom: 10,
   },
 });
 

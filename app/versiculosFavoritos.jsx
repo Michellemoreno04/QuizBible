@@ -82,7 +82,7 @@ const VersiculosFavoritos = () => {
       }
       const appLink = 'https://play.google.com/store/apps/details?id=com.app.QuizBible';
       await Share.share({
-        message: `${selectedVerse?.texto}\n\n${selectedVerse?.versiculo}\n\nDescarga QuizBible: ${appLink}`,
+        message: `${imageUrl}\n\n${selectedVerse?.versiculo}\n\nDescarga esta app para estudiar la Biblia en el siguiente enlace: ${appLink}`,
         
         
       });

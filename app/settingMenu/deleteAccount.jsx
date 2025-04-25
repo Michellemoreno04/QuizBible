@@ -4,10 +4,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
-import useAuth from '../components/authContext/authContext';
+import useAuth from '@/components/authContext/authContext'; 
 import { deleteUser, EmailAuthProvider, reauthenticateWithCredential } from 'firebase/auth';
 import { doc, deleteDoc } from 'firebase/firestore';
-import { db } from '../components/firebase/firebaseConfig';
+import { db } from '@/components/firebase/firebaseConfig';
 
 const DeleteAccount = () => {
   const [password, setPassword] = useState('');

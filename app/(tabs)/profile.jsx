@@ -64,7 +64,7 @@ export default function Profile() {
         <View style={styles.header}>
           <Text style={styles.title}>Perfil</Text>
           <Pressable 
-            onPress={() => navigation.navigate('menuScreen')}
+            onPress={() => navigation.navigate('settingMenu/menuScreen')}
             style={styles.menuButton}
           >
             <Feather name="menu" size={28} color="white" />

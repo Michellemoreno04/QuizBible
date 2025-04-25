@@ -87,7 +87,7 @@ export default function RootLayout() {
             }}
           />
           <Stack.Screen
-            name="resetPassWord"
+            name="settingMenu/resetPassWord"
             options={{
               headerShown: true,
               headerTransparent: true,
@@ -151,33 +151,27 @@ export default function RootLayout() {
             }}
           />
           <Stack.Screen
-            name="menuScreen"
+            name="settingMenu/menuScreen"
             options={{
               headerShown: true,
               headerBackTitle: "volver",
               headerTitle: "Menu",
-              //presentation: "modal",
-              
             }}
           />
           <Stack.Screen
-            name="editProfile"
+            name="settingMenu/editProfile"
             options={{
               headerShown: false,
               headerBackTitle: "volver",
               presentation: "modal",
-              
-              
             }}
           />
           <Stack.Screen
-            name="soporte"
+            name="settingMenu/soporte"
             options={{
               headerShown: true,
               headerBackTitle: "volver",
               presentation: "modal",
-              
-              
             }}
           />
           <Stack.Screen name="+not-found" />

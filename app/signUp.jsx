@@ -50,6 +50,8 @@ const SignUp = () => {
   const [rachaMaxima, setRachaMaxima] = useState(0);
   const [selectedAvatar, setSelectedAvatar] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const navigate = useNavigation();
   const { user } = useAuth();
   const userId = user?.uid;
@@ -279,10 +281,17 @@ const SignUp = () => {
                   placeholder="Contraseña"
                   placeholderTextColor="rgba(255,255,255,0.7)"
                   style={styles.input}
-                  secureTextEntry
+                  secureTextEntry={!showPassword}
                   value={credenciales.password}
                   onChangeText={(text) => handlerOnChange("password", text)}
                 />
+                <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                  <MaterialIcons 
+                    name={showPassword ? "visibility" : "visibility-off"} 
+                    size={18} 
+                    color="#FFF" 
+                  />
+                </TouchableOpacity>
               </View>
               {
                 // Validación de la contraseña
@@ -305,12 +314,19 @@ const SignUp = () => {
                   placeholder="Confirmar contraseña"
                   placeholderTextColor="rgba(255,255,255,0.7)"
                   style={styles.input}
-                  secureTextEntry
+                  secureTextEntry={!showConfirmPassword}
                   value={credenciales.confirmPassword}
                   onChangeText={(text) =>
                     handlerOnChange("confirmPassword", text)
                   }
                 />
+                <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
+                  <MaterialIcons 
+                    name={showConfirmPassword ? "visibility" : "visibility-off"} 
+                    size={18} 
+                    color="#FFF" 
+                  />
+                </TouchableOpacity>
               </View>
 
               {error && <Text style={styles.errorText}>{error}</Text>}

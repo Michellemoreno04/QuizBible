@@ -26,7 +26,6 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import useAuth from "../authContext/authContext";
-import { useNavigation } from "@react-navigation/native";
 import { captureRef } from "react-native-view-shot";
 import { useToast } from "react-native-toast-notifications";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
@@ -34,18 +33,25 @@ import { LinearGradient } from "expo-linear-gradient";
 
 export const VersiculosDiarios = () => {
   const { user } = useAuth();
-  const navigation = useNavigation();
+
   const [versiculo, setVersiculo] = useState(null);
   const [versiculoGuardado, setVersiculoGuardado] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+
+
   const userId = user?.uid;
   const toast = useToast();
+
+
+
+
 
   // Estado para controlar si se muestran los botones o no.
   const [hideButtons, setHideButtons] = useState(false);
   // Ref para capturar la vista completa (fondo y contenido)
   const viewRef = useRef();
 
+  
   // Obtener versículo del día
   useEffect(() => {
     if (!userId) return;
@@ -127,8 +133,20 @@ export const VersiculosDiarios = () => {
   
     fetchVersiculoDelDia();
   }, [userId]);
-  
 
+  // Verificar si el versículo está guardado
+  useEffect(() => {
+    if (!userId || !versiculo?.id) return;
+    
+    const docRef = doc(db, `users/${userId}/versiculosFavoritos/${versiculo.id}`);
+    
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      setVersiculoGuardado(docSnap.exists());
+    });
+    
+    return () => unsubscribe(); // Limpiar la suscripción cuando el componente se desmonte
+  }, [userId, versiculo?.id]);
+  
   // Función para compartir la imagen capturada sin botones
   const share = async () => {
     try {
@@ -157,10 +175,9 @@ export const VersiculosDiarios = () => {
       const imageUrl = await getDownloadURL(imageRef);
       // Compartir con la URL de la imagen
       await Share.share({
-        url: imageUrl,
-        //message: `¡Mira este versículo de la Biblia! ${versiculo?.versiculo} - ${versiculo?.texto}`
+        message: ` ${imageUrl} ¡Mira este versículo de la Biblia! ${versiculo?.versiculo}`
       });
-      console.log('url de la imagen', imageUrl)
+     // console.log('url de la imagen', imageUrl)
     } catch (error) {
       console.error("Error al compartir:", error);
       toast.show("😢 Error al compartir", { type: "danger" });
@@ -168,20 +185,7 @@ export const VersiculosDiarios = () => {
       setHideButtons(false);
     }
   };
-
-  useEffect(() => {
-    if (!userId || !versiculo?.id) return;
   
-    const docRef = doc(db, `users/${userId}/versiculosFavoritos/${versiculo.id}`);
-  
-    const unsubscribe = onSnapshot(docRef, (docSnap) => {
-      setVersiculoGuardado(docSnap.exists());
-    });
-  
-    return () => unsubscribe(); // Limpiar la suscripción cuando el componente se desmonte
-  }, [userId, versiculo?.id]);
-
- 
  // Función de guardado simplificada
  const guardar = async () => {
   
@@ -230,7 +234,6 @@ toast.show("⭐ Guardando...",{
     }, { merge: true });
 
     setVersiculoGuardado(true); // Actualizar estado inmediatamente
-    
   } catch (error) {
     console.error("Error:", error);
     toast.show("😢 Error al guardar", { type: "danger" });
@@ -240,7 +243,6 @@ toast.show("⭐ Guardando...",{
   }
   
 };
-
 
 
 return (
@@ -287,11 +289,9 @@ return (
   // Estilos ajustados
   const styles = StyleSheet.create({
     container: {
- 
-      
       borderRadius: 20,
-      overflow: "hidden",
-     marginBottom: 20
+    //  overflow: "hidden",
+     marginBottom: 10
     },
    
     card: {
@@ -353,5 +353,6 @@ return (
       height: 300,
       borderRadius: 20,
       overflow: "hidden",
+      resizeMode: 'cover',
     }
   });

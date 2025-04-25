@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { View, Text, TextInput, Pressable, Alert, StyleSheet } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
-import { auth } from '../components/firebase/firebaseConfig'
+import { auth } from '@/components/firebase/firebaseConfig'
 import { sendPasswordResetEmail } from 'firebase/auth'
 import { useRouter } from 'expo-router'
 import { MaterialIcons } from '@expo/vector-icons'

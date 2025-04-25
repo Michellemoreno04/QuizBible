@@ -1,8 +1,9 @@
 import React from 'react';
-import { StyleSheet, TouchableOpacity, Text, Linking, Alert, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, Text, Linking, Alert, View, SafeAreaView, Platform, StatusBar } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 export const SupportContact = () => {
+
   const handleSupportPress = async () => {
     try {
       const email = 'morenov.dev@gmail.com';
@@ -34,6 +35,7 @@ export const SupportContact = () => {
   };
 
   return (
+    <SafeAreaView style={Platform.OS === 'android' ? { paddingTop: StatusBar.currentHeight } : {}}>
     <View style={styles.container}>
       <Ionicons name="headset-outline" size={50} color="#2F80ED" style={styles.icon} />
       
@@ -63,6 +65,7 @@ export const SupportContact = () => {
         También puedes visitar nuestra sección de Preguntas Frecuentes
       </Text>*/}
     </View>
+    </SafeAreaView>
   );
 };
 

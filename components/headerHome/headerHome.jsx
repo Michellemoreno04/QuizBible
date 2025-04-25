@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, Platform, TouchableOpacity, Pressable, Image } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { Avatar } from '@rneui/base';
-import { FontAwesome5 } from '@expo/vector-icons';
+import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import useAuth  from '../../components/authContext/authContext';
 import { doc, onSnapshot, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../../components/firebase/firebaseConfig';
@@ -18,6 +18,7 @@ export const HeaderHome = () => {
 const [userAuthenticated, setUserAuthenticated] = useState({});
 const [isModalRachaVisible, setIsModalRachaVisible] = useState(false);
 const [isImageOpen, setIsImageOpen] = useState(false);
+const [isInsigniaModalVisible, setIsInsigniaModalVisible] = useState(false);
   
   const openModalRacha = () => {
     setIsModalRachaVisible(true);
@@ -34,6 +35,14 @@ const [isImageOpen, setIsImageOpen] = useState(false);
 
   const closeImage = () => {
     setIsImageOpen(false);
+  }
+
+  const openInsigniaModal = () => {
+    setIsInsigniaModalVisible(true);
+  }
+
+  const closeInsigniaModal = () => {
+    setIsInsigniaModalVisible(false);
   }
 
 
@@ -89,76 +98,118 @@ const [isImageOpen, setIsImageOpen] = useState(false);
     return (
         <View style={styles.headerContainer}>
         <ModalRacha isVisible={isModalRachaVisible} setModalRachaVisible={closeModalRacha} />
-        <Modal isVisible={isImageOpen} animationIn="zoomIn" animationOut="zoomOut" backdropTransitionOutTiming={0} backdropOpacity={0.7} onBackdropPress={closeImage} style={styles.modal}
->
-  <LinearGradient
-    colors={[ '#1E3A5F', '#3C6E9F']}
-    start={{ x: 0, y: 0 }}
-    end={{ x: 1, y: 1 }}
-    style={styles.modalContent}
-  >
-    <TouchableOpacity 
-      style={styles.closeButton} 
-      onPress={closeImage}
-      activeOpacity={0.7}
-    >
-      <FontAwesome5 name="times" size={24} color="white" />
-    </TouchableOpacity>
-    
-    <Image 
-      source={{ uri: userAuthenticated?.FotoPerfil || '' }}
-      style={styles.modalImage}  
-      resizeMode="stretch"
-    />
-  </LinearGradient>
-</Modal>
-        <View style={styles.leftContainer}>
-        <TouchableOpacity onPress={openImage}>
-        <Avatar
-          size={60}
-          rounded
-          containerStyle={{
-            backgroundColor: userAuthenticated?.FotoPerfil ? 'transparent' : 'orange',
-          }}
-          {...(userAuthenticated?.FotoPerfil
-            ? { source: { uri: userAuthenticated?.FotoPerfil} }
-            : { title: userAuthenticated?.Name?.charAt(0).toUpperCase() }
-          )}
-          avatarStyle={styles.avatar} />
-          </TouchableOpacity>
+        <Modal isVisible={isImageOpen} animationIn="zoomIn" animationOut="zoomOut" backdropTransitionOutTiming={0} backdropOpacity={0.7} onBackdropPress={closeImage} style={styles.modal}>
+            <LinearGradient
+                colors={[ '#1E3A5F', '#3C6E9F']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.modalContent}
+            >
+                <TouchableOpacity 
+                    style={styles.closeButton} 
+                    onPress={closeImage}
+                    activeOpacity={0.7}
+                >
+                    <FontAwesome5 name="times" size={24} color="white" />
+                </TouchableOpacity>
+                
+                <Image 
+                    source={{ uri: userAuthenticated?.FotoPerfil || '' }}
+                    style={styles.modalImage}  
+                    resizeMode="stretch"
+                />
+            </LinearGradient>
+        </Modal>
 
-          <View style={styles.userInfo}>
-            <Text style={styles.greeting}>
-              {`Hola!, ${userAuthenticated?.Name || '...'}`}
-            </Text>
-            <View style={styles.levelContainer}>
-             <LinearGradient
-    colors={['#FFD700', '#D4AF37', '#FFD700']}
-    start={{ x: 0, y: 0 }}
-    end={{ x: 1, y: 1 }}
-    style={styles.gradientBadge}
-  >
-    <Text style={styles.levelText}>
-      {userAuthenticated?.Exp >= 200 
-        ? niveles(userAuthenticated?.Exp || 0).insignia 
-        : 'PRINCIPIANTE'}
-    </Text>
-  </LinearGradient>
+        {/* Modal para la insignia */}
+        <Modal
+            isVisible={isInsigniaModalVisible}
+            onBackdropPress={closeInsigniaModal}
+            backdropOpacity={0.7}
+            animationIn="zoomIn"
+            animationOut="zoomOut"
+            backdropTransitionOutTiming={0} 
+        >
+            <LinearGradient
+                colors={['#5a1a08', '#5a1003']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.modalInsigniaContent}
+            >
+                <TouchableOpacity 
+                    style={styles.closeButton} 
+                    onPress={closeInsigniaModal}
+                    activeOpacity={0.7}
+                >
+                    <FontAwesome5 name="times" size={24} color="white" />
+                </TouchableOpacity>
+
+                <View style={styles.modalHeader}>
+                    <MaterialCommunityIcons name="crown" size={40} color="#FFD700" />
+                    <Text style={styles.modalTitle}>
+                        {userAuthenticated?.Exp >= 200 
+                            ? niveles(userAuthenticated?.Exp || 0).insignia 
+                            : 'PRINCIPIANTE'}
+                    </Text>
+                </View>
+
+                <Text style={styles.modalDescription}>
+                    {userAuthenticated?.Exp >= 200 
+                        ? niveles(userAuthenticated?.Exp || 0).description 
+                        : '¡Comienza tu viaje para obtener tu primera insignia!'}
+                </Text>
+            </LinearGradient>
+        </Modal>
+
+        <View style={styles.leftContainer}>
+            <TouchableOpacity onPress={openImage}>
+                <Avatar
+                    size={60}
+                    rounded
+                    containerStyle={{
+                        backgroundColor: userAuthenticated?.FotoPerfil ? 'transparent' : 'orange',
+                    }}
+                    {...(userAuthenticated?.FotoPerfil
+                        ? { source: { uri: userAuthenticated?.FotoPerfil} }
+                        : { title: userAuthenticated?.Name?.charAt(0).toUpperCase() }
+                    )}
+                    avatarStyle={styles.avatar} 
+                />
+            </TouchableOpacity>
+
+            <View style={styles.userInfo}>
+                <Text style={styles.greeting}>
+                    {`Hola!, ${userAuthenticated?.Name || '...'}`}
+                </Text>
+                <TouchableOpacity onPress={openInsigniaModal}>
+                    <View style={styles.levelContainer}>
+                        <LinearGradient
+                            colors={['#FFD700', '#D4AF37', '#FFD700']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
+                            style={styles.gradientBadge}
+                        >
+                            <Text style={styles.levelText}>
+                                {userAuthenticated?.Exp >= 200 
+                                    ? niveles(userAuthenticated?.Exp || 0).insignia 
+                                    : 'PRINCIPIANTE'}
+                            </Text>
+                        </LinearGradient>
+                    </View>
+                </TouchableOpacity>
             </View>
-          </View>
         </View>
 
         <TouchableOpacity onPress={openModalRacha}>
-        <LinearGradient
-    colors={['#FFD700', '#D4AF37', '#FFD700']}
-    start={{ x: 0, y: 0 }}
-    end={{ x: 1, y: 1 }}
-     style={styles.rachaContainer}
-     
-     >
-          <Text style={styles.rachaText}>{userAuthenticated?.Racha || 0}</Text>
-          <FontAwesome5 name="fire-alt" size={24} color="white" />
-        </LinearGradient>
+            <LinearGradient
+                colors={['#FFD700', '#D4AF37', '#FFD700']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.rachaContainer}
+            >
+                <Text style={styles.rachaText}>{userAuthenticated?.Racha || 0}</Text>
+                <FontAwesome5 name="fire-alt" size={24} color="white" />
+            </LinearGradient>
         </TouchableOpacity>
       </View>
     )
@@ -177,13 +228,13 @@ const styles = StyleSheet.create({
         margin: 0,
         justifyContent: 'center',
         alignItems: 'center',
-    
+       
       },
       modalContent: {
         width: '90%',
         height: '60%',
         position: 'relative',
-       // backgroundColor: 'rgba(255, 215, 0, 0.8)',
+       //backgroundColor: 'rgba(255, 215, 0, 0.8)',
       },
       closeButton: {
         width: 50,
@@ -269,6 +320,33 @@ const styles = StyleSheet.create({
         color: 'white', // Texto dorado
         marginLeft: 5,
       },
+      modalInsigniaContent: {
+        
+        padding: 20,
+        borderRadius: 20,
+      },
+      modalHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 20,
+        gap: 5,
+        
+    },
+    modalTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#FFD700',
+        textAlign: 'center',
+    },
+    modalDescription: {
+      
+        color: 'white',
+        fontSize: 18,
+        fontWeight: 'bold',
+        lineHeight: 24,
+        textAlign: 'center',
+        marginTop: 5,
+    },
 
 
 })

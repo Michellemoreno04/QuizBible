@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Text, View, Pressable, Alert, TextInput,  ScrollView, SafeAreaView,Platform ,StyleSheet,StatusBar as RNStatusBar, ActivityIndicator} from 'react-native'
+import { Text, View, Alert, TextInput,  ScrollView, SafeAreaView,Platform ,StyleSheet,StatusBar as RNStatusBar, ActivityIndicator} from 'react-native'
 import { useNavigation } from '@react-navigation/native';
 import { Link } from 'expo-router';
 import { auth } from '../components/firebase/firebaseConfig';
@@ -14,6 +14,7 @@ function Login() {
  
 const navigation = useNavigation();
 const [isLoading, setIsLoading] = useState(false);
+const [showPassword, setShowPassword] = useState(false);
 
 
 const [loginCredentials, setLoginCredentials] = useState({
@@ -142,10 +143,17 @@ return (
                 placeholder="Contraseña"
                 placeholderTextColor="rgba(255,255,255,0.7)"
                 style={styles.input}
-                secureTextEntry
+                secureTextEntry={!showPassword}
                 value={loginCredentials.password}
                 onChangeText={(text) => handlerOnchange('password', text)}
               />
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                <MaterialIcons 
+                  name={showPassword ? "visibility" : "visibility-off"} 
+                  size={18} 
+                  color="#FFF" 
+                />
+              </TouchableOpacity>
             </View>
             <Link href="/resetPassWord" style={styles.signupLink}> 
              <Text style={styles.forgotPasswordText}>¿Olvidaste tu contraseña?</Text>

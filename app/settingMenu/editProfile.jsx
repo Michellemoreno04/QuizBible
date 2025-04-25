@@ -15,8 +15,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { AntDesign } from '@expo/vector-icons';
 import { Avatar } from '@rneui/themed';
 import { updateDoc, doc, onSnapshot } from 'firebase/firestore';
-import { db } from '../components/firebase/firebaseConfig';
-import useAuth from '../components/authContext/authContext';
+import { db } from '@/components/firebase/firebaseConfig';
+import useAuth from '@/components/authContext/authContext';
 import * as ImagePicker from 'expo-image-picker';
 import { useNavigation } from 'expo-router';
 import { useToast } from 'react-native-toast-notifications';
@@ -191,7 +191,7 @@ const EditProfileScreen = () => {
       >
         <View style={styles.header}>
           <AntDesign 
-            name="close" 
+            name="arrowleft" 
             size={24} 
             color="white" 
             onPress={() => navigation.goBack()} 

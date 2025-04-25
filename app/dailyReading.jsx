@@ -9,7 +9,7 @@ import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { InterstitialAd, AdEventType, TestIds } from 'react-native-google-mobile-ads';
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import Animated, { useAnimatedStyle, withTiming, withRepeat, withSequence } from 'react-native-reanimated';
 
 
 const adUnitId = __DEV__ 
@@ -36,7 +36,43 @@ const DailyReading = () => {
   const [currentTextPosition, setCurrentTextPosition] = useState(0);
   const userId = user?.uid;
 
-   
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        {
+          scale: withRepeat(
+            withSequence(
+              withTiming(1.1, { duration: 1000 }),
+              withTiming(1, { duration: 1000 })
+            ),
+            -1,
+            true
+          ),
+        },
+      ],
+      shadowColor: '#FFFFFF',
+      shadowOffset: {
+        width: 0,
+        height: 0,
+      },
+      shadowOpacity: withRepeat(
+        withSequence(
+          withTiming(0.8, { duration: 1000 }),
+          withTiming(0.2, { duration: 1000 })
+        ),
+        -1,
+        true
+      ),
+      shadowRadius: withRepeat(
+        withSequence(
+          withTiming(20, { duration: 1000 }),
+          withTiming(10, { duration: 1000 })
+        ),
+        -1,
+        true
+      ),
+    };
+  });
 
   useEffect(() => {
     let isMounted = true; // Para prevenir actualizaciones en componentes desmontados
@@ -347,29 +383,6 @@ const DailyReading = () => {
                 </View>
             ))}
     
-            {/* Controlador de audio */}
-            <View style={styles.audioControls}>
-              <TouchableOpacity 
-                style={[styles.audioButton, isSpeaking && styles.activeAudioButton]}
-                onPress={handleSpeak}
-                activeOpacity={0.8}
-              >
-                {isLoadingAudio ? (
-                  <ActivityIndicator size="small" color="white" style={styles.audioIcon} />
-                ) : (
-                  <FontAwesome6 
-                    name={isSpeaking ? "pause" : "play"} 
-                    size={28} 
-                    color="white" 
-                    style={styles.audioIcon}
-                  />
-                )}
-                <Text style={styles.audioButtonText}>
-                  {isLoadingAudio ? 'Cargando...' : isSpeaking ? 'Reproduciendo...' : 'Reproducir'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-    
             {/* Checkbox para marcar como leído */}
             <TouchableOpacity 
               style={styles.checkboxContainer}
@@ -405,6 +418,31 @@ const DailyReading = () => {
               )}
             </View>
           </ScrollView>
+
+          {/* Controlador de audio fijo en la parte inferior */}
+          <View style={styles.fixedAudioControls}>
+            <Animated.View style={[
+              styles.audioButtonContainer,
+              isSpeaking && animatedStyle
+            ]}>
+              <TouchableOpacity 
+                style={[styles.audioButton, isSpeaking && styles.activeAudioButton]}
+                onPress={handleSpeak}
+                activeOpacity={0.8}
+              >
+                {isLoadingAudio ? (
+                  <ActivityIndicator size="large" color="white" style={styles.audioIcon} />
+                ) : (
+                  <FontAwesome6 
+                    name={isSpeaking ? "pause" : "play"} 
+                    size={30} 
+                    color="white" 
+                    style={styles.audioIcon}
+                  />
+                )}
+              </TouchableOpacity>
+            </Animated.View>
+          </View>
         </LinearGradient>
         
       );
@@ -444,25 +482,30 @@ const DailyReading = () => {
           marginBottom: 25,
           alignItems: 'center',
         },
+        audioButtonContainer: {
+          width: 80,
+          height: 80,
+          justifyContent: 'center',
+          alignItems: 'center',
+        },
         audioButton: {
-          
+          width: 80,
+          height: 80,
           backgroundColor: '#2196F3',
           flexDirection: 'row',
           alignItems: 'center',
-          paddingVertical: 14,
-          paddingHorizontal: 24,
+          justifyContent: 'center',
           borderRadius: 50,
-          shadowColor: '#2196F3',
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.2,
-          shadowRadius: 10,
-          elevation: 3,
+          borderWidth: 2,
+          borderColor: '#FFFFFF',
         },
         activeAudioButton: {
           backgroundColor: '#1976D2',
+          borderWidth: 2,
+          borderColor: '#FFFFFF',
         },
         audioIcon: {
-          marginRight: 12,
+         // marginRight: 12,
         },
         audioButtonText: {
           fontSize: 16,
@@ -470,6 +513,7 @@ const DailyReading = () => {
           color: 'white',
         },
         checkboxContainer: {
+          marginTop: 20,
           flexDirection: 'row',
           alignItems: 'center',
           marginBottom: 30,
@@ -534,6 +578,18 @@ const DailyReading = () => {
           marginTop: 8,
           textAlign: 'center',
           color: 'gray',
+        },
+        fixedAudioControls: {
+          position: 'absolute',
+          bottom: 20,
+          left: 0,
+          right: 0,
+          alignItems: 'center',
+          paddingHorizontal: 20,
+          zIndex: 1000,
+        },
+        scrollContainer: {
+          paddingBottom: 100, // Añadir espacio para el botón fijo
         },
       });
     

@@ -131,7 +131,7 @@ const [isInsigniaModalVisible, setIsInsigniaModalVisible] = useState(false);
             backdropTransitionOutTiming={0} 
         >
             <LinearGradient
-                colors={['#5a1a08', '#5a1003']}
+                colors={['#FFD700', '#D4AF37', '#FFD700']}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 1 }}
                 style={styles.modalInsigniaContent}

@@ -1,5 +1,5 @@
 import { doc, increment, updateDoc } from 'firebase/firestore';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import {
   Modal,
   View,
@@ -8,16 +8,18 @@ import {
   TouchableOpacity,
   Platform,
   Alert,
+  Image,
+  ActivityIndicator,
+  Dimensions,
 } from 'react-native';
 import { db } from '../firebase/firebaseConfig';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation } from '@react-navigation/native';
 import { RewardedAd, RewardedAdEventType, TestIds } from 'react-native-google-mobile-ads';
 import { useSound } from '../soundFunctions/soundFunction';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
+const { width, height } = Dimensions.get('screen');
 
 const adUnitId = __DEV__ 
   ? TestIds.REWARDED 
@@ -27,50 +29,26 @@ const adUnitId = __DEV__
 
 export const RewardedAdModal = ({ isVisible,setIsVisible, onClose,userId,vidas,setShowModal }) => {
   const [loaded, setLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [rewardedAd, setRewardedAd] = useState(null);
-const navigation = useNavigation();
 const playSound = useSound();
 
   
-  useEffect(() => {
-if(isVisible){
-  playSound(require('../../assets/sound/notVidasSoundModal.mp3'));
-}
-// Guardar la fecha del quiz en AsyncStorage para ejecutar la racha antes del modal
-const today = new Date().toDateString();
-AsyncStorage.setItem("lastQuizDate", today);
-AsyncStorage.setItem("quizCompleted", "true");
-      const newRewarded = RewardedAd.createForAdRequest(adUnitId, {
-        keywords: ['religion', 'bible'],
-      });
-
-      const unsubscribeLoaded = newRewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
-        setLoaded(true);
-        console.log('Anuncio no vidas cargado ');
-      });
-
-
-      const unsubscribeEarned = newRewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, () => {
-        console.log('Recompensa obtenida');
-        addLife();
-        setIsVisible(false);
-        onClose();
-      });
-
-      newRewarded.load();
-      setRewardedAd(newRewarded);
-
-      return () => {
-        unsubscribeLoaded();
-        unsubscribeEarned();
-        setRewardedAd(null);
-        setLoaded(false);
-      };
-    
-  }, [isVisible]);
-
-  const addLife = async () => {
+  const saveQuizDate = useCallback(async () => {
     try {
+      const today = new Date().toDateString();
+      await AsyncStorage.multiSet([
+        ["lastQuizDate", today],
+        ["quizCompleted", "true"]
+      ]);
+    } catch (error) {
+      console.error('Error al guardar la fecha del quiz:', error);
+    }
+  }, []);
+
+  const addLife = useCallback(async () => {
+    try {
+      setIsLoading(true);
       const userDocRef = doc(db, 'users', userId);
       await updateDoc(userDocRef, {
         Vidas: increment(1),
@@ -78,94 +56,161 @@ AsyncStorage.setItem("quizCompleted", "true");
     } catch (error) {
       console.error('Error al actualizar las vidas:', error);
       Alert.alert('Error', 'No se pudieron actualizar las vidas.');
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [userId]);
 
-  const handleShowAd = async () => {
-    if (loaded && rewardedAd) {
-      try {
+  const handleShowAd = useCallback(async () => {
+    if (!loaded || !rewardedAd) {
+      Alert.alert('Error', 'El anuncio no está listo. Por favor, intenta de nuevo.');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
       await rewardedAd.show();
-      } catch (error) {
-        await rewardedAd.load();
-        console.error('Error al mostrar el anuncio:', error);
-        // Si hay error al mostrar el anuncio, damos la recompensa igualmente
-        addLife();
-        setIsVisible(false);
-        onClose();
-      }
-    } else {
-      // si el anuncio no ha cargado 
-      await rewardedAd.load();
-    
-      addLife();
+    } catch (error) {
+      console.error('Error al mostrar el anuncio:', error);
+      // Si hay error al mostrar el anuncio, damos la recompensa igualmente
+      await addLife();
       setIsVisible(false);
       onClose();
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [loaded, rewardedAd, addLife, setIsVisible, onClose]);
 
-  const cerrar = () => {
+  const cerrar = useCallback(() => {
     try {
-      if(vidas === 0){
-     setIsVisible(false);
-      setShowModal(true);
+      if (vidas === 0) {
+        setIsVisible(false);
+        setShowModal(true);
       }
     } catch (error) {
-      console.log(error);
+      console.error('Error al cerrar el modal:', error);
     } finally {
       setIsVisible(false);
     }
-  };
+  }, [vidas, setIsVisible, setShowModal]);
+
+  useEffect(() => {
+    if (!isVisible) return;
+
+    playSound(require('../../assets/sound/notVidasSoundModal.mp3'));
+    saveQuizDate();
+
+    const newRewarded = RewardedAd.createForAdRequest(adUnitId, {
+      keywords: ['religion', 'bible'],
+    });
+
+    const unsubscribeLoaded = newRewarded.addAdEventListener(RewardedAdEventType.LOADED, () => {
+      setLoaded(true);
+      console.log('Anuncio no vidas cargado');
+    });
+
+    const unsubscribeEarned = newRewarded.addAdEventListener(RewardedAdEventType.EARNED_REWARD, async () => {
+      console.log('Recompensa obtenida');
+      await addLife();
+      setIsVisible(false);
+      onClose();
+    });
+
+    newRewarded.load();
+    setRewardedAd(newRewarded);
+
+    return () => {
+      unsubscribeLoaded();
+      unsubscribeEarned();
+      setRewardedAd(null);
+      setLoaded(false);
+    };
+  }, [isVisible, playSound, saveQuizDate, addLife, setIsVisible, onClose]);
 
   return (
-    <Modal visible={isVisible} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal visible={isVisible} animationType="fade" transparent onRequestClose={onClose}>
       <View style={styles.modalContainer}>
-        {/* Fondo con efecto blur (requiere @react-native-community/blur) */}
+        {/* Fondo con overlay */}
         <View
           style={styles.absolute}
+          
         />
         
-        <View style={styles.modalContent}>
-          {/* Icono decorativo */}
-          <View style={styles.heartContainer}>
-            <Ionicons name="heart-circle" size={70} color="#FF3366" />
+        <LinearGradient
+        colors={['#1A1A2E', '#2D2D4A', '#1A1A2E']}
+        style={styles.gradientContainer}
+      >
+          {/* Decoración superior */}
+          <View style={styles.topDecoration}>
+            <Image 
+              source={require('../../assets/images/cordero_triste.png')}
+              style={styles.lambImage}
+              resizeMode="contain"
+            />
+           
           </View>
   
-          <Text style={styles.title}>¡Consigue más Corazones! 💖</Text>
+          {/* Contenido principal */}
+          <Text style={styles.title}>¡Necesitas más Corazones! 💖</Text>
           <Text style={styles.subtitle}>
-            Mira un breve anuncio para obtener{"\n"}vidas extras y seguir jugando
+            Completa acciones para obtener vidas extras y{"\n"}
           </Text>
   
-          {/* Botón principal con gradiente */}
-          <LinearGradient
-            colors={['#FF6B6B', '#FF3366']}
-            style={[styles.button, !loaded && styles.disabledButton]}
+          
+          {/* Botón principal */}
+          <TouchableOpacity 
+            onPress={handleShowAd}
+            disabled={!loaded || isLoading}
+            style={[styles.button, (!loaded || isLoading) && styles.disabledButton]}
           >
-            <TouchableOpacity
-              onPress={handleShowAd}
-              
-            disabled={!loaded}
-              style={styles.buttonTouchable}
+            <LinearGradient
+              colors={['#FF6B6B', '#FF3366']}
+              style={styles.buttonGradient}
+              start={{x: 0, y: 0.5}}
+              end={{x: 1, y: 0.5}}
             >
-              <MaterialIcons name="play-circle-outline" size={24} color="white" />
-              <Text style={styles.buttonText}>
-                {loaded ? 'Ver Anuncio' : 'Cargando...'}
-              </Text>
-            </TouchableOpacity>
-          </LinearGradient>
+              {isLoading ? (
+                <ActivityIndicator color="white" size="small" />
+              ) : (
+                <>
+                  <MaterialIcons name="play-circle-filled" size={28} color="white" />
+                  <Text style={styles.buttonText}>
+                    {loaded ? 'Obtener 2 corazones' : 'Cargando...'}
+                  </Text>
+                  {loaded && (
+                    <View style={styles.badge}>
+                      <Text style={styles.badgeText}>GRATIS</Text>
+                    </View>
+                  )}
+                </>
+              )}
+            </LinearGradient>
+          </TouchableOpacity>
   
-          {/* Botón de cierre con icono */}
+          {/* Opción alternativa */}
+          <TouchableOpacity style={styles.storeButton}>
+            <Text style={styles.storeText}>¿Prefieres comprar? </Text>
+            <Ionicons name="storefront" size={18} color="#FF3366" />
+          </TouchableOpacity>
+  
+          {/* Botón de cierre */}
           <TouchableOpacity 
             style={styles.closeButton} 
             onPress={cerrar}
-            
           >
-            <Ionicons name="close-circle" size={30} color="#666" />
+            <LinearGradient
+              colors={['#FFFFFF', '#F8F9FA']}
+              style={styles.closeGradient}
+            >
+              <Ionicons name="close" size={20} color="#666" />
+            </LinearGradient>
           </TouchableOpacity>
+      </LinearGradient>
         </View>
-      </View>
+
     </Modal>
   );
-};
+}
   const styles = StyleSheet.create({
     modalContainer: {
       flex: 1,
@@ -178,55 +223,84 @@ AsyncStorage.setItem("quizCompleted", "true");
       left: 0,
       bottom: 0,
       right: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.6)',
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
     },
-    modalContent: {
-      backgroundColor: '#FFF',
-      width: '85%',
-      borderRadius: 20,
+    gradientContainer: {
+     
+      width: width * 0.9,
+      height: height * 0.5,
+      borderRadius: 30,
       padding: 25,
       alignItems: 'center',
+      borderWidth: 1,
+      borderColor: 'rgba(255, 107, 107, 0.2)',
+    },
+    modalContent: {
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      width: '90%',
+      borderRadius: 30,
+      padding: 25,
+      alignItems: 'center',
+      borderWidth: 1,
+      borderColor: 'rgba(255, 107, 107, 0.2)',
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: 10 },
-      shadowOpacity: 0.2,
-      shadowRadius: 20,
-      elevation: 10,
+      shadowOffset: { width: 0, height: 20 },
+      shadowOpacity: 0.25,
+      shadowRadius: 30,
+      elevation: 15,
     },
-    heartContainer: {
-      position: 'absolute',
-      top: -35,
-      backgroundColor: 'white',
-      borderRadius: 50,
-      padding: 5,
+    topDecoration: {
+      position: 'relative',
+      marginTop: -100,
+      marginBottom: 20,
     },
+    lambImage: {
+      width: 120,
+      height: 120,
+      zIndex: 2,
+    },
+   
     title: {
-      fontSize: 26,
+      fontSize: 28,
       fontFamily: 'Poppins-Bold',
-      color: '#2D3436',
-      marginTop: 20,
+      color: '#FFFFFF',
       marginBottom: 10,
       textAlign: 'center',
       letterSpacing: 0.5,
+      textShadowColor: 'rgba(0, 0, 0, 0.3)',
+      textShadowOffset: { width: 0, height: 2 },
+      textShadowRadius: 4,
     },
     subtitle: {
       fontSize: 16,
       fontFamily: 'Poppins-Medium',
-      color: '#636E72',
+      color: '#E0E0E0',
       textAlign: 'center',
       lineHeight: 24,
       marginBottom: 25,
+      textShadowColor: 'rgba(0, 0, 0, 0.2)',
+      textShadowOffset: { width: 0, height: 1 },
+      textShadowRadius: 2,
     },
+    
     button: {
       width: '100%',
       borderRadius: 15,
-      paddingVertical: 15,
+      overflow: 'hidden',
       marginBottom: 15,
+      shadowColor: '#FF3366',
+      shadowOffset: { width: 0, height: 10 },
+      shadowOpacity: 0.3,
+      shadowRadius: 15,
+      elevation: 10,
     },
-    buttonTouchable: {
+    buttonGradient: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: 10,
+      paddingVertical: 18,
+      paddingHorizontal: 25,
+      gap: 12,
     },
     buttonText: {
       color: 'white',
@@ -234,14 +308,51 @@ AsyncStorage.setItem("quizCompleted", "true");
       fontFamily: 'Poppins-SemiBold',
       letterSpacing: 0.5,
     },
-    disabledButton: {
-      opacity: 0.6,
+    badge: {
+      position: 'absolute',
+      right: 15,
+      backgroundColor: 'rgba(255, 255, 255, 0.2)',
+      paddingVertical: 3,
+      paddingHorizontal: 10,
+      borderRadius: 50,
+    },
+    badgeText: {
+      color: 'white',
+      fontFamily: 'Poppins-Bold',
+      fontSize: 12,
+    },
+    storeButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 10,
+    },
+    storeText: {
+      color: '#E0E0E0',
+      fontFamily: 'Poppins-Medium',
+      fontSize: 14,
+      textShadowColor: 'rgba(0, 0, 0, 0.2)',
+      textShadowOffset: { width: 0, height: 1 },
+      textShadowRadius: 2,
     },
     closeButton: {
-      
       position: 'absolute',
-      top: 15,
-      right: 15,
-      padding: 5,
+      top: 20,
+      right: 20,
+      borderRadius: 50,
+      overflow: 'hidden',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 5,
+      elevation: 3,
+    },
+    closeGradient: {
+      padding: 8,
+      borderRadius: 50,
+      borderWidth: 1,
+      borderColor: 'rgba(0, 0, 0, 0.05)',
+    },
+    disabledButton: {
+      opacity: 0.6,
     },
   });

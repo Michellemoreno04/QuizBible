@@ -4,10 +4,7 @@ import {
   Text,
   Pressable,
   StyleSheet,
-  Share,
   ActivityIndicator,
-  Platform,
-  Image
 } from "react-native";
 import { Feather, AntDesign } from "@expo/vector-icons";
 import { db } from "../firebase/firebaseConfig";
@@ -30,6 +27,8 @@ import { captureRef } from "react-native-view-shot";
 import { useToast } from "react-native-toast-notifications";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import { LinearGradient } from "expo-linear-gradient";
+import Share from 'react-native-share';
+
 
 export const VersiculosDiarios = () => {
   const { user } = useAuth();
@@ -155,29 +154,22 @@ export const VersiculosDiarios = () => {
         type: "success",
         placement: "top",
       });
-      await new Promise(resolve => setTimeout(resolve, 200));
-
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
       const uri = await captureRef(viewRef, {
         format: "png",
         quality: 0.9,
-        result: "tmpfile"
       });
-
-      // Subir imagen a Firebase Storage
-      const storage = getStorage();
-      const filename = `shared_versiculo_${Date.now()}.png`;
-      const imageRef = storageRef(storage, `shared/${userId}/${filename}`);
-      
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      await uploadBytes(imageRef, blob);
-      
-      const imageUrl = await getDownloadURL(imageRef);
-      // Compartir con la URL de la imagen
-      await Share.share({
-        message: ` ${imageUrl} ¡Mira este versículo de la Biblia! ${versiculo?.versiculo}`
-      });
-     // console.log('url de la imagen', imageUrl)
+  
+      // Compartir la imagen directamente
+      const shareOptions = {
+        title: 'Compartir versículo',
+        url: uri, // URI local de la imagen
+        message: `¡Mira este versículo de la Biblia! \n${versiculo?.versiculo}\n\n ${'https://play.google.com/store/apps/details?id=com.moreno.dev.Bible_game1'}`,
+        social: Share.Social.WHATSAPP, // Opcional: fuerza WhatsApp
+      };
+  
+      await Share.open(shareOptions);
     } catch (error) {
       console.error("Error al compartir:", error);
       toast.show("😢 Error al compartir", { type: "danger" });
@@ -247,12 +239,12 @@ toast.show("⭐ Guardando...",{
 
 return (
   <LinearGradient
-  ref={viewRef}
+ ref={viewRef} collapsable={false}
   colors={["#6A65FB", "#8C9EFF"]}
     style={styles.container}
   >
 
-    <View style={styles.card}>
+    <View style={styles.card} >
      <Text style={styles.reference}>- {versiculo?.versiculo}</Text>
       <Text style={styles.text}>{versiculo?.texto}</Text>
       {!hideButtons && (

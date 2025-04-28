@@ -185,7 +185,7 @@ export default function Profile() {
             <Text style={styles.sectionTitle}>Descripción</Text>
             <View style={styles.bioCard}>
               <Text style={styles.bioText}>
-                {userInfo?.Description || '¡Completa tu perfil para que otros te conozcan mejor!'}
+                {userInfo?.Description || '¡Completa una descripcion'}
               </Text>
             </View>
           </View>

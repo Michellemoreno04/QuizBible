@@ -5,10 +5,8 @@ import useAuth from "../components/authContext/authContext";
 import LottieView from "lottie-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar as RNStatusBar } from "react-native";
-//import { SigninComponents } from "../components/signinComponents/signinComponents";
-
+import  SignInComponents  from "../components/authContext/signInComponents";
 export default function SignUpScreen() {
-  const { user } = useAuth();
 
   const navigation = useNavigation();
 
@@ -59,7 +57,7 @@ export default function SignUpScreen() {
           >
             <Text style={styles.buttonText}>Regístrate</Text>
           </Pressable>
-
+          
           {/* Enlace a Login */}
           <View style={styles.loginLinkContainer}>
             <Text style={styles.loginText}>¿Ya tienes una cuenta? </Text>
@@ -68,7 +66,7 @@ export default function SignUpScreen() {
             </Pressable>
           </View>
 
-         {/* <SigninComponents />*/}
+          <SignInComponents />
         </View>
       </ScrollView>
       </SafeAreaView>

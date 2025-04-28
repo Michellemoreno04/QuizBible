@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Modal, StyleSheet, Button, Share, TextInput, ScrollView } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Modal, StyleSheet, Button, Share, TextInput, ScrollView, Dimensions, Platform } from 'react-native';
 import useAuth from '../../components/authContext/authContext';
 import { doc, collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
+
+const { width, height } = Dimensions.get('screen');
 
 export default function Lecturas() {
   const { user } = useAuth();
@@ -70,7 +72,7 @@ export default function Lecturas() {
     try {
       const titulo = selectedTema?.titulo || 'Lectura diaria';
       await Share.share({
-        message: `📖 *${titulo}*\n\n${selectedTema.texto}`,
+        message: `📖 *${titulo}*\n\n${selectedTema.texto} \n\n ${'https://play.google.com/store/apps/details?id=com.moreno.dev.Bible_game1'}`,
       });
     } catch (error) {
       console.error('Error compartiendo:', error);
@@ -134,10 +136,10 @@ export default function Lecturas() {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-        <ScrollView style={{height: '100%'}}>
+        <ScrollView style={{height: '100%'}} >
             {selectedTema && (
               <>
-                <Text style={styles.modalTitle}>{selectedTema.titulo || 'Titulo aqui'}</Text>
+                <Text style={styles.modalTitle}>{selectedTema.titulo || '...'}</Text>
                 <Text style={styles.modalText}>{selectedTema.texto}</Text>
                 
                 <View style={styles.buttonContainer}>
@@ -212,6 +214,8 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)'
   },
   modalContent: {
+    width: width * 0.9,
+    height: height * 0.8,
     backgroundColor: 'white',
     margin: 20,
     padding: 20,

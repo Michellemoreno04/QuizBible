@@ -1,30 +1,25 @@
 import { Link } from "expo-router";
-import React, { useState, useEffect } from "react";
+import React, { useState} from "react";
 import {
   View,
   TextInput,
-  KeyboardAvoidingView,
   Text,
   Platform,
-  Pressable,
   Alert,
   ScrollView,
   StyleSheet,
-  Image,
-  Linking,
+ 
   SafeAreaView,
   StatusBar as RNStatusBar,
   TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
 import {
-  GoogleAuthProvider,
   createUserWithEmailAndPassword,
-  signInWithCredential,
 } from "firebase/auth";
 import { auth, db } from "../components/firebase/firebaseConfig";
 import { useNavigation } from "@react-navigation/native";
-import { doc, setDoc, Timestamp, getDoc } from "firebase/firestore";
+import { doc, setDoc, Timestamp} from "firebase/firestore";
 import { LinearGradient } from "expo-linear-gradient";
 import {
   MaterialIcons,

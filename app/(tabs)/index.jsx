@@ -34,6 +34,8 @@ export default function AppComponent() {
   const [isModalRachaPerdidaVisible, setModalRachaPerdidaVisible] = useState(false);
   const [userInfo, setUserInfo] = useState({});
 
+  
+ 
 
 
 // obtener los datos del usuario
@@ -135,7 +137,7 @@ useEffect(() => {
            <ModalRacha userInfo={userInfo} isVisible={isModalRachaVisible} setModalRachaVisible={setModalRachaVisible}  />
            <ModalRachaPerdida userInfo={userInfo} isVisible={isModalRachaPerdidaVisible} setModalRachaPerdidaVisible={setModalRachaPerdidaVisible}  />
            <HeaderHome />
-          
+
             <VersiculosDiarios />
            
             <ExploraComponent />

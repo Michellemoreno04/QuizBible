@@ -10,5 +10,6 @@
 
 # cosas hecha 
 
-1. Cambio para compartir la imagen con npm install react-native-share (que es mejor que share de react-native)
+1. errores arreglados de la version anterior
+
 

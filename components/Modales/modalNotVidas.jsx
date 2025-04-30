@@ -51,7 +51,7 @@ const playSound = useSound();
       setIsLoading(true);
       const userDocRef = doc(db, 'users', userId);
       await updateDoc(userDocRef, {
-        Vidas: increment(1),
+        Vidas: increment(2),
       });
     } catch (error) {
       console.error('Error al actualizar las vidas:', error);
@@ -94,11 +94,15 @@ const playSound = useSound();
     }
   }, [vidas, setIsVisible, setShowModal]);
 
+  // para que el sonido se reproduzca solo la primera vez que se abre el modal
   useEffect(() => {
     if (!isVisible) return;
 
-    playSound(require('../../assets/sound/notVidasSoundModal.mp3'));
-    saveQuizDate();
+    // Verificamos si el modal se está abriendo por primera vez
+    if (isVisible) {
+      playSound(require('../../assets/sound/notVidasSoundModal.mp3'));
+      saveQuizDate();
+    }
 
     const newRewarded = RewardedAd.createForAdRequest(adUnitId, {
       keywords: ['religion', 'bible'],
@@ -125,7 +129,7 @@ const playSound = useSound();
       setRewardedAd(null);
       setLoaded(false);
     };
-  }, [isVisible, playSound, saveQuizDate, addLife, setIsVisible, onClose]);
+  }, [isVisible]);
 
   return (
     <Modal visible={isVisible} animationType="fade" transparent onRequestClose={onClose}>
@@ -175,8 +179,9 @@ const playSound = useSound();
                 <>
                   <MaterialIcons name="play-circle-filled" size={28} color="white" />
                   <Text style={styles.buttonText}>
-                    {loaded ? 'Obtener 2 corazones' : 'Cargando...'}
+                    {loaded ? 'Obtener 2 corazones ' : 'Cargando...'}
                   </Text>
+                  
                   {loaded && (
                     <View style={styles.badge}>
                       <Text style={styles.badgeText}>GRATIS</Text>
@@ -188,10 +193,10 @@ const playSound = useSound();
           </TouchableOpacity>
   
           {/* Opción alternativa */}
-          <TouchableOpacity style={styles.storeButton}>
+         {/* <TouchableOpacity style={styles.storeButton}>
             <Text style={styles.storeText}>¿Prefieres comprar? </Text>
             <Ionicons name="storefront" size={18} color="#FF3366" />
-          </TouchableOpacity>
+          </TouchableOpacity>*/}
   
           {/* Botón de cierre */}
           <TouchableOpacity 
@@ -295,6 +300,7 @@ const playSound = useSound();
       elevation: 10,
     },
     buttonGradient: {
+
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
@@ -304,12 +310,11 @@ const playSound = useSound();
     },
     buttonText: {
       color: 'white',
-      fontSize: 18,
-      fontFamily: 'Poppins-SemiBold',
-      letterSpacing: 0.5,
+      fontSize: width * 0.04,
+      fontWeight: 'bold',
     },
     badge: {
-      position: 'absolute',
+      position: 'relative',
       right: 15,
       backgroundColor: 'rgba(255, 255, 255, 0.2)',
       paddingVertical: 3,

@@ -18,7 +18,7 @@
         "foregroundImage": "./assets/images/quizBible-logo.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.moreno.dev.Bible_game1",
+      "package": "com.moreno.dev.QuizBible",
       "softwareKeyboardLayoutMode": "pan",
       "permissions": [
         "com.google.android.gms.permission.AD_ID",
@@ -26,7 +26,8 @@
         "android.permission.ACCESS_NETWORK_STATE",
         "com.android.vending.BILLING"
       ],
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "versionCode": 7
     },
     "web": {
       "bundler": "metro",
@@ -65,7 +66,7 @@
         {
           "icon": "./assets/images/quizBible-logo.png",
           "color": "#ffffff",
-          "sounds": ["./assets/sound/rachaSound.mp3"]
+          "sounds": ["./assets/sound/rachasound.mp3"]
         }
       ]
     ],

@@ -342,7 +342,7 @@ const DailyReading = () => {
       // Se comparte el título y el texto concatenados
       await Share.share({
         title: 'Reflexión Diaria',
-        message: `${readingText[0].titulo}. ${readingText[0].texto}`,
+        message: `${readingText[0].titulo}. ${readingText[0].texto} \n\n ${'Obtén más lecturas como esta con la siguiente App: '}\n ${'https://play.google.com/store/apps/details?id=com.moreno.dev.QuizBible'}`,
       });
     } catch (error) {
       Alert.alert('Error al compartir la lectura.');

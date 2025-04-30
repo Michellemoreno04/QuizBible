@@ -165,7 +165,7 @@ export const VersiculosDiarios = () => {
       const shareOptions = {
         title: 'Compartir versículo',
         url: uri, // URI local de la imagen
-        message: `¡Mira este versículo de la Biblia! \n${versiculo?.versiculo}\n\n ${'https://play.google.com/store/apps/details?id=com.moreno.dev.Bible_game1'}`,
+        message: `¡Mira este versículo de la Biblia! \n${versiculo?.versiculo}\n\n ${'https://play.google.com/store/apps/details?id=com.moreno.dev.QuizBible'}`,
         social: Share.Social.WHATSAPP, // Opcional: fuerza WhatsApp
       };
   

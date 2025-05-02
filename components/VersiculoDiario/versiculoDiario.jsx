@@ -165,14 +165,14 @@ export const VersiculosDiarios = () => {
       const shareOptions = {
         title: 'Compartir versículo',
         url: uri, // URI local de la imagen
-        message: `¡Mira este versículo de la Biblia! \n${versiculo?.versiculo}\n\n ${'https://play.google.com/store/apps/details?id=com.moreno.dev.Bible_game1'}`,
+        message: `¡Mira este versículo de la Biblia! \n${versiculo?.versiculo}\n\n ${'https://play.google.com/store/apps/details?id=com.moreno.dev.QuizBible'}`,
         social: Share.Social.WHATSAPP, // Opcional: fuerza WhatsApp
       };
   
       await Share.open(shareOptions);
     } catch (error) {
       console.error("Error al compartir:", error);
-      toast.show("😢 Error al compartir", { type: "danger" });
+     // toast.show("😢 Error al compartir", { type: "danger" });
     } finally {
       setHideButtons(false);
     }
@@ -228,7 +228,7 @@ toast.show("⭐ Guardando...",{
     setVersiculoGuardado(true); // Actualizar estado inmediatamente
   } catch (error) {
     console.error("Error:", error);
-    toast.show("😢 Error al guardar", { type: "danger" });
+  //  toast.show("😢 Error al guardar", { type: "danger" });
   } finally {
     setHideButtons(false);
     setIsProcessing(false);

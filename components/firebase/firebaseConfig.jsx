@@ -24,4 +24,4 @@ const auth = initializeAuth(app, {
 
 const googleProvider = new GoogleAuthProvider();
 
-export { auth, db, storage, googleProvider }; 
+export { auth, db, storage, googleProvider, app }; 

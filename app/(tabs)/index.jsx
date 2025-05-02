@@ -16,7 +16,7 @@ import { ModalRachaPerdida } from '@/components/Modales/rachaPerdida';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BannerAd, TestIds } from 'react-native-google-mobile-ads';
 import { Colors } from '@/constants/Colors';
-
+import { useToast } from 'react-native-toast-notifications';
 
 const bannerAdUnitId = __DEV__ 
   ? TestIds.BANNER 
@@ -33,7 +33,8 @@ export default function AppComponent() {
   const [isModalRachaVisible, setModalRachaVisible] = useState(false);
   const [isModalRachaPerdidaVisible, setModalRachaPerdidaVisible] = useState(false);
   const [userInfo, setUserInfo] = useState({});
-
+  const toast = useToast();
+  
 
 
 // obtener los datos del usuario
@@ -46,7 +47,14 @@ useEffect(() => {
     
     if (userData) {
       setUserInfo(userData);
+    } else {
+      toast.show('Network error', {
+        type: 'danger',
+        placement: 'top',
+        duration: 4000,
+      });
     }
+
   });
 
   return () => unsubscribe();
@@ -135,7 +143,7 @@ useEffect(() => {
            <ModalRacha userInfo={userInfo} isVisible={isModalRachaVisible} setModalRachaVisible={setModalRachaVisible}  />
            <ModalRachaPerdida userInfo={userInfo} isVisible={isModalRachaPerdidaVisible} setModalRachaPerdidaVisible={setModalRachaPerdidaVisible}  />
            <HeaderHome />
-          
+
             <VersiculosDiarios />
            
             <ExploraComponent />

@@ -72,7 +72,7 @@ export default function Lecturas() {
     try {
       const titulo = selectedTema?.titulo || 'Lectura diaria';
       await Share.share({
-        message: `📖 *${titulo}*\n\n${selectedTema.texto} \n\n ${'https://play.google.com/store/apps/details?id=com.moreno.dev.Bible_game1'}`,
+        message: `📖 *${titulo}*\n\n${selectedTema.texto} \n\n ${'https://play.google.com/store/apps/details?id=com.moreno.dev.QuizBible'}`,
       });
     } catch (error) {
       console.error('Error compartiendo:', error);

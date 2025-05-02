@@ -24,7 +24,7 @@ export function ModalRacha({ isVisible, setModalRachaVisible }) {
 
   useEffect(() => {
     if (isVisible) {
-      playSound(require('../../assets/sound/rachaSound.mp3'));
+      playSound(require('../../assets/sound/rachasound.mp3'));
       
       // Secuencia de animaciones
       Animated.sequence([

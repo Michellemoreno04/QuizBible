@@ -7,7 +7,7 @@ Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
     shouldPlaySound: true,
-    shouldSetBadge: false,
+    shouldSetBadge: true, // para que se muestre el numero de notificaciones en el badge
   }),
 });
 
@@ -28,7 +28,7 @@ async function scheduleDailyNotifications() {
   await Notifications.scheduleNotificationAsync({
     content: {
       title: "¡Es hora de estudiar la Biblia! 📖",
-      body: 'Toma un momento para reflexionar sobre la palabra de Dios',
+      body: 'Toma un momento para reforzar tus conocimientos Biblicos',
       data: { data: 'datos aquí' },
     },
     trigger: {
@@ -42,7 +42,7 @@ async function scheduleDailyNotifications() {
   await Notifications.scheduleNotificationAsync({
     content: {
       title: "¡Es hora de estudiar la Biblia! 📖",
-      body: 'Toma un momento para reflexionar sobre la palabra de Dios',
+      body: 'Toma un momento para reforzar tus conocimientos Biblicos',
       data: { data: 'datos aquí' },
     },
     trigger: {
@@ -80,9 +80,10 @@ async function registerForPushNotificationsAsync() {
     if (!projectId) {
       throw new Error('No se encontró el ID del proyecto');
     }
-    await Notifications.getExpoPushTokenAsync({
-      projectId,
-    });
+   // const token = await Notifications.getExpoPushTokenAsync({
+   //   projectId,
+   // });
+   // console.log('Token de notificaciones:', token.data);
   } catch (e) {
     console.error('Error al obtener el token:', e);
   }

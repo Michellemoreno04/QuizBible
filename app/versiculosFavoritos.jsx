@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, ImageBackground, Pressable, StyleSheet, Alert, Share, Modal, ActivityIndicator, Dimensions, ScrollView } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import { View, Text, FlatList, ImageBackground, Pressable, StyleSheet, Alert, Modal, ActivityIndicator, Dimensions, ScrollView, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialIcons, Ionicons, Feather } from '@expo/vector-icons';
 import { db, storage } from '../components/firebase/firebaseConfig';
@@ -7,15 +7,17 @@ import { collection, query, orderBy, onSnapshot, deleteDoc, doc } from 'firebase
 import { deleteObject, ref as storageRef } from 'firebase/storage';
 import useAuth from '../components/authContext/authContext';
 import { useToast } from 'react-native-toast-notifications';
-
-const { width } = Dimensions.get('window');
+import Share from 'react-native-share';
+import { captureRef } from 'react-native-view-shot';
+const { width, height } = Dimensions.get('screen');
 
 const VersiculosFavoritos = () => {
   const { user } = useAuth();
   const [versiculos, setVersiculos] = useState({});
-  const [textVerse, setTextVerse] = useState(null);
   const [selectedVerse, setSelectedVerse] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [hideButtons, setHideButtons] = useState(false);
+  const viewRef = useRef();
   const toast = useToast();
 
 
@@ -76,18 +78,38 @@ const VersiculosFavoritos = () => {
 
   const handleShare = async (imageUrl) => {
     try {
-      if (!imageUrl) {
-        toast.show('No hay imagen para compartir', { type: 'warning' });
-        return;
-      }
-      const appLink = 'https://play.google.com/store/apps/details?id=com.app.QuizBible';
-      await Share.share({
-        message: `${imageUrl}\n\n${selectedVerse?.versiculo}\n\nDescarga esta app para estudiar la Biblia en el siguiente enlace: ${appLink}`,
-        
-        
+      setHideButtons(true);
+      toast.show("⭐ Preparando para compartir...", {
+        type: "success",
+        placement: "top",
       });
+      
+      // Esperamos un momento para asegurar que la imagen esté cargada
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const uri = await captureRef(viewRef.current, {
+        format: "png",
+        quality: 0.9,
+      });
+
+      // Solo activamos loading después de capturar la imagen
+      setLoading(true);
+
+      const appLink = 'https://play.google.com/store/apps/details?id=com.moreno.dev.QuizBible';
+      const shareOptions = {
+        title: 'Compartir versículo',
+        url: uri,
+        message: `${selectedVerse?.versiculo}\n\nDescarga esta app para estudiar la Biblia en el siguiente enlace: ${appLink}`,
+        social: Share.Social.WHATSAPP,
+      };
+
+      await Share.open(shareOptions);
     } catch (error) {
+      console.log('Error al compartir:', error);
       toast.show('Error al compartir', { type: 'danger' });
+    } finally {
+      setHideButtons(false);
+      setLoading(false);
     }
   };
   
@@ -136,63 +158,62 @@ const VersiculosFavoritos = () => {
         }
       />
 
-      <Modal
-        visible={!!selectedVerse}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setSelectedVerse(null)}
-      >
-        <View style={styles.modalContainer}>
-          {loading ? (
-            <ActivityIndicator size="large" color="#FFF" />
-          ) : (
-            <>
-              <Pressable 
-                style={styles.closeButton}
-                onPress={() => setSelectedVerse(null)}
-              >
-                <Feather name="x" size={28} color="white" />
-              </Pressable>
+<Modal
+  visible={!!selectedVerse}
+  transparent={true}
+  animationType="fade"
+  onRequestClose={() => setSelectedVerse(null)}
+>
+  <View style={styles.modalContainer}>
+    {loading ? (
+      <ActivityIndicator size="large" color="#FFF" />
+    ) : (
+      <>
+        {/* Botón de cerrar fuera del viewRef */}
+        <Pressable 
+          style={styles.closeButton}
+          onPress={() => setSelectedVerse(null)}
+        >
+          <Feather name="x" size={28} color="white" />
+        </Pressable>
 
-              <ImageBackground
-                source={{ uri: selectedVerse?.imageUrl }}
-                style={styles.fullImage}
-                resizeMode="contain"
-              >
-                <LinearGradient
-                  colors={['rgba(0,0,0,0.7)', 'transparent', 'rgba(0,0,0,0.7)']}
-                  style={styles.modalGradient}
-                >
-                  <View style={styles.modalContent}>
-                    <View style={styles.verseInfo}>
-                      <Text style={styles.verseText}>{selectedVerse?.verseText}</Text>
-                      <Text style={styles.verseReference}>— {selectedVerse?.reference}</Text>
-                    </View>
-                    
-                    <View style={styles.modalActions}>
-                      <Pressable
-                        style={styles.modalActionButton}
-                        onPress={() => handleShare(selectedVerse?.imageUrl)}
-                      >
-                        <Ionicons name="share-social" size={26} color="white" />
-                        <Text style={styles.actionText}>Compartir</Text>
-                      </Pressable>
-                      
-                      <Pressable
-                        style={[styles.modalActionButton, { backgroundColor: 'rgba(255,77,77,0.3)' }]}
-                        onPress={() => handleDelete(selectedVerse)}
-                      >
-                        <MaterialIcons name="delete" size={26} color="#ff4d4d" />
-                        <Text style={[styles.actionText, { color: '#ff4d4d' }]}>Eliminar</Text>
-                      </Pressable>
-                    </View>
-                  </View>
-                </LinearGradient>
-              </ImageBackground>
-            </>
-          )}
+        {/* Contenedor de imagen solo para captura */}
+        <View 
+          ref={viewRef} 
+          collapsable={false} 
+          style={[styles.imageContainer, { backgroundColor: 'black' }]}
+        >
+          <Image
+            source={{ uri: selectedVerse?.imageUrl }}
+            style={styles.fullImage}
+            resizeMode="stretch"
+          />
         </View>
-      </Modal>
+
+        {/* Botones de acciones fuera del viewRef */}
+        {!hideButtons && (
+          <View style={styles.modalActions}>
+            <Pressable
+              style={styles.modalActionButton}
+              onPress={() => handleShare(selectedVerse?.imageUrl)}
+            >
+              <Ionicons name="share-social" size={26} color="white" />
+              <Text style={styles.actionText}>Compartir</Text>
+            </Pressable>
+            
+            <Pressable
+              style={[styles.modalActionButton, { backgroundColor: 'rgba(255,77,77,0.3)' }]}
+              onPress={() => handleDelete(selectedVerse)}
+            >
+              <MaterialIcons name="delete" size={26} color="#ff4d4d" />
+              <Text style={[styles.actionText, { color: '#ff4d4d' }]}>Eliminar</Text>
+            </Pressable>
+          </View>
+        )}
+      </>
+    )}
+  </View>
+</Modal>
     </LinearGradient>
           
   );
@@ -223,7 +244,6 @@ const styles = StyleSheet.create({
     
   },
   cardImage: {
-    
     borderRadius: 16,
     resizeMode:'stretch',
   },
@@ -250,56 +270,29 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.95)',
     justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.95)',
   },
+  imageContainer: {
+    position:'relative',
+  
+    borderRadius: 5,
+    overflow: 'hidden',
+   
+  },
+  
   fullImage: {
     width: '100%',
-    height: '85%',
-    justifyContent: 'space-between',
-  },
-  modalGradient: {
-    flex: 1,
-    padding: 20,
-  },
-  closeButton: {
-    position: 'absolute',
-    top: 50,
-    right: 25,
-    zIndex: 1,
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderRadius: 20,
-    padding: 10,
-  },
-  modalContent: {
-    flex: 1,
-    justifyContent: 'space-between',
-  },
-  verseInfo: {
-    padding: 20,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    borderRadius: 15,
-    marginTop: 20,
-  },
-  verseText: {
-    color: 'white',
-    fontSize: 18,
-    lineHeight: 26,
-    fontFamily: 'Georgia-Italic',
-    textAlign: 'center',
-  },
-  verseReference: {
-    color: 'rgba(255,255,255,0.8)',
-    fontSize: 16,
-    textAlign: 'right',
-    marginTop: 15,
-    fontFamily: 'Inter-Medium',
+    height: 300,
   },
   modalActions: {
+    position: 'absolute',
+    bottom: 20,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginBottom: 30,
+    paddingHorizontal: 20,
   },
   modalActionButton: {
     alignItems: 'center',
@@ -315,6 +308,15 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontFamily: 'Inter-SemiBold',
+  },
+  closeButton: {
+    position: 'absolute',
+    top: 50,
+    right: 25,
+    zIndex: 1,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 20,
+    padding: 10,
   },
 });
 

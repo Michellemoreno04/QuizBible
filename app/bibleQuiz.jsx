@@ -689,7 +689,7 @@ useEffect(() => {
       />
       <RewardedAdModal isVisible={showModalNotVidas} setIsVisible={setShowModalNotVidas} setShowModal={setShowModal} onClose={cerrarRewardModal} userId={userId} vidas={userInfo.Vidas} />
 <ImageBackground 
-        source={require('../assets/images/bg-quiz2.png')} 
+        source={require('../assets/images/bg-quiz.png')} 
          resizeMode="cover" 
         style={styles.backgroundImage}
       >

@@ -48,6 +48,25 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
+        name="chat"
+        options={{
+          title: 'Chat',
+          headerShown: true,
+          headerStyle: {
+            backgroundColor: '#3C7E9F',
+            height: 85,
+          },
+
+          headerTitleStyle: {
+            color: '#fff',
+            fontSize: 20,
+            fontWeight: '600',
+          },
+          headerTintColor: '#fff',
+          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="chat" color={color} size={26} />,
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',

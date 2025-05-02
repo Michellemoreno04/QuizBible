@@ -1,0 +1,370 @@
+import React, { useState, useRef, useEffect } from 'react';
+import { 
+  View, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  StyleSheet, 
+  Image, 
+  ScrollView, 
+  KeyboardAvoidingView, 
+  Platform, 
+  Animated,
+  ActivityIndicator,
+  Alert,
+  StatusBar
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import * as Animatable from 'react-native-animatable';
+import { Audio } from 'expo-av';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import { app } from '../../components/firebase/firebaseConfig';
+import { Avatar } from '@rneui/base'
+import  useAuth  from '../../components/authContext/authContext';
+import { db } from '../../components/firebase/firebaseConfig';
+import { doc, onSnapshot, getDoc, updateDoc, increment } from 'firebase/firestore';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Colors } from '@/constants/Colors';
+
+
+
+// Inicializar Firebase Functions
+const functions = getFunctions(app);
+
+const LambChat = () => {
+  const [userInfo, setUserInfo] = useState({});
+  const [messages, setMessages] = useState([{
+    id: '1',
+    text: "¡Hola! Soy Nilu, tu corderito guia 🐑. ¿Que te gustaria saber de la palabra de Dios?",
+    user: 'ai',
+    createdAt: new Date(),
+    image: require('../../assets/images/cordero_saludando.png')
+  }]);
+
+  const { user } = useAuth();
+  const userId = user?.uid;
+
+  const [dailyMessageCount, setDailyMessageCount] = useState(0);
+  const [isPremium, setIsPremium] = useState(false);
+
+  // Obtener información del usuario
+  useEffect(() => {
+    if (!userId) return;
+
+    const userRef = doc(db, 'users', userId);
+    const unsubscribe = onSnapshot(userRef, (snapshot) => {
+      const userData = snapshot.data() || {};
+      if (userData) {
+        setUserInfo(userData);
+        setIsPremium(userData.isPremium || false);
+        setDailyMessageCount(userData.dailyMessageCount || 0);
+      }
+    });
+    return () => unsubscribe();
+  }, [userId]);
+
+  const [inputText, setInputText] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const scrollViewRef = useRef(null);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+
+  const playSound = async (sound) => {
+    const { sound: audioSound } = await Audio.Sound.createAsync(
+      sound === 'send' 
+        ? require('../../assets/sound/mensaje-usuario.mp3')
+        : require('../../assets/sound/mensaje-cordero.mp3')
+    );
+    await audioSound.playAsync();
+  };
+
+  // Agregar función para verificar y actualizar el contador diario
+  const checkAndUpdateMessageCount = async () => {
+    if (!userId) return false;
+
+    const userRef = doc(db, 'users', userId);
+    const userDoc = await getDoc(userRef);
+    const userData = userDoc.data();
+    
+    const today = new Date().toDateString();
+    const lastMessageDate = userData.lastMessageDate;
+    
+    // Reiniciar contador si es un nuevo día
+    if (lastMessageDate !== today) {
+      await updateDoc(userRef, {
+        dailyMessageCount: 0,
+        lastMessageDate: today
+      });
+      return true;
+    }
+    
+    // Verificar límite para usuarios no premium
+    if (!userData.isPremium && userData.dailyMessageCount >= 2) {
+      Alert.alert(
+        "Límite de mensajes alcanzado",
+        "Has alcanzado el límite diario de mensajes. ¡Actualiza a premium para mensajes ilimitados!",
+        [
+          { text: "OK", style: "cancel" },
+          { 
+            text: "Obtener Premium", 
+            onPress: () => {
+              // Aquí puedes agregar la navegación a la pantalla de premium
+              // navigation.navigate('Premium');
+              console.log('obtener premium')
+            }
+          }
+        ]
+      );
+      return false;
+    }
+    
+    return true;
+  };
+
+  const handleSend = async () => {
+    if (!inputText.trim()) return;
+
+    const canSendMessage = await checkAndUpdateMessageCount();
+    if (!canSendMessage) return;
+
+    const userMessage = {
+      id: Date.now().toString(),
+      text: inputText,
+      user: 'user',
+      createdAt: new Date()
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInputText('');
+    await playSound('mensaje-usuario');
+
+    // Actualizar el contador de mensajes
+    const userRef = doc(db, 'users', userId);
+    await updateDoc(userRef, {
+      dailyMessageCount: increment(1)
+    });
+
+    setIsLoading(true);
+    try {
+      const responderPreguntas = httpsCallable(functions, 'responderPreguntas');
+      const result = await responderPreguntas({ pregunta: inputText });
+      
+      
+      const aiMessage = {
+        id: (Date.now() + 1).toString(),
+        text: result.data.respuesta,
+        user: 'ai',
+        createdAt: new Date(),
+        image: require('../../assets/images/cordero_saludando.png')
+      };
+    
+      setMessages(prev => [...prev, aiMessage]);
+    } catch (error) {
+      console.error('Error al obtener respuesta:', error);
+      const errorMessage = {
+        id: (Date.now() + 1).toString(),
+        text: "Lo siento, hubo un error al procesar tu pregunta. Por favor, intenta de nuevo.",
+        user: 'ai',
+        createdAt: new Date(),
+        image: require('../../assets/images/cordero_saludando.png')
+      };
+      setMessages(prev => [...prev, errorMessage]);
+    } finally {
+      setIsLoading(false);
+      await playSound('receive');
+    }
+  };
+
+  const renderMessage = ({ item }) => (
+    <Animatable.View 
+      animation="fadeInUp"
+      duration={800}
+      style={[
+        styles.messageContainer,
+        item.user === 'user' ? styles.userMessage : styles.aiMessage
+      ]}
+    >
+      {item.user === 'ai' && (
+        <Image
+          source={item.image}
+          style={styles.avatar}
+        />
+      )}
+      
+      {item.user === 'user' && (
+        <Avatar
+          size={32}
+          rounded
+          source={userInfo.FotoPerfil ? { uri: userInfo.FotoPerfil } : require('../../assets/images/cordero_saludando.png')}
+        />
+      )}
+      <View style={styles.messageContent}>
+        <Text style={item.user === 'user' ? styles.userText : styles.aiText}>
+          {item.text}
+        </Text>
+      </View>
+      
+    </Animatable.View>
+  );
+
+  return (
+    <KeyboardAvoidingView // para que el teclado no tape el input
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
+      <LinearGradient
+        colors={Colors.bgApp}
+        style={styles.container}
+      >
+      <StatusBar barStyle="dark-content" />
+      <ScrollView
+        ref={scrollViewRef}
+        contentContainerStyle={styles.messagesContainer}
+        onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
+      >
+        {messages.map((item) => (
+          <View key={item.id}>
+            {renderMessage({ item })}
+          </View>
+        ))}
+        
+        {isLoading && (
+          <Animatable.View 
+            animation="pulse" 
+            iterationCount="infinite"
+            style={styles.loadingContainer}
+          >
+            <Image
+              source={require('../../assets/images/cordero_saludando.png')}
+              style={styles.loadingAvatar}
+            />
+            <ActivityIndicator size="small" color="#6C63FF" />
+          </Animatable.View>
+        )}
+      </ScrollView>
+      </LinearGradient>
+
+      <LinearGradient
+        colors={['#3C6E9F','#3C6E9F']}
+        style={styles.inputContainer}
+      >
+        <TextInput
+          value={inputText}
+          onChangeText={setInputText}
+          placeholder="Habla con Nilu..."
+          placeholderTextColor="#fff"
+          style={styles.input}
+          multiline
+        />
+        
+        <TouchableOpacity 
+          onPress={handleSend}
+          style={styles.sendButton}
+          disabled={isLoading}
+        >
+          <Ionicons 
+            name="send" 
+            size={24} 
+            color="white" 
+            style={styles.sendIcon} 
+          />
+        </TouchableOpacity>
+      </LinearGradient>
+    </KeyboardAvoidingView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F5F7FB'
+  },
+  messagesContainer: {
+    padding: 16
+  },
+  messageContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    marginVertical: 8,
+    maxWidth: '80%'
+  },
+  aiMessage: {
+    alignSelf: 'flex-start'
+  },
+  userMessage: {
+    alignSelf: 'flex-end',
+    flexDirection: 'row-reverse'
+  },
+  avatar: {
+    width: 30,
+    height: 30,
+    borderRadius: 20,
+    marginRight: 8,
+    transform: [{ scaleX: -1 }] // Invertir la imagen
+  },
+  messageContent: {
+    backgroundColor: 'white',
+    borderRadius: 16,
+    padding: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2
+  },
+  userText: {
+    color: '#333',
+    fontSize: 16
+  },
+  aiText: {
+    color: '#444',
+    fontSize: 16,
+    fontStyle: 'italic'
+  },
+  lambImage: {
+    width: 200,
+    height: 200,
+    borderRadius: 12
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderTopWidth: 0.3,
+    borderTopColor: 'rgba(7, 2, 14, 0.9)'
+  },
+  input: {
+    flex: 1,
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    borderRadius: 24,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: '#fff',
+    maxHeight: 120
+  },
+  sendButton: {
+    backgroundColor: '#6C63FF',
+    borderRadius: 24,
+    padding: 12,
+    marginLeft: 8
+  },
+  sendIcon: {
+    transform: [{ rotate: '-30deg' }]
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderRadius: 20,
+    marginTop: 8
+  },
+  loadingAvatar: {
+    width: 30,
+    height: 30,
+    borderRadius: 15,
+    marginRight: 12
+  }
+});
+
+export default LambChat;

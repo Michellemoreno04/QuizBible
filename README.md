@@ -10,6 +10,6 @@
 
 # cosas hecha 
 
-1. errores arreglados de la version anterior
+1. Chat con Nilu agregado
 
 

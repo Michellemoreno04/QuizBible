@@ -174,6 +174,7 @@ export default function RootLayout() {
               presentation: "modal",
             }}
           />
+          
           <Stack.Screen name="+not-found" />
         </Stack>
         <StatusBar style="light" />

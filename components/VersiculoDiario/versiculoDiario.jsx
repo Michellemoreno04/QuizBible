@@ -172,7 +172,7 @@ export const VersiculosDiarios = () => {
       await Share.open(shareOptions);
     } catch (error) {
       console.error("Error al compartir:", error);
-      toast.show("😢 Error al compartir", { type: "danger" });
+     // toast.show("😢 Error al compartir", { type: "danger" });
     } finally {
       setHideButtons(false);
     }
@@ -228,7 +228,7 @@ toast.show("⭐ Guardando...",{
     setVersiculoGuardado(true); // Actualizar estado inmediatamente
   } catch (error) {
     console.error("Error:", error);
-    toast.show("😢 Error al guardar", { type: "danger" });
+  //  toast.show("😢 Error al guardar", { type: "danger" });
   } finally {
     setHideButtons(false);
     setIsProcessing(false);

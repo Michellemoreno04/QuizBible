@@ -11,7 +11,10 @@
     "jsEngine": "hermes",
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.moreno.dev.QuizBible"
+      "bundleIdentifier": "com.moreno.dev.QuizBible",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -36,7 +39,6 @@
     },
     "plugins": [
       "expo-router",
-      
       [
         "expo-splash-screen",
         {
@@ -66,7 +68,9 @@
         {
           "icon": "./assets/images/quizBible-logo.png",
           "color": "#ffffff",
-          "sounds": ["./assets/sound/rachasound.mp3"]
+          "sounds": [
+            "./assets/sound/rachasound.mp3"
+          ]
         }
       ]
     ],

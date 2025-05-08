@@ -1,4 +1,4 @@
-import { View, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, Platform,  StatusBar as RNStatusBar, Alert} from 'react-native';
+import { View, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, Platform,  StatusBar as RNStatusBar, Alert, TouchableOpacity, Text} from 'react-native';
 import React, { useEffect, useState } from 'react';
 import {VersiculosDiarios} from '@/components/VersiculoDiario/versiculoDiario';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -17,6 +17,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BannerAd, TestIds } from 'react-native-google-mobile-ads';
 import { Colors } from '@/constants/Colors';
 import { useToast } from 'react-native-toast-notifications';
+import Notificaciones from '@/components/notificaciones/notificaciones';
+import { useNavigation } from '@react-navigation/native';
+
 
 const bannerAdUnitId = __DEV__ 
   ? TestIds.BANNER 
@@ -26,7 +29,7 @@ const bannerAdUnitId = __DEV__
 
 
 export default function AppComponent() {
-
+  const navigation = useNavigation();
   const { user } = useAuth();
   const userId = user?.uid;
   const [isNotVidasModalVisible, setNotVidasModalVisible] = useState(false);
@@ -143,8 +146,9 @@ useEffect(() => {
            <ModalRacha userInfo={userInfo} isVisible={isModalRachaVisible} setModalRachaVisible={setModalRachaVisible}  />
            <ModalRachaPerdida userInfo={userInfo} isVisible={isModalRachaPerdidaVisible} setModalRachaPerdidaVisible={setModalRachaPerdidaVisible}  />
            <HeaderHome />
-
+           <Notificaciones />
             <VersiculosDiarios />
+           
            
             <ExploraComponent />
             <GuardadosComponents />

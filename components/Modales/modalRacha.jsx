@@ -10,7 +10,6 @@ import useAuth from '../authContext/authContext';
 import { useSound } from '../soundFunctions/soundFunction';
 import { LinearGradient } from 'expo-linear-gradient';
 
-const { width, height } = Dimensions.get('screen');
 
 export function ModalRacha({ isVisible, setModalRachaVisible }) {
   const { user } = useAuth();
@@ -86,6 +85,7 @@ export function ModalRacha({ isVisible, setModalRachaVisible }) {
       animationOut="fadeOut"
       backdropOpacity={0.7}
       onBackdropPress={closeModal}
+      style={styles.modalContainer}
     >
       <Animated.View 
         style={[
@@ -168,14 +168,21 @@ export function ModalRacha({ isVisible, setModalRachaVisible }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
+  modalContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
+  container: {
+    width: '100%',
+    height: '100%',
+    
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   gradientContainer: {
-    width: width * 0.85,
-    height: height * 0.65,
+    width: '100%',
+    height: '75%',
     borderRadius: 30,
     padding: 25,
     alignItems: 'center',

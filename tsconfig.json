@@ -16,5 +16,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-, "app/+not-found.jsx", "app/_layout.jsx", "app/(tabs)/_layout.jsx", "app/(tabs)/index.jsx", "app/(tabs)/profile.jsx", "hooks/useRevenueCat.jsx", "components/PremiumModal.jsx", "constants/RevenueCat.jsx"  ]
+, "app/+not-found.jsx", "app/_layout.jsx", "app/(tabs)/_layout.jsx", "app/(tabs)/index.jsx", "app/(tabs)/profile.jsx", "hooks/useRevenueCat.jsx", "components/PremiumModal.jsx", "constants/RevenueCat.jsx", "components/reveneucatContext/purchasesContext.tsx", "components/reveneucatContext/purchaseProvider.tsx", "hooks/usesPurchases.tsx"  ]
 }

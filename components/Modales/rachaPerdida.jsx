@@ -105,17 +105,7 @@ return (
     onBackdropPress={() => setModalRachaPerdidaVisible(false)}
   >
     <Animated.View 
-      style={[
-        styles.container,
-        {
-          opacity: fadeAnim,
-          transform: [
-            { scale: scaleAnim },
-            { translateY: slideAnim }
-          ]
-        }
-      ]}
-    >
+      style={styles.container} >
       <LinearGradient
         colors={['#1A1A2E', '#2D2D4A', '#1A1A2E']}
         style={styles.gradientContainer}
@@ -208,14 +198,14 @@ return (
 }
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    width: '100%',
+    height: '90%',
     justifyContent: 'center',
     alignItems: 'center',
-    transform: [{ scale: 1 }],
   },
   gradientContainer: {
     width: width * 0.85,
-    height: height * 0.65,
+    height: '85%',
     borderRadius: 30,
     padding: 25,
     alignItems: 'center',

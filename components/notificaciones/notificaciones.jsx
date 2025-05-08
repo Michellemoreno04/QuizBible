@@ -1,35 +1,25 @@
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
-import Constants from 'expo-constants';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
     shouldShowAlert: true,
     shouldPlaySound: true,
-    shouldSetBadge: true, // para que se muestre el numero de notificaciones en el badge
+    shouldSetBadge: true,
   }),
 });
 
-export default function Notificaciones() {
-  useEffect(() => {
-    registerForPushNotificationsAsync();
-    scheduleDailyNotifications();
-  }, []);
-
-  return null;
-}
-
 async function scheduleDailyNotifications() {
-  // Cancelar notificaciones anteriores
+  // Cancelar notificaciones existentes
   await Notifications.cancelAllScheduledNotificationsAsync();
-  
-  // Programar notificación para las 9 AM
+
+  // Programar notificación de la mañana (9:00 AM)
   await Notifications.scheduleNotificationAsync({
     content: {
-      title: "¡Es hora de estudiar la Biblia! 📖",
-      body: 'Toma un momento para reforzar tus conocimientos Biblicos',
-      data: { data: 'datos aquí' },
+      title: "¡Buenos días!",
+      body: "No olvides hacer tu lectura diaria y el quiz para seguir aprendiendo de la palabra de Dios",
+      data: { type: 'daily_reminder' },
     },
     trigger: {
       hour: 9,
@@ -38,12 +28,12 @@ async function scheduleDailyNotifications() {
     },
   });
 
-  // Programar notificación para las 8 PM
+  // Programar notificación de la tarde (8:00 PM)
   await Notifications.scheduleNotificationAsync({
     content: {
-      title: "¡Es hora de estudiar la Biblia! 📖",
-      body: 'Toma un momento para reforzar tus conocimientos Biblicos',
-      data: { data: 'datos aquí' },
+      title: "¡Buenas noches!",
+      body: "¿Ya completaste tu lectura diaria y el quiz de hoy? ¡No te pierdas la oportunidad de aprender!",
+      data: { type: 'daily_reminder' },
     },
     trigger: {
       hour: 20,
@@ -55,36 +45,45 @@ async function scheduleDailyNotifications() {
 
 async function registerForPushNotificationsAsync() {
   if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('myNotificationChannel', {
-      name: 'Canal de notificaciones',
+    Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
       importance: Notifications.AndroidImportance.MAX,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: '#FF231F7C',
     });
   }
 
-  const { status: existingStatus } = await Notifications.getPermissionsAsync();
-  let finalStatus = existingStatus;
-  
-  if (existingStatus !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync();
-    finalStatus = status;
-  }
-  
-  if (finalStatus !== 'granted') {
-    return;
-  }
-
-  try {
-    const projectId = Constants?.expoConfig?.extra?.eas?.projectId ?? Constants?.easConfig?.projectId;
-    if (!projectId) {
-      throw new Error('No se encontró el ID del proyecto');
+  if (Platform.OS !== 'web') {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
     }
-   // const token = await Notifications.getExpoPushTokenAsync({
-   //   projectId,
-   // });
-   // console.log('Token de notificaciones:', token.data);
-  } catch (e) {
-    console.error('Error al obtener el token:', e);
+    if (finalStatus !== 'granted') {
+      console.log('¡Permiso no concedido para notificaciones!');
+      return;
+    }
+    
+    try {
+      const token = await Notifications.getDevicePushTokenAsync();
+      if (token) {
+        await scheduleDailyNotifications();
+      }
+    } catch (error) {
+     // console.log('Error al obtener el token:', error);
+    }
   }
 }
+
+export default function Notificaciones() {
+  useEffect(() => {
+    registerForPushNotificationsAsync();
+  }, []);
+
+  return null;
+}
+
+
+
+

@@ -30,11 +30,11 @@ export default function Lecturas() {
       const temasData = querySnapshot.docs.map(doc => ({
         id: doc.id,
         ...doc.data(),
-       fecha: doc.data().fechaStr
-      }));
+        fecha: doc.data().fechaStr ? new Date(doc.data().fechaStr) : new Date()
+      })).sort((a, b) => b.fecha - a.fecha);
      
       setTemas(temasData);
-      setFilteredLecturas(temasData); // Inicializar con todos los datos
+      setFilteredLecturas(temasData);
     } catch (error) {
       console.error('Error cargando lecturas:', error);
     }

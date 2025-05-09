@@ -28,7 +28,7 @@
   "dependencies": {
     "@expo/vector-icons": "^14.0.2",
     "@react-native-async-storage/async-storage": "1.23.1",
-    "@react-native-community/netinfo": "^11.4.1",
+    "@react-native-community/netinfo": "11.4.1",
     "@react-native-firebase/app": "^18.7.3",
     "@react-native-firebase/auth": "^18.7.3",
     "@react-native-google-signin/google-signin": "^13.2.0",
@@ -51,7 +51,7 @@
     "expo-linking": "~7.0.5",
     "expo-navigation-bar": "~4.0.9",
     "expo-notifications": "~0.29.14",
-    "expo-router": "~4.0.19",
+    "expo-router": "~4.0.21",
     "expo-screen-orientation": "~8.0.4",
     "expo-speech": "~13.0.1",
     "expo-splash-screen": "~0.29.24",

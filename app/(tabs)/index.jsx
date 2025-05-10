@@ -19,6 +19,7 @@ import { Colors } from '@/constants/Colors';
 import { useToast } from 'react-native-toast-notifications';
 import Notificaciones from '@/components/notificaciones/notificaciones';
 import { useNavigation } from '@react-navigation/native';
+//import NetInfo from '@react-native-community/netinfo';
 
 
 const bannerAdUnitId = __DEV__ 

@@ -31,18 +31,43 @@ import { Colors } from '@/constants/Colors';
 // Inicializar Firebase Functions
 const functions = getFunctions(app);
 
+const mensajesPredefinidos = [
+  "¿Qué dice la Biblia sobre el amor?",
+  "¿Cómo puedo fortalecer mi fe?",
+  "¿Cuál es el primer mandamiento?",
+  "¿Qué dice la Biblia sobre el perdón?",
+];
+
+const MensajePredefinido = ({ mensaje, onPress }) => (
+  <TouchableOpacity 
+    style={styles.mensajePredefinido} 
+    onPress={() => onPress(mensaje)}
+  >
+    <Text style={styles.mensajePredefinidoText}>{mensaje}</Text>
+  </TouchableOpacity>
+);
+
 const LambChat = () => {
   const [userInfo, setUserInfo] = useState({});
-  const [messages, setMessages] = useState([{
-    id: '1',
-    text: "¡Hola! Soy Nilu, tu corderito guia 🐑. ¿Que te gustaria saber de la palabra de Dios?",
-    user: 'ai',
-    createdAt: new Date(),
-    image: require('../../assets/images/cordero_saludando.png')
-  }]);
+  const [messages, setMessages] = useState([]);
+  const [hasShownWelcome, setHasShownWelcome] = useState(false);
 
   const { user } = useAuth();
   const userId = user?.uid;
+
+  // Efecto para mostrar el mensaje de bienvenida solo una vez
+  useEffect(() => {
+    if (!hasShownWelcome) {
+      setMessages([{
+        id: '1',
+        text: "¡Hola! Soy Nilu, tu corderito guia 🐑. ¿Que te gustaria saber de la palabra de Dios?",
+        user: 'ai',
+        createdAt: new Date(),
+        image: require('../../assets/images/cordero_saludando.png')
+      }]);
+      setHasShownWelcome(true);
+    }
+  }, [hasShownWelcome]);
 
   const [dailyMessageCount, setDailyMessageCount] = useState(0);
   const [isPremium, setIsPremium] = useState(false);
@@ -98,10 +123,10 @@ const LambChat = () => {
     }
     
     // Verificar límite para usuarios no premium
-    if (!userData.isPremium && userData.dailyMessageCount >= 2) {
+    if (!userData.isPremium && userData.dailyMessageCount >= 3) {
       Alert.alert(
         "Límite de mensajes alcanzado",
-        "Has alcanzado el límite diario de mensajes. ¡Actualiza a premium para mensajes ilimitados!",
+        "Has alcanzado el límite diario de mensajes. ¡Actualiza a premium para mensajes ilimitados o regresa mañana!",
         [
           { text: "OK", style: "cancel" },
           { 
@@ -109,7 +134,8 @@ const LambChat = () => {
             onPress: () => {
               // Aquí puedes agregar la navegación a la pantalla de premium
               // navigation.navigate('Premium');
-              console.log('obtener premium')
+              //console.log('obtener premium')
+              Alert.alert('No disponible por el momento','Mas adelante podras adquirir el plan premium')
             }
           }
         ]
@@ -145,8 +171,17 @@ const LambChat = () => {
 
     setIsLoading(true);
     try {
+      // Convertir los mensajes anteriores al formato requerido por la API
+      const mensajesAnteriores = messages.map(msg => ({
+        role: msg.user === 'user' ? 'user' : 'assistant',
+        content: msg.text
+      }));
+
       const responderPreguntas = httpsCallable(functions, 'responderPreguntas');
-      const result = await responderPreguntas({ pregunta: inputText });
+      const result = await responderPreguntas({ 
+        pregunta: inputText,
+        mensajesAnteriores: mensajesAnteriores
+      });
       
       
       const aiMessage = {
@@ -174,19 +209,24 @@ const LambChat = () => {
     }
   };
 
-  const renderMessage = ({ item }) => (
+  const handleMensajePredefinido = (mensaje) => {
+    setInputText(mensaje);
+  };
+
+  const renderMessage = ({ item, index }) => (
     <Animatable.View 
       animation="fadeInUp"
       duration={800}
       style={[
         styles.messageContainer,
-        item.user === 'user' ? styles.userMessage : styles.aiMessage
+        item.user === 'user' ? styles.userMessage : styles.aiMessage,
+        index === 0 && styles.firstMessageContainer
       ]}
     >
       {item.user === 'ai' && (
         <Image
           source={item.image}
-          style={styles.avatar}
+          style={index === 0 ? styles.firstMessageAvatar : styles.avatar}
         />
       )}
       
@@ -197,12 +237,17 @@ const LambChat = () => {
           source={userInfo.FotoPerfil ? { uri: userInfo.FotoPerfil } : require('../../assets/images/cordero_saludando.png')}
         />
       )}
-      <View style={styles.messageContent}>
-        <Text style={item.user === 'user' ? styles.userText : styles.aiText}>
+      <View style={[
+        styles.messageContent,
+        index === 0 && styles.firstMessageContent
+      ]}>
+        <Text style={[
+          item.user === 'user' ? styles.userText : styles.aiText,
+          index === 0 && styles.firstMessageText
+        ]}>
           {item.text}
         </Text>
       </View>
-      
     </Animatable.View>
   );
 
@@ -221,9 +266,9 @@ const LambChat = () => {
         contentContainerStyle={styles.messagesContainer}
         onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
       >
-        {messages.map((item) => (
+        {messages.map((item, index) => (
           <View key={item.id}>
-            {renderMessage({ item })}
+            {renderMessage({ item, index })}
           </View>
         ))}
         
@@ -239,6 +284,27 @@ const LambChat = () => {
             />
             <ActivityIndicator size="small" color="#6C63FF" />
           </Animatable.View>
+        )}
+
+        {messages.length === 1 && (
+          <View style={styles.mensajesPredefinidosContainer}>
+            <Text style={styles.mensajesPredefinidosTitulo}>
+              ¿Qué te gustaría saber?
+            </Text>
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.mensajesPredefinidosScroll}
+            >
+              {mensajesPredefinidos.map((mensaje, index) => (
+                <MensajePredefinido
+                  key={index}
+                  mensaje={mensaje}
+                  onPress={handleMensajePredefinido}
+                />
+              ))}
+            </ScrollView>
+          </View>
         )}
       </ScrollView>
       </LinearGradient>
@@ -304,6 +370,7 @@ const styles = StyleSheet.create({
   messageContent: {
     backgroundColor: 'white',
     borderRadius: 16,
+   
     padding: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -364,7 +431,70 @@ const styles = StyleSheet.create({
     height: 30,
     borderRadius: 15,
     marginRight: 12
-  }
+  },
+  firstMessageContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    alignSelf: 'center',
+    maxWidth: '100%',
+    marginBottom: 5,
+    paddingTop: 10,
+    backgroundColor: '#1a365d',
+    borderRadius: 50,
+   
+    padding: 10,
+   //marginHorizontal: 5
+  },
+  firstMessageAvatar: {
+    width: 120,
+    height: 120,
+    borderRadius: 50,
+  
+  },
+  firstMessageContent: {
+    width: '100%',
+    alignItems: 'center',
+    backgroundColor: '#1a365d'
+  },
+  firstMessageText: {
+    color: 'white',
+    fontSize: 20,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  mensajesPredefinidosContainer: {
+    marginTop: 5,
+    paddingHorizontal: 16,
+  },
+  mensajesPredefinidosTitulo: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: 'white',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  mensajesPredefinidosScroll: {
+    paddingBottom: 16,
+  },
+  mensajePredefinido: {
+    backgroundColor: 'white',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 20,
+    marginRight: 8,
+    borderWidth: 1,
+    borderColor: '#3C6E9F',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  mensajePredefinidoText: {
+    color: '#3C6E9F',
+    fontSize: 13,
+  },
 });
 
 export default LambChat;

@@ -811,7 +811,7 @@ const styles = StyleSheet.create({
   mainContainer: {
     height: height * 0.8,
     alignItems: 'center',
-  justifyContent: 'center',
+ // justifyContent: 'center',
   },
   header: {
     width: '100%',
@@ -847,7 +847,7 @@ const styles = StyleSheet.create({
     width: responsiveWidth,
     alignItems: 'center',
     paddingHorizontal: 20,
-    
+  
   },
  
   muteButtonContainer: {
@@ -905,7 +905,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: responsiveWidth,
     minHeight: 60,
-    marginVertical: 5,
+    marginVertical: 8,
     borderRadius: 25,
     backgroundColor: 'rgb(0, 16, 61)',
     borderColor: '#00f7ff33',

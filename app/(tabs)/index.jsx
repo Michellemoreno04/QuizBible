@@ -19,7 +19,7 @@ import { Colors } from '@/constants/Colors';
 import { useToast } from 'react-native-toast-notifications';
 import Notificaciones from '@/components/notificaciones/notificaciones';
 import { useNavigation } from '@react-navigation/native';
-//import NetInfo from '@react-native-community/netinfo';
+import NetInfo from '@react-native-community/netinfo';
 
 
 const bannerAdUnitId = __DEV__ 
@@ -38,94 +38,105 @@ export default function AppComponent() {
   const [isModalRachaPerdidaVisible, setModalRachaPerdidaVisible] = useState(false);
   const [userInfo, setUserInfo] = useState({});
   const toast = useToast();
-  
 
-
-// obtener los datos del usuario
-useEffect(() => {
-  if (!userId) return;
-
-  const userRef = doc(db, 'users', userId);
-  const unsubscribe = onSnapshot(userRef, (snapshot) => {
-    const userData = snapshot.data() || {};
-    
-    if (userData) {
-      setUserInfo(userData);
-    } else {
-      toast.show('Network error', {
-        type: 'danger',
-        placement: 'top',
-        duration: 4000,
-      });
-    }
-
-  });
-
-  return () => unsubscribe();
-}, [userId]);
-
-// aqui vamos a mostrar el modal de not vidas si es un nuevo dia y el usuario tiene menos de 2 vidas
-useEffect(() => {
-  if (!userId ) return;
-
-  const checkAndUpdateVidas = async () => {
-    try {
-
-      const hoy = new Date();
-      const hoyString = hoy.toISOString().split('T')[0];
-      const fechaGuardada = await AsyncStorage.getItem('hoy');
-
-      // Paso 1: Verificar si es un nuevo día
-      if (fechaGuardada !== hoyString) {
-        const userRef = doc(db, 'users', userId);
-        const userDoc = await getDoc(userRef);
-        const currentVidas = userDoc.data()?.Vidas || 0;
-
-        // Paso 2: Actualizar solo si tiene menos de 2 vidas
-        if (currentVidas < 2) {
-          await updateDoc(userRef, {
-             Vidas: 2,
-            Monedas: increment(200),
-            });
-          setNotVidasModalVisible(true); // Mostrar modal solo si se actualizó
-        }
-
-        // Paso 3: Guardar la nueva fecha
-        await AsyncStorage.setItem('hoy', hoyString);
+  // Monitorear el estado de la conexión de internet
+  useEffect(() => {
+    const unsubscribe = NetInfo.addEventListener(state => {
+      if (!state.isConnected) {
+        toast.show("No tienes conexión a internet", {
+          type: "warning",
+          placement: "top",
+          duration: 3000,
+          offset: 50,
+          animationType: "slide-in"
+        });
       }
-    } catch (error) {
-      console.error("Error en checkAndUpdateVidas:", error);
-    }
-  };
+    });
 
-  // Ejecutar al montar el componente
-  checkAndUpdateVidas();
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
-}, [userId]);
+  // obtener los datos del usuario
+  useEffect(() => {
+    if (!userId) return;
 
-
-
-// aqui vamos a verificar si el usuario ha completado el quiz
-useEffect(() => {
-  if (!userId) return;
-
-  const checkQuizCompletion = async () => {
-    try {
-      const quizCompleted = await AsyncStorage.getItem("quizCompleted");
+    const userRef = doc(db, 'users', userId);
+    const unsubscribe = onSnapshot(userRef, (snapshot) => {
+      const userData = snapshot.data() || {};
       
-      if (quizCompleted === "true") {
-        // Ejecutar manejarRachaDiaria
-        await manejarRachaDiaria(userId, setModalRachaVisible, setModalRachaPerdidaVisible);
-        // Limpiar el estado de quiz completado
-        await AsyncStorage.removeItem("quizCompleted");
+      if (userData) {
+        setUserInfo(userData);
       }
-    } catch (error) {
-      console.error("Error verificando la finalización del quiz:", error);
-    }
-  };
+   
+    });
 
-  checkQuizCompletion();
-}, [userId]);
+    return () => unsubscribe();
+  }, [userId]);
+
+  // aqui vamos a mostrar el modal de not vidas si es un nuevo dia y el usuario tiene menos de 2 vidas
+  useEffect(() => {
+    if (!userId ) return;
+
+    const checkAndUpdateVidas = async () => {
+      try {
+
+        const hoy = new Date();
+        const hoyString = hoy.toISOString().split('T')[0];
+        const fechaGuardada = await AsyncStorage.getItem('hoy');
+
+        // Paso 1: Verificar si es un nuevo día
+        if (fechaGuardada !== hoyString) {
+          const userRef = doc(db, 'users', userId);
+          const userDoc = await getDoc(userRef);
+          const currentVidas = userDoc.data()?.Vidas || 0;
+
+          // Paso 2: Actualizar solo si tiene menos de 2 vidas
+          if (currentVidas < 2) {
+            await updateDoc(userRef, {
+               Vidas: 2,
+              Monedas: increment(200),
+              });
+            setNotVidasModalVisible(true); // Mostrar modal solo si se actualizó
+          }
+
+          // Paso 3: Guardar la nueva fecha
+          await AsyncStorage.setItem('hoy', hoyString);
+        }
+      } catch (error) {
+        console.error("Error en checkAndUpdateVidas:", error);
+      }
+    };
+
+    // Ejecutar al montar el componente
+    checkAndUpdateVidas();
+
+  }, [userId]);
+
+
+
+  // aqui vamos a verificar si el usuario ha completado el quiz
+  useEffect(() => {
+    if (!userId) return;
+
+    const checkQuizCompletion = async () => {
+      try {
+        const quizCompleted = await AsyncStorage.getItem("quizCompleted");
+        
+        if (quizCompleted === "true") {
+          // Ejecutar manejarRachaDiaria
+          await manejarRachaDiaria(userId, setModalRachaVisible, setModalRachaPerdidaVisible);
+          // Limpiar el estado de quiz completado
+          await AsyncStorage.removeItem("quizCompleted");
+        }
+      } catch (error) {
+        console.error("Error verificando la finalización del quiz:", error);
+      }
+    };
+
+    checkQuizCompletion();
+  }, [userId]);
 
   if(!userId){
     return <ActivityIndicator size="large" color="white" />

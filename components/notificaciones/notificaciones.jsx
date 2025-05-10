@@ -19,13 +19,15 @@ async function scheduleDailyNotifications() {
     content: {
       title: "¡Buenos días!",
       body: "No olvides hacer tu lectura diaria y el quiz para seguir aprendiendo de la palabra de Dios",
-      data: { type: 'daily_reminder' },
+      data: { type: 'morning_reminder' },
     },
     trigger: {
+      type: 'daily',
       hour: 9,
       minute: 0,
       repeats: true,
     },
+    identifier: 'morning_notification'
   });
 
   // Programar notificación de la tarde (8:00 PM)
@@ -33,13 +35,15 @@ async function scheduleDailyNotifications() {
     content: {
       title: "¡Buenas noches!",
       body: "¿Ya completaste tu lectura diaria y el quiz de hoy? ¡No te pierdas la oportunidad de aprender!",
-      data: { type: 'daily_reminder' },
+      data: { type: 'evening_reminder' },
     },
     trigger: {
+      type: 'daily',
       hour: 20,
       minute: 0,
       repeats: true,
     },
+    identifier: 'evening_notification'
   });
 }
 

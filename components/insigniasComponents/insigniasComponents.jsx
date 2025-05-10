@@ -45,58 +45,61 @@ export const InsigniasComponent = ({ userInfo }) => {
                         style={styles.badgeContainer}
                         onPress={() => openModal(insignia)}
                     >
-                        {/* Borde dorado con efecto 3D */}
-                        <LinearGradient
-                            colors={['#FFD700', '#D4AF37', '#C88A32', '#FFD700']}
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 1 }}
-                            style={styles.badgeBorder}
-                        >
-                            {/* Tarjeta principal */}
+                        {/* Contenedor con fondo sólido para la sombra */}
+                        <View style={styles.badgeShadowContainer}>
+                            {/* Borde dorado con efecto 3D */}
                             <LinearGradient
-                                colors={['#2a1a07', '#1a1003']}
-                                style={styles.badgeCard}
+                                colors={['#FFD700', '#D4AF37', '#C88A32', '#FFD700']}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 1 }}
+                                style={styles.badgeBorder}
                             >
-                                {/* Brillo interno */}
+                                {/* Tarjeta principal */}
                                 <LinearGradient
-                                    colors={['rgba(255,215,0,0.15)', 'transparent']}
-                                    style={styles.goldShine}
-                                    start={{ x: 0.8, y: 0.2 }}
-                                    end={{ x: 0, y: 1 }}
-                                />
-                                
-                                {/* Partículas de brillo */}
-                                <View style={styles.sparkle1}></View>
-                                <View style={styles.sparkle2}></View>
-                                <View style={styles.sparkle3}></View>
-
-                                {/* Icono con relieve */}
-                                <MaterialCommunityIcons 
-                                    name="crown" 
-                                    size={48} 
-                                    color="#FFD700" 
-                                    style={styles.badgeIcon}
-                                />
-                                
-                                {/* Cinta dorada */}
-                                <LinearGradient
-                                    colors={['#FFD70080', '#D4AF3780']}
-                                    style={styles.badgeRibbon}
-                                    start={{ x: 0, y: 0 }}
-                                    end={{ x: 1, y: 0 }}
+                                    colors={['#2a1a07', '#1a1003']}
+                                    style={styles.badgeCard}
                                 >
-                                    <Text style={styles.badgeText}>{insignia}</Text>
-                                    {/* Brillo en la cinta */}
+                                    {/* Brillo interno */}
                                     <LinearGradient
-                                        colors={['#ffffff20', '#ffffff00']}
-                                        style={styles.ribbonShine}
+                                        colors={['rgba(255,215,0,0.15)', 'transparent']}
+                                        style={styles.goldShine}
+                                        start={{ x: 0.8, y: 0.2 }}
+                                        end={{ x: 0, y: 1 }}
                                     />
+                                    
+                                    {/* Partículas de brillo */}
+                                    <View style={styles.sparkle1}></View>
+                                    <View style={styles.sparkle2}></View>
+                                    <View style={styles.sparkle3}></View>
+
+                                    {/* Icono con relieve */}
+                                    <MaterialCommunityIcons 
+                                        name="crown" 
+                                        size={48} 
+                                        color="#FFD700" 
+                                        style={styles.badgeIcon}
+                                    />
+                                    
+                                    {/* Cinta dorada */}
+                                    <LinearGradient
+                                        colors={['#FFD70080', '#D4AF3780']}
+                                        style={styles.badgeRibbon}
+                                        start={{ x: 0, y: 0 }}
+                                        end={{ x: 1, y: 0 }}
+                                    >
+                                        <Text style={styles.badgeText}>{insignia}</Text>
+                                        {/* Brillo en la cinta */}
+                                        <LinearGradient
+                                            colors={['#ffffff20', '#ffffff00']}
+                                            style={styles.ribbonShine}
+                                        />
+                                    </LinearGradient>
+                                    
+                                    {/* Detalle de joya */}
+                                    <View style={styles.jewelAccent}></View>
                                 </LinearGradient>
-                                
-                                {/* Detalle de joya */}
-                                <View style={styles.jewelAccent}></View>
                             </LinearGradient>
-                        </LinearGradient>
+                        </View>
                     </TouchableOpacity>
                 ))}
             </ScrollView>
@@ -145,15 +148,18 @@ const styles = StyleSheet.create({
     },
     badgeContainer: {
         marginRight: 10,
+    },
+    badgeShadowContainer: {
+        backgroundColor: '#1a1003', // Color sólido que coincide con el gradiente
         shadowColor: '#FFD700',
         shadowOffset: { width: 0, height: 4 },
         shadowRadius: 15,
-        shadowOpacity: 0.4
+        shadowOpacity: 0.4,
+        borderRadius: 23, // Un poco más grande que el borderRadius del badgeBorder
     },
     badgeBorder: {
         padding: 3,
         borderRadius: 20,
-       // transform: [{ rotateZ: '-5deg' }]
     },
     badgeCard: {
         width: width * 0.40,

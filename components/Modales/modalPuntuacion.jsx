@@ -200,11 +200,7 @@ const styles = StyleSheet.create({
     maxHeight: height * 0.8,
     borderRadius: 25,
     backgroundColor: '#fdf2ff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 15,
+  
   },
   gradientContainer: {
     width: '100%',
@@ -255,11 +251,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 15,
     borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 3,
+   
   },
   animationContainer: {
     position: 'relative',
@@ -301,11 +293,7 @@ const styles = StyleSheet.create({
     padding: 18,
     borderRadius: 25,
     backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 3,
-    elevation: 8,
+    
   },
   rewardValue: {
     fontSize: 26,
@@ -345,11 +333,7 @@ const styles = StyleSheet.create({
     width: '100%',
     marginTop: 5,
     backgroundColor: '#ff6b6b',
-    shadowColor: '#ff6b6b',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-    elevation: 4,
+   
   },
   buttonGradient: {
     paddingVertical: 16,

@@ -230,11 +230,7 @@ const playSound = useSound();
       height: height * 0.7,
       borderRadius: 30,
       backgroundColor: '#1A1A2E',
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 10 },
-      shadowOpacity: 0.3,
-      shadowRadius: 20,
-      elevation: 15,
+     
     },
     gradientContainer: {
       width: '100%',
@@ -335,11 +331,7 @@ const playSound = useSound();
       right: 20,
       borderRadius: 50,
       overflow: 'hidden',
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 5,
-      elevation: 3,
+     
     },
     closeGradient: {
       padding: 8,

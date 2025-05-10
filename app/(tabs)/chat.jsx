@@ -296,13 +296,15 @@ const LambChat = () => {
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={styles.mensajesPredefinidosScroll}
             >
-              {mensajesPredefinidos.map((mensaje, index) => (
-                <MensajePredefinido
-                  key={index}
-                  mensaje={mensaje}
-                  onPress={handleMensajePredefinido}
-                />
-              ))}
+              <View style={styles.mensajesPredefinidosGrid}>
+                {mensajesPredefinidos.map((mensaje, index) => (
+                  <MensajePredefinido
+                    key={index}
+                    mensaje={mensaje}
+                    onPress={handleMensajePredefinido}
+                  />
+                ))}
+              </View>
             </ScrollView>
           </View>
         )}
@@ -465,7 +467,8 @@ const styles = StyleSheet.create({
   },
   mensajesPredefinidosContainer: {
     marginTop: 5,
-    paddingHorizontal: 16,
+  
+   // paddingHorizontal: 16,
   },
   mensajesPredefinidosTitulo: {
     fontSize: 18,
@@ -477,12 +480,18 @@ const styles = StyleSheet.create({
   mensajesPredefinidosScroll: {
     paddingBottom: 16,
   },
+  mensajesPredefinidosGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    gap: 8,
+    width: 400, // Ancho fijo para permitir el scroll horizontal
+  },
   mensajePredefinido: {
     backgroundColor: 'white',
     paddingHorizontal: 12,
     paddingVertical: 10,
     borderRadius: 20,
-    marginRight: 8,
     borderWidth: 1,
     borderColor: '#3C6E9F',
     shadowColor: '#000',
@@ -490,6 +499,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    width: 180, // Ancho fijo para cada mensaje
   },
   mensajePredefinidoText: {
     color: '#3C6E9F',

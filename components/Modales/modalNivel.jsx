@@ -105,11 +105,7 @@ const styles = StyleSheet.create({
     height: height * 0.8,
     borderRadius: 30,
     backgroundColor: '#1A1E32',
-    shadowColor: '#FFB80299',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 15,
+    
   },
   gradientContainer: {
     width: '100%',

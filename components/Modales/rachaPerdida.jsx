@@ -229,11 +229,8 @@ const styles = StyleSheet.create({
   lambImage: {
     width: 120,
     height: 120,
-    marginTop: -60,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.3,
-    shadowRadius: 15,
+    //marginTop: -60,
+   
   },
   title: {
     fontSize: 26,
@@ -317,7 +314,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     borderRadius: 50,
-    overflow: 'hidden',
   },
 
   descriptionText: {

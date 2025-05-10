@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useSound } from '../soundFunctions/soundFunction';
 
 export const NotVidasModal = ({ visible, setNotVidasModalVisible }) => {
-  const scaleValue = new Animated.Value(0);
+ // const scaleValue = new Animated.Value(0);
   const pulseAnim = new Animated.Value(1);
   const playSound = useSound();
 
@@ -12,11 +12,7 @@ export const NotVidasModal = ({ visible, setNotVidasModalVisible }) => {
   useEffect(() => {
     if (visible) {
       playSound(require('../../assets/sound/vidasYmonedasCargadas.mp3'));
-      Animated.spring(scaleValue, {
-        toValue: 1,
-        friction: 4,
-        useNativeDriver: true,
-      }).start();
+    
 
       Animated.loop(
         Animated.sequence([
@@ -35,7 +31,7 @@ export const NotVidasModal = ({ visible, setNotVidasModalVisible }) => {
         ])
       ).start();
     } else {
-      scaleValue.setValue(0);
+//scaleValue.setValue(0);
       pulseAnim.stopAnimation();
     }
   }, [visible]);
@@ -48,7 +44,7 @@ export const NotVidasModal = ({ visible, setNotVidasModalVisible }) => {
       onRequestClose={() => setNotVidasModalVisible(false) }
     >
       <View style={styles.centeredView}>
-        <Animated.View style={[styles.modalView, { transform: [{ scale: scaleValue }] }]}>
+        <Animated.View style={[styles.modalView]}>
           <View style={styles.gradientWrapper}>
             <LinearGradient
               colors={[ '#1E3A5F', '#3C6E9F']}
@@ -147,11 +143,7 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 30,
     backgroundColor: '#1E3A5F',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 15,
+    
   },
   gradientBackground: {
     width: '100%',
@@ -181,8 +173,8 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     textAlign: 'center',
     textShadowColor: 'rgba(255, 215, 0, 0.8)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 15,
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 5,
     marginTop: 20
   },
   subtitle: {
@@ -235,10 +227,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     overflow: 'hidden',
     marginTop: 15,
-    shadowColor: '#FFD700',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.6,
-    shadowRadius: 10,
+    
   },
   buttonGradient: {
     paddingVertical: 16,

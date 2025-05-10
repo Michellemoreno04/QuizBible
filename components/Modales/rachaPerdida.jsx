@@ -106,117 +106,121 @@ return (
   >
     <Animated.View 
       style={styles.container} >
-      <LinearGradient
-        colors={['#1A1A2E', '#2D2D4A', '#1A1A2E']}
-        style={styles.gradientContainer}
-      >
-        {/* Cabecera con Cordero */}
-        <View style={styles.header}>
-          <Image 
-            source={require('../../assets/images/cordero_triste.png')}
-            style={styles.lambImage}
-            resizeMode="contain"
-          />
-          <Text style={styles.title}>¡Racha Perdida!</Text>
-        </View>
-
-        {/* Contenido */}
-        <View style={styles.content}>
-          <Text style={styles.highlightedText}>
-            ❌ Has roto tu racha de {userInfo?.Racha} días
-          </Text>
-
-          {/* Estadísticas */}
-          <View style={styles.statsContainer}>
-            <LinearGradient
-              colors={['#FFFFFF08', '#FFFFFF03']}
-              style={[styles.statBox, styles.glassEffect]}
-            >
-              <FontAwesome5 name="calendar-times" size={24} color="#FF6B6B" />
-              <Text style={styles.statNumber}>{userInfo?.Racha}</Text>
-              <Text style={styles.statLabel}>Días Perdidos</Text>
-            </LinearGradient>
-
-            <LinearGradient
-              colors={['#FFFFFF08', '#FFFFFF03']}
-              style={[styles.statBox, styles.glassEffect]}
-            >
-              <FontAwesome5 name="trophy" size={24} color="#FFD700" />
-              <Text style={styles.statNumber}>{userInfo?.RachaMaxima}</Text>
-              <Text style={styles.statLabel}>Récord</Text>
-            </LinearGradient>
+      <View style={styles.gradientWrapper}>
+        <LinearGradient
+          colors={['#1A1A2E', '#2D2D4A', '#1A1A2E']}
+          style={styles.gradientContainer}
+        >
+          {/* Cabecera con Cordero */}
+          <View style={styles.header}>
+            <Image 
+              source={require('../../assets/images/cordero_triste.png')}
+              style={styles.lambImage}
+              resizeMode="contain"
+            />
+            <Text style={styles.title}>¡Racha Perdida!</Text>
           </View>
 
-          {/* Opciones de Recuperación */}
-          <View style={styles.recoveryOptions}>
-            <Text style={styles.descriptionText}>
-              ¿Quieres recuperar tu racha?
+          {/* Contenido */}
+          <View style={styles.content}>
+            <Text style={styles.highlightedText}>
+              ❌ Has roto tu racha de {userInfo?.Racha} días
             </Text>
-            
-            <View style={styles.buttonContainer}>
-              <Pressable 
-                onPress={handlePay}
-                style={({ pressed }) => [
-                  styles.button,
-                  pressed && styles.buttonPressed
-                ]}
-              >
-                <LinearGradient
-                  colors={['#FFB802', '#FF8C00']}
-                  style={styles.buttonGradient}
-                >
-                  <MaterialIcons name="redeem" size={24} color="white" />
-                  <Text style={styles.buttonText}>Recuperar por 1000</Text>
-                  <FontAwesome5 name="coins" size={18} color="#FFD700" />
-                </LinearGradient>
-              </Pressable>
 
-              <Pressable 
-                onPress={handleReset}
-                style={({ pressed }) => [
-                  styles.secondaryButton,
-                  pressed && styles.buttonPressed
-                ]}
+            {/* Estadísticas */}
+            <View style={styles.statsContainer}>
+              <LinearGradient
+                colors={['#FFFFFF08', '#FFFFFF03']}
+                style={[styles.statBox, styles.glassEffect]}
               >
-                <LinearGradient
-                  colors={['#6C757D', '#495057']}
-                  style={styles.buttonGradient}
+                <FontAwesome5 name="calendar-times" size={24} color="#FF6B6B" />
+                <Text style={styles.statNumber}>{userInfo?.Racha}</Text>
+                <Text style={styles.statLabel}>Días Perdidos</Text>
+              </LinearGradient>
+
+              <LinearGradient
+                colors={['#FFFFFF08', '#FFFFFF03']}
+                style={[styles.statBox, styles.glassEffect]}
+              >
+                <FontAwesome5 name="trophy" size={24} color="#FFD700" />
+                <Text style={styles.statNumber}>{userInfo?.RachaMaxima}</Text>
+                <Text style={styles.statLabel}>Récord</Text>
+              </LinearGradient>
+            </View>
+
+            {/* Opciones de Recuperación */}
+            <View style={styles.recoveryOptions}>
+              <Text style={styles.descriptionText}>
+                ¿Quieres recuperar tu racha?
+              </Text>
+              
+              <View style={styles.buttonContainer}>
+                <Pressable 
+                  onPress={handlePay}
+                  style={({ pressed }) => [
+                    styles.button,
+                    pressed && styles.buttonPressed
+                  ]}
                 >
-                  <MaterialIcons name="restart-alt" size={24} color="white" />
-                  <Text style={styles.secondaryButtonText}>Empezar de nuevo</Text>
-                </LinearGradient>
-              </Pressable>
+                  <LinearGradient
+                    colors={['#FFB802', '#FF8C00']}
+                    style={styles.buttonGradient}
+                  >
+                    <MaterialIcons name="redeem" size={24} color="white" />
+                    <Text style={styles.buttonText}>Recuperar por 1000</Text>
+                    <FontAwesome5 name="coins" size={18} color="#FFD700" />
+                  </LinearGradient>
+                </Pressable>
+
+                <Pressable 
+                  onPress={handleReset}
+                  style={({ pressed }) => [
+                    styles.secondaryButton,
+                    pressed && styles.buttonPressed
+                  ]}
+                >
+                  <LinearGradient
+                    colors={['#6C757D', '#495057']}
+                    style={styles.buttonGradient}
+                  >
+                    <MaterialIcons name="restart-alt" size={24} color="white" />
+                    <Text style={styles.secondaryButtonText}>Empezar de nuevo</Text>
+                  </LinearGradient>
+                </Pressable>
+              </View>
             </View>
           </View>
-        </View>
-
-       
-      </LinearGradient>
+        </LinearGradient>
+      </View>
     </Animated.View>
   </Modal>
 )
 }
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
-    height: '90%',
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  gradientContainer: {
-    width: width * 0.85,
-    height: '85%',
+  gradientWrapper: {
+    width: width * 0.9,
+    height: height * 0.7,
     borderRadius: 30,
-    padding: 25,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#FFFFFF15',
-   // overflow: 'hidden',
+    backgroundColor: '#1A1A2E',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
     shadowRadius: 20,
     elevation: 15,
+  },
+  gradientContainer: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 30,
+    padding: width * 0.04,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#FFFFFF15',
   },
   header: {
     alignItems: 'center',

@@ -138,7 +138,7 @@ const BibleQuiz = () => {
           collection(db, 'preguntas'),
           orderBy('index'),
           startAfter(lastQuestionIndex),
-          limit(7)
+          limit(10)
         );
         
         const querySnapshot = await getDocs(q);
@@ -229,8 +229,6 @@ useEffect(() => {
 
   // Función para comprobar la respuesta seleccionada
   const comprobarRespuesta = async (respuesta) => {
-  
-  
     // Caso: Respuesta correcta
     if (respuesta === correcta) {
       setRespuestaSeleccionada(respuesta);
@@ -240,7 +238,6 @@ useEffect(() => {
       // Sumamos 15 puntos de experiencia.
       setExpGanada((prevExp) => prevExp + 15);
       // Actualizamos el contador de respuestas correctas.
-      // Usamos una variable local para tener el nuevo total sin depender del estado asíncrono.
       const nuevasRespuestasCorrectas = resultadoRespuestas + 1;
       setResultadoRespuestas(nuevasRespuestasCorrectas);
   
@@ -250,39 +247,36 @@ useEffect(() => {
         questions[currentQuestion]?.index
       );
   
-      
-      // NOTA: No actualizamos las monedas en cada pregunta correcta.
       const userDocRef = doc(db, 'users', userId);
       await updateDoc(userDocRef, {
         Exp: increment(15),
         Nivel: niveles(userInfo.Exp + 15).nivel
       });
   
-      // Si aún quedan preguntas por contestar, avanzamos a la siguiente.
-      if (currentQuestion < questions.length - 1) {
-        setCurrentQuestion(currentQuestion + 1);
-        setRespuestaSeleccionada(null);
-      } else {
-        // Al finalizar el quiz, calculamos las monedas ganadas:
-       
-        const totalMonedas = nuevasRespuestasCorrectas * 10;
-        await updateDoc(userDocRef, {
-          // Sumamos las monedas totales ganadas al valor actual.
-          Monedas: userInfo.Monedas + totalMonedas,
-        });
-        // Guardamos la fecha del quiz en AsyncStorage.
-        const today = new Date().toDateString();
-        // Mostramos el modal final.
-        stopMusic(backgroundMusic);
-        // Guardamos la fecha del quiz para ejecutar la racha antes del modal
-        await AsyncStorage.setItem("lastQuizDate", today);
-        await AsyncStorage.setItem("quizCompleted", "true");
-        setShowModal(true);
-      }
+      // Esperamos 2 segundos antes de avanzar
+      setTimeout(() => {
+        // Si aún quedan preguntas por contestar, avanzamos a la siguiente.
+        if (currentQuestion < questions.length - 1) {
+          setCurrentQuestion(currentQuestion + 1);
+          setRespuestaSeleccionada(null);
+        } else {
+          // Al finalizar el quiz, calculamos las monedas ganadas:
+          const totalMonedas = nuevasRespuestasCorrectas * 10;
+          updateDoc(userDocRef, {
+            Monedas: userInfo.Monedas + totalMonedas,
+          });
+          // Guardamos la fecha del quiz en AsyncStorage.
+          const today = new Date().toDateString();
+          // Mostramos el modal final.
+          stopMusic(backgroundMusic);
+          // Guardamos la fecha del quiz para ejecutar la racha antes del modal
+          AsyncStorage.setItem("lastQuizDate", today);
+          AsyncStorage.setItem("quizCompleted", "true");
+          setShowModal(true);
+        }
+      }, 2000);
     } else {
       // Caso: Respuesta incorrecta.
-      
-      //setMostrarRespuestaCorrecta(true);
       setRespuestaSeleccionada(respuesta);
       await playSound(require('../assets/sound/incorrect-choice.mp3'));
   
@@ -313,22 +307,25 @@ useEffect(() => {
               setShowModalNotVidas(true);
             }
   
-            // Si quedan preguntas, avanzamos a la siguiente.
-            if (currentQuestion < questions.length - 1) {
-              setMostrarRespuestaCorrecta(false);
-              setCurrentQuestion(currentQuestion + 1);
-              setRespuestaSeleccionada(null);
-            } else {
-              // Al finalizar el quiz, actualizamos las monedas con las respuestas correctas acumuladas.
-              const totalMonedas = resultadoRespuestas * 10;
-              await updateDoc(userDocRef, {
-                Monedas: userInfo.Monedas + totalMonedas,
-              });
-              const today = new Date().toDateString();
-              await AsyncStorage.setItem("lastQuizDate", today);
-              stopMusic(backgroundMusic);
-              setShowModal(true);
-            }
+            // Esperamos 2 segundos antes de avanzar
+            setTimeout(() => {
+              // Si quedan preguntas, avanzamos a la siguiente.
+              if (currentQuestion < questions.length - 1) {
+                setMostrarRespuestaCorrecta(false);
+                setCurrentQuestion(currentQuestion + 1);
+                setRespuestaSeleccionada(null);
+              } else {
+                // Al finalizar el quiz, actualizamos las monedas con las respuestas correctas acumuladas.
+                const totalMonedas = resultadoRespuestas * 10;
+                updateDoc(userDocRef, {
+                  Monedas: userInfo.Monedas + totalMonedas,
+                });
+                const today = new Date().toDateString();
+                AsyncStorage.setItem("lastQuizDate", today);
+                stopMusic(backgroundMusic);
+                setShowModal(true);
+              }
+            }, 2000);
           } catch (error) {
             console.error('Error al actualizar las vidas:', error);
             Alert.alert('Error', 'No se pudieron actualizar las vidas.');
@@ -347,7 +344,6 @@ useEffect(() => {
         }
       }, 1000);
     }
-
   };
 
   
@@ -911,7 +907,7 @@ const styles = StyleSheet.create({
     minHeight: 60,
     marginVertical: 5,
     borderRadius: 25,
-    backgroundColor: 'rgba(0, 16, 61, 0.7)',
+    backgroundColor: 'rgb(0, 16, 61)',
     borderColor: '#00f7ff33',
     shadowColor: '#00f7ff',
     shadowOffset: { width: 0, height: 0 },
@@ -926,7 +922,7 @@ const styles = StyleSheet.create({
     fontWeight: '600'
   },
   selectedAnswer: {
-    backgroundColor: 'rgba(0, 255, 100, 0.5)',
+    backgroundColor: 'rgb(0, 255, 100)',
     borderColor: '#00ff88',
     borderWidth: 3,
     borderRadius: 25,
@@ -936,11 +932,11 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
   },
   correctAnswer: {
-    backgroundColor: 'rgba(0, 255, 0, 0.5)',
+    backgroundColor: 'rgb(0, 255, 0)',
     borderColor: '#00FF00'
   },
   incorrectAnswer: {
-    backgroundColor: 'rgba(255, 0, 0, 0.6)',
+    backgroundColor: 'rgb(255, 0, 0)',
     borderColor: '#FF0000'
   },
   answerText: {

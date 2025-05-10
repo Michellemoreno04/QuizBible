@@ -33,7 +33,7 @@ export default function SignInComponents() {
     const has = await GoogleSignin.hasPlayServices();
     if (has) {
       GoogleSignin.configure({
-
+        iosClientId: "1001847642825-mqg5h7s4n72rn3u1t9lv8osli9aamc59.apps.googleusercontent.com",
         webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
       });
     }

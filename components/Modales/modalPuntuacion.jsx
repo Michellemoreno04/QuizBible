@@ -120,82 +120,95 @@ const showAd = () => {
 
   return (
     <Modal isVisible={isVisible} backdropOpacity={0.3}>
-      <LinearGradient
-        colors={['#fdf2ff', '#e6d4ff', '#d8c4ff']}
-        style={styles.gradientContainer}
-      >
-        <View style={styles.contentContainer}>
-          <Text style={styles.subtitle}>🎉 Nueva recompensa 🎉</Text>
+      <View style={styles.gradientWrapper}>
+        <LinearGradient
+          colors={['#fdf2ff', '#e6d4ff', '#d8c4ff']}
+          style={styles.gradientContainer}
+        >
+          <View style={styles.contentContainer}>
+            <Text style={styles.subtitle}>🎉 Nueva recompensa 🎉</Text>
+            
           
-        
 
-          <Text style={styles.streakText}>🔥 Racha actual: {userInfo.Racha} días consecutivos</Text>
+            <Text style={styles.streakText}>🔥 Racha actual: {userInfo.Racha} días consecutivos</Text>
 
-          <View style={styles.animationContainer}>
-            <LottieView
-              source={require('../../assets/lottieFiles/treasureCoins.json')}
-              autoPlay
-              loop={false}
-              style={styles.animation}
-            />
-            <Text style={styles.congratsText}>¡Felicidades!</Text>
-            <View style={styles.confettiEffect}/>
-          </View>
-
-          <View style={styles.rewardsContainer}>
-            <View style={styles.rewardItem}>
-              <LinearGradient
-                colors={['#ffd700', '#ffbf00']}
-                style={[styles.iconContainer, styles.coinBackground]}
-              >
-                <FontAwesome5 name="coins" size={32} color="#a88600" />
-              </LinearGradient>
-              <Text style={styles.rewardValue}>+{monedasGanadas}</Text>
-              <Text style={styles.rewardLabel}>Monedas</Text>
-            </View>
-
-            <View style={styles.rewardItem}>
-              <LinearGradient
-                colors={['#6a5acd', '#7b68ee']}
-                style={[styles.iconContainer, styles.expBackground]}
-              >
-                <FontAwesome6 name="award" size={32} color="#fff" />
-              </LinearGradient>
-              <Text style={styles.rewardValue}>+{expGanada}</Text>
-              <Text style={styles.rewardLabel}>Experiencia</Text>
-            </View>
-          </View>
-
-          <View style={styles.progressContainer}>
-            <Text style={styles.progressText}>
-              {respuestasCorrectas}/{7}
-            </Text>
-            <View style={styles.progressBarBackground}>
-              <LinearGradient
-                colors={['#76ff03', '#4CAF50']}
-                style={[styles.progressBarFill, { width: `${(respuestasCorrectas / 7) * 100}%` }]}
+            <View style={styles.animationContainer}>
+              <LottieView
+                source={require('../../assets/lottieFiles/treasureCoins.json')}
+                autoPlay
+                loop={false}
+                style={styles.animation}
               />
+              <Text style={styles.congratsText}>¡Felicidades!</Text>
+              <View style={styles.confettiEffect}/>
             </View>
-          </View>
 
-          <Pressable onPress={showAd}  style={[styles.buttonContainer, { opacity: loaded || loading ? 1 : 0.5 }  ]}>
-            <LinearGradient
-              colors={['#ff6b6b', '#ff8e53']}
-              style={[styles.buttonGradient, { opacity: loading ? 0.5 : 1 }]}
-            >
-              <Text style={styles.buttonText}>{loaded ? 'Volver al inicio' : 'Obteniendo recompensas...'}</Text>
-            </LinearGradient>
-          </Pressable>
-        </View>
-      </LinearGradient>
+            <View style={styles.rewardsContainer}>
+              <View style={styles.rewardItem}>
+                <LinearGradient
+                  colors={['#ffd700', '#ffbf00']}
+                  style={[styles.iconContainer, styles.coinBackground]}
+                >
+                  <FontAwesome5 name="coins" size={32} color="#a88600" />
+                </LinearGradient>
+                <Text style={styles.rewardValue}>+{monedasGanadas}</Text>
+                <Text style={styles.rewardLabel}>Monedas</Text>
+              </View>
+
+              <View style={styles.rewardItem}>
+                <LinearGradient
+                  colors={['#6a5acd', '#7b68ee']}
+                  style={[styles.iconContainer, styles.expBackground]}
+                >
+                  <FontAwesome6 name="award" size={32} color="#fff" />
+                </LinearGradient>
+                <Text style={styles.rewardValue}>+{expGanada}</Text>
+                <Text style={styles.rewardLabel}>Experiencia</Text>
+              </View>
+            </View>
+
+            <View style={styles.progressContainer}>
+              <Text style={styles.progressText}>
+                {respuestasCorrectas}/{7}
+              </Text>
+              <View style={styles.progressBarBackground}>
+                <LinearGradient
+                  colors={['#76ff03', '#4CAF50']}
+                  style={[styles.progressBarFill, { width: `${(respuestasCorrectas / 7) * 100}%` }]}
+                />
+              </View>
+            </View>
+
+            <Pressable onPress={showAd}  style={[styles.buttonContainer, { opacity: loaded || loading ? 1 : 0.5 }  ]}>
+              <LinearGradient
+                colors={['#ff6b6b', '#ff8e53']}
+                style={[styles.buttonGradient, { opacity: loading ? 0.5 : 1 }]}
+              >
+                <Text style={styles.buttonText}>{loaded ? 'Volver al inicio' : 'Obteniendo recompensas...'}</Text>
+              </LinearGradient>
+            </Pressable>
+          </View>
+        </LinearGradient>
+      </View>
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
+  gradientWrapper: {
+    width: width * 0.9,
+    maxHeight: height * 0.8,
+    borderRadius: 25,
+    backgroundColor: '#fdf2ff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 15,
+  },
   gradientContainer: {
     width: '100%',
-    maxHeight: height * 0.8,
+    height: '100%',
     borderRadius: 25,
     overflow: 'hidden',
   },
@@ -242,6 +255,10 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 15,
     borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
     elevation: 3,
   },
   animationContainer: {
@@ -283,11 +300,11 @@ const styles = StyleSheet.create({
   iconContainer: {
     padding: 18,
     borderRadius: 25,
-   
+    backgroundColor: '#fff',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
     elevation: 8,
   },
   rewardValue: {
@@ -327,15 +344,18 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: '100%',
     marginTop: 5,
+    backgroundColor: '#ff6b6b',
     shadowColor: '#ff6b6b',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
   buttonGradient: {
     paddingVertical: 16,
     borderRadius: 15,
     alignItems: 'center',
+    backgroundColor: '#ff6b6b',
   },
   buttonText: {
     color: 'white',

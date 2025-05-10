@@ -29,67 +29,66 @@ useEffect(() => {
       backdropTransitionInTiming={600}
     >
       <View style={styles.container}>
-      
-
-        {/* Contenido principal */}
-        <LinearGradient
-          colors={['#1A1E32', '#2A2F4D', '#1A1E32']}
-          style={styles.gradientContainer}
-        >
-          {/* Cabecera */}
-          <View style={styles.header}>
-            <MaterialIcons name="stars" size={28} color="#FFB802" />
-            <Text style={styles.title}>¡Nuevo Nivel Alcanzado!</Text>
-            <MaterialIcons name="stars" size={28} color="#FFB802" />
-          </View>
-
-          {/* Insignia principal */}
-          <View style={styles.modalContainer}>
-            <LottieView
-              source={animation}
-              autoPlay
-              loop
-              style={styles.modalAnimation}
-              
-            />
-          
-          </View>
-
-          {/* Información de la insignia */}
-          <ScrollView style={styles.infoContainer}>
-            <View style={styles.levelBadge}>
-              <Text style={styles.levelText}>Nivel {nivel}</Text>
-            </View>
-            <LinearGradient
-    colors={['#FFD700', '#D4AF37', '#FFD700']}
-    start={{ x: 0, y: 0 }}
-    end={{ x: 1, y: 1 }}
-    style={styles.gradientBadge}
-  >
-            <Text style={styles.insigniaName}>{insignia}</Text>
-            </LinearGradient>
-            <Text style={styles.description}>{description}</Text>
-          </ScrollView>
-
-          {/* Botón de acción */}
-          <Pressable 
-            onPress={onClose} 
-            style={({ pressed }) => [
-              styles.button,
-              pressed && styles.buttonPressed
-            ]}
+        <View style={styles.gradientWrapper}>
+          <LinearGradient
+            colors={['#1A1E32', '#2A2F4D', '#1A1E32']}
+            style={styles.gradientContainer}
           >
-            <LinearGradient
-              colors={['#FFB802', '#FF8C00']}
-              style={styles.buttonGradient}
-              start={{ x: 0, y: 0.5 }}
-              end={{ x: 1, y: 0.5 }}
+            {/* Cabecera */}
+            <View style={styles.header}>
+              <MaterialIcons name="stars" size={28} color="#FFB802" />
+              <Text style={styles.title}>¡Nuevo Nivel Alcanzado!</Text>
+              <MaterialIcons name="stars" size={28} color="#FFB802" />
+            </View>
+
+            {/* Insignia principal */}
+            <View style={styles.modalContainer}>
+              <LottieView
+                source={animation}
+                autoPlay
+                loop
+                style={styles.modalAnimation}
+                
+              />
+            
+            </View>
+
+            {/* Información de la insignia */}
+            <ScrollView style={styles.infoContainer}>
+              <View style={styles.levelBadge}>
+                <Text style={styles.levelText}>Nivel {nivel}</Text>
+              </View>
+              <LinearGradient
+        colors={['#FFD700', '#D4AF37', '#FFD700']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.gradientBadge}
+      >
+              <Text style={styles.insigniaName}>{insignia}</Text>
+              </LinearGradient>
+              <Text style={styles.description}>{description}</Text>
+            </ScrollView>
+
+            {/* Botón de acción */}
+            <Pressable 
+              onPress={onClose} 
+              style={({ pressed }) => [
+                styles.button,
+                pressed && styles.buttonPressed
+              ]}
             >
-              <Text style={styles.buttonText}>Continuar Aventura</Text>
-              <MaterialIcons name="arrow-forward" size={24} color="white" />
-            </LinearGradient>
-          </Pressable>
-        </LinearGradient>
+              <LinearGradient
+                colors={['#FFB802', '#FF8C00']}
+                style={styles.buttonGradient}
+                start={{ x: 0, y: 0.5 }}
+                end={{ x: 1, y: 0.5 }}
+              >
+                <Text style={styles.buttonText}>Continuar Aventura</Text>
+                <MaterialIcons name="arrow-forward" size={24} color="white" />
+              </LinearGradient>
+            </Pressable>
+          </LinearGradient>
+        </View>
       </View>
     </Modal>
   );
@@ -101,22 +100,25 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-
-  
-  gradientContainer: {
-    
+  gradientWrapper: {
     width: width * 0.9,
     height: height * 0.8,
     borderRadius: 30,
-    padding: width * 0.04,
-    alignItems: 'center',
-    borderWidth: 4,
-    borderColor: '#FFB80299',
+    backgroundColor: '#1A1E32',
     shadowColor: '#FFB80299',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
     shadowRadius: 20,
     elevation: 15,
+  },
+  gradientContainer: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 30,
+    padding: width * 0.04,
+    alignItems: 'center',
+    borderWidth: 4,
+    borderColor: '#FFB80299',
   },
   header: {
     flexDirection: 'row',

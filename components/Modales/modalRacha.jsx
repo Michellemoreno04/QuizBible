@@ -99,69 +99,71 @@ export function ModalRacha({ isVisible, setModalRachaVisible }) {
           }
         ]}
       >
-        <LinearGradient
-          colors={['#1A1A2E', '#2D2D4A', '#1A1A2E']}
-          style={styles.gradientContainer}
-        >
-          {/* Cabecera */}
-          <View style={styles.header}>
-            <Image 
-              source={require('../../assets/images/cordero_feliz.png')}
-              style={styles.lambImage}
-              resizeMode="contain"
-            />
-            <Text style={styles.title}>¡Récord Diario!</Text>
-          </View>
-
-          {/* Contenido */}
-          <View style={styles.content}>
-            <Text style={styles.highlightedText}>
-              ¡Estás en llamas!{'\n'}Sigue así 🔥
-            </Text>
-
-            <Text style={styles.descriptionText}>
-              Sigue jugando todos los días para aumentar y mantener tu racha 😊
-            </Text>
-
-            {/* Estadísticas */}
-            <View style={styles.statsContainer}>
-              <LinearGradient
-                colors={['#FFFFFF08', '#FFFFFF03']}
-                style={[styles.statBox, styles.glassEffect]}
-              >
-                <FontAwesome5 name="fire" size={24} color="#FF6B35" />
-                <Text style={styles.statNumber}>{userInfo.Racha}</Text>
-                <Text style={styles.statLabel}>Días consecutivos</Text>
-              </LinearGradient>
-
-              <LinearGradient
-                colors={['#FFFFFF08', '#FFFFFF03']}
-                style={[styles.statBox, styles.glassEffect]}
-              >
-                <FontAwesome5 name="trophy" size={24} color="#FFD700" />
-                <Text style={styles.statNumber}>{userInfo.RachaMaxima}</Text>
-                <Text style={styles.statLabel}>Racha máxima</Text>
-              </LinearGradient>
+        <View style={styles.gradientWrapper}>
+          <LinearGradient
+            colors={['#1A1A2E', '#2D2D4A', '#1A1A2E']}
+            style={styles.gradientContainer}
+          >
+            {/* Cabecera */}
+            <View style={styles.header}>
+              <Image 
+                source={require('../../assets/images/cordero_feliz.png')}
+                style={styles.lambImage}
+                resizeMode="contain"
+              />
+              <Text style={styles.title}>¡Récord Diario!</Text>
             </View>
 
-            {/* Botón de acción */}
-            <Pressable 
-              onPress={closeModal} 
-              style={({ pressed }) => [
-                styles.button,
-                pressed && styles.buttonPressed
-              ]}
-            >
-              <LinearGradient
-                colors={['#FFB802', '#FF8C00']}
-                style={styles.buttonGradient}
+            {/* Contenido */}
+            <View style={styles.content}>
+              <Text style={styles.highlightedText}>
+                ¡Estás en llamas!{'\n'}Sigue así 🔥
+              </Text>
+
+              <Text style={styles.descriptionText}>
+                Sigue jugando todos los días para aumentar y mantener tu racha 😊
+              </Text>
+
+              {/* Estadísticas */}
+              <View style={styles.statsContainer}>
+                <LinearGradient
+                  colors={['#FFFFFF08', '#FFFFFF03']}
+                  style={[styles.statBox, styles.glassEffect]}
+                >
+                  <FontAwesome5 name="fire" size={24} color="#FF6B35" />
+                  <Text style={styles.statNumber}>{userInfo.Racha}</Text>
+                  <Text style={styles.statLabel}>Días consecutivos</Text>
+                </LinearGradient>
+
+                <LinearGradient
+                  colors={['#FFFFFF08', '#FFFFFF03']}
+                  style={[styles.statBox, styles.glassEffect]}
+                >
+                  <FontAwesome5 name="trophy" size={24} color="#FFD700" />
+                  <Text style={styles.statNumber}>{userInfo.RachaMaxima}</Text>
+                  <Text style={styles.statLabel}>Racha máxima</Text>
+                </LinearGradient>
+              </View>
+
+              {/* Botón de acción */}
+              <Pressable 
+                onPress={closeModal} 
+                style={({ pressed }) => [
+                  styles.button,
+                  pressed && styles.buttonPressed
+                ]}
               >
-                <MaterialIcons name="arrow-forward" size={24} color="white" />
-                <Text style={styles.buttonText}>¡Continuar racha!</Text>
-              </LinearGradient>
-            </Pressable>
-          </View>
-        </LinearGradient>
+                <LinearGradient
+                  colors={['#FFB802', '#FF8C00']}
+                  style={styles.buttonGradient}
+                >
+                  <MaterialIcons name="arrow-forward" size={24} color="white" />
+                  <Text style={styles.buttonText}>¡Continuar racha!</Text>
+                </LinearGradient>
+              </Pressable>
+            </View>
+          </LinearGradient>
+        </View>
       </Animated.View>
     </Modal>
   );
@@ -180,32 +182,37 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  gradientContainer: {
+  gradientWrapper: {
     width: '100%',
     height: '75%',
     borderRadius: 30,
-    padding: 25,
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#FFFFFF15',
+    backgroundColor: '#1A1A2E',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.3,
     shadowRadius: 20,
     elevation: 15,
   },
+  gradientContainer: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 30,
+    padding: 25,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#FFFFFF15',
+  },
   header: {
     alignItems: 'center',
     marginBottom: 20,
+    
   },
   lambImage: {
     width: 120,
     height: 120,
-    marginTop: -60,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.3,
-    shadowRadius: 15,
+   // marginTop: -60,
+    
+    
   },
   title: {
     fontSize: 26,

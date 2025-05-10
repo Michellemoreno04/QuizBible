@@ -49,80 +49,82 @@ export const NotVidasModal = ({ visible, setNotVidasModalVisible }) => {
     >
       <View style={styles.centeredView}>
         <Animated.View style={[styles.modalView, { transform: [{ scale: scaleValue }] }]}>
-          <LinearGradient
-            colors={[ '#1E3A5F', '#3C6E9F']}
-            style={styles.gradientBackground}
-            start={{ x: 0.5, y: 0 }}
-            end={{ x: 0.5, y: 1 }}
-          >
-            <Animated.View style={[styles.particles, { transform: [{ scale: pulseAnim }] }]}>
-              {[...Array(6)].map((_, i) => (
-                <Text 
-                  key={i} 
-                  style={[styles.particle, { transform: [{ rotate: `${i * 60}deg` }] }]}
+          <View style={styles.gradientWrapper}>
+            <LinearGradient
+              colors={[ '#1E3A5F', '#3C6E9F']}
+              style={styles.gradientBackground}
+              start={{ x: 0.5, y: 0 }}
+              end={{ x: 0.5, y: 1 }}
+            >
+              <Animated.View style={[styles.particles, { transform: [{ scale: pulseAnim }] }]}>
+                {[...Array(6)].map((_, i) => (
+                  <Text 
+                    key={i} 
+                    style={[styles.particle, { transform: [{ rotate: `${i * 60}deg` }] }]}
+                  >
+                    hy
+                  </Text>
+                ))}
+              </Animated.View>
+
+              <Text style={styles.title}>¡Vidas Recargadas!</Text>
+              <Text style={styles.subtitle}>Prepárate para nuevos desafíos</Text>
+
+              <View style={styles.lifeContainer}> 
+                <LinearGradient
+                  colors={['#FFD700', '#D4AF37', '#FFD700']}
+                  style={styles.lifeGradient}
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 1, y: 0.5 }}
                 >
-                  hy
-                </Text>
-              ))}
-            </Animated.View>
+                  <View style={styles.rewardsContainer}>
+                  <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+                  <Text style={styles.heart}>❤️</Text>
+                  <Text style={styles.lifeText}>2</Text>
+                  </View>
+                  <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
+                    <Text style={styles.heart}>💰</Text>
+                    <Text style={styles.lifeText}>+200</Text>
+                  </View>
 
-            <Text style={styles.title}>¡Vidas Recargadas!</Text>
-            <Text style={styles.subtitle}>Prepárate para nuevos desafíos</Text>
+                  </View>
+                </LinearGradient>
+               
 
-            <View style={styles.lifeContainer}> 
-              <LinearGradient
-                colors={['#FFD700', '#D4AF37', '#FFD700']}
-                style={styles.lifeGradient}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}
+              </View>
+
+              <Text style={styles.message}>
+                ¡Energía al máximo! Responde preguntas y mantén tu racha
+              </Text>
+
+              <TouchableOpacity 
+                style={styles.button}
+                onPress={() => setNotVidasModalVisible(false)}
+                activeOpacity={0.95}
               >
-                <View style={styles.rewardsContainer}>
-                <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
-                <Text style={styles.heart}>❤️</Text>
-                <Text style={styles.lifeText}>2</Text>
-                </View>
-                <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
-                  <Text style={styles.heart}>💰</Text>
-                  <Text style={styles.lifeText}>+200</Text>
-                </View>
+                <LinearGradient
+                  colors={['#FFD700', '#D4AF37', '#FFD700']}
+                  style={styles.buttonGradient}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  <Text style={styles.buttonText}>¡A JUGAR!</Text>
+                </LinearGradient>
+              </TouchableOpacity>
 
-                </View>
-              </LinearGradient>
-             
-
-            </View>
-
-            <Text style={styles.message}>
-              ¡Energía al máximo! Responde preguntas y mantén tu racha
-            </Text>
-
-            <TouchableOpacity 
-              style={styles.button}
-              onPress={() => setNotVidasModalVisible(false)}
-              activeOpacity={0.95}
-            >
-              <LinearGradient
-                colors={['#FFD700', '#D4AF37', '#FFD700']}
-                style={styles.buttonGradient}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
+              <TouchableOpacity 
+                style={styles.closeButton}
+                onPress={() => setNotVidasModalVisible(false)}
               >
-                <Text style={styles.buttonText}>¡A JUGAR!</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-              style={styles.closeButton}
-              onPress={() => setNotVidasModalVisible(false)}
-            >
-              <LinearGradient
-                colors={['#75643F', '#3A2F0F']}
-                style={styles.closeButtonGradient}
-              >
-                <Text style={styles.closeText}>×</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </LinearGradient>
+                <LinearGradient
+                  colors={['#75643F', '#3A2F0F']}
+                  style={styles.closeButtonGradient}
+                >
+                  <Text style={styles.closeText}>×</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            </LinearGradient>
+          </View>
         </Animated.View>
       </View>
     </Modal>
@@ -140,10 +142,19 @@ const styles = StyleSheet.create({
     width: '85%',
     borderRadius: 30,
     overflow: 'hidden',
-    borderWidth: 2,
-    borderColor: 'rgba(255, 215, 0, 0.8)',
+  },
+  gradientWrapper: {
+    width: '100%',
+    borderRadius: 30,
+    backgroundColor: '#1E3A5F',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 15,
   },
   gradientBackground: {
+    width: '100%',
     padding: 30,
     alignItems: 'center',
     borderRadius: 30,

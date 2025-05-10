@@ -134,85 +134,80 @@ const playSound = useSound();
   return (
     <Modal visible={isVisible} animationType="fade" transparent onRequestClose={onClose}>
       <View style={styles.modalContainer}>
-        {/* Fondo con overlay */}
-        <View
-          style={styles.absolute}
-          
-        />
-        
-        <LinearGradient
-        colors={['#1A1A2E', '#2D2D4A', '#1A1A2E']}
-        style={styles.gradientContainer}
-      >
-          {/* Decoración superior */}
-          <View style={styles.topDecoration}>
-            <Image 
-              source={require('../../assets/images/cordero_triste.png')}
-              style={styles.lambImage}
-              resizeMode="contain"
-            />
-           
-          </View>
-  
-          {/* Contenido principal */}
-          <Text style={styles.title}>¡Necesitas más Corazones! 💖</Text>
-          <Text style={styles.subtitle}>
-            Completa acciones para obtener vidas extras y{"\n"}
-          </Text>
-  
-          
-          {/* Botón principal */}
-          <TouchableOpacity 
-            onPress={handleShowAd}
-            disabled={!loaded || isLoading}
-            style={[styles.button, (!loaded || isLoading) && styles.disabledButton]}
+        <View style={styles.absolute} />
+        <View style={styles.gradientWrapper}>
+          <LinearGradient
+            colors={['#1A1A2E', '#2D2D4A', '#1A1A2E']}
+            style={styles.gradientContainer}
           >
-            <LinearGradient
-              colors={['#FF6B6B', '#FF3366']}
-              style={styles.buttonGradient}
-              start={{x: 0, y: 0.5}}
-              end={{x: 1, y: 0.5}}
+            {/* Decoración superior */}
+            <View style={styles.topDecoration}>
+              <Image 
+                source={require('../../assets/images/cordero_triste.png')}
+                style={styles.lambImage}
+                resizeMode="contain"
+              />
+            </View>
+    
+            {/* Contenido principal */}
+            <Text style={styles.title}>¡Necesitas más Corazones! 💖</Text>
+            <Text style={styles.subtitle}>
+              Completa acciones para obtener vidas extras y{"\n"}
+            </Text>
+    
+            
+            {/* Botón principal */}
+            <TouchableOpacity 
+              onPress={handleShowAd}
+              disabled={!loaded || isLoading}
+              style={[styles.button, (!loaded || isLoading) && styles.disabledButton]}
             >
-              {isLoading ? (
-                <ActivityIndicator color="white" size="small" />
-              ) : (
-                <>
-                  <MaterialIcons name="play-circle-filled" size={28} color="white" />
-                  <Text style={styles.buttonText}>
-                    {loaded ? 'Obtener 2 corazones ' : 'Cargando...'}
-                  </Text>
-                  
-                  {loaded && (
-                    <View style={styles.badge}>
-                      <Text style={styles.badgeText}>GRATIS</Text>
-                    </View>
-                  )}
-                </>
-              )}
-            </LinearGradient>
-          </TouchableOpacity>
-  
-          {/* Opción alternativa */}
-         {/* <TouchableOpacity style={styles.storeButton}>
-            <Text style={styles.storeText}>¿Prefieres comprar? </Text>
-            <Ionicons name="storefront" size={18} color="#FF3366" />
-          </TouchableOpacity>*/}
-  
-          {/* Botón de cierre */}
-          <TouchableOpacity 
-            style={styles.closeButton} 
-            onPress={cerrar}
-          >
-            <LinearGradient
-              colors={['#FFFFFF', '#F8F9FA']}
-              style={styles.closeGradient}
+              <LinearGradient
+                colors={['#FF6B6B', '#FF3366']}
+                style={styles.buttonGradient}
+                start={{x: 0, y: 0.5}}
+                end={{x: 1, y: 0.5}}
+              >
+                {isLoading ? (
+                  <ActivityIndicator color="white" size="small" />
+                ) : (
+                  <>
+                    <MaterialIcons name="play-circle-filled" size={28} color="white" />
+                    <Text style={styles.buttonText}>
+                      {loaded ? 'Obtener 2 corazones ' : 'Cargando...'}
+                    </Text>
+                    
+                    {loaded && (
+                      <View style={styles.badge}>
+                        <Text style={styles.badgeText}>GRATIS</Text>
+                      </View>
+                    )}
+                  </>
+                )}
+              </LinearGradient>
+            </TouchableOpacity>
+    
+            {/* Opción alternativa */}
+           {/* <TouchableOpacity style={styles.storeButton}>
+              <Text style={styles.storeText}>¿Prefieres comprar? </Text>
+              <Ionicons name="storefront" size={18} color="#FF3366" />
+            </TouchableOpacity>*/}
+    
+            {/* Botón de cierre */}
+            <TouchableOpacity 
+              style={styles.closeButton} 
+              onPress={cerrar}
             >
-              <Ionicons name="close" size={20} color="#666" />
-            </LinearGradient>
-          </TouchableOpacity>
-      </LinearGradient>
+              <LinearGradient
+                colors={['#FFFFFF', '#F8F9FA']}
+                style={styles.closeGradient}
+              >
+                <Ionicons name="close" size={20} color="#666" />
+              </LinearGradient>
+            </TouchableOpacity>
+          </LinearGradient>
         </View>
-
+      </View>
     </Modal>
   );
 }
@@ -230,29 +225,25 @@ const playSound = useSound();
       right: 0,
       backgroundColor: 'rgba(0, 0, 0, 0.8)',
     },
-    gradientContainer: {
-     
+    gradientWrapper: {
       width: width * 0.9,
-      height: height * 0.5,
+      height: height * 0.7,
       borderRadius: 30,
-      padding: 25,
-      alignItems: 'center',
-      borderWidth: 1,
-      borderColor: 'rgba(255, 107, 107, 0.2)',
-    },
-    modalContent: {
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      width: '90%',
-      borderRadius: 30,
-      padding: 25,
-      alignItems: 'center',
-      borderWidth: 1,
-      borderColor: 'rgba(255, 107, 107, 0.2)',
+      backgroundColor: '#1A1A2E',
       shadowColor: '#000',
-      shadowOffset: { width: 0, height: 20 },
-      shadowOpacity: 0.25,
-      shadowRadius: 30,
+      shadowOffset: { width: 0, height: 10 },
+      shadowOpacity: 0.3,
+      shadowRadius: 20,
       elevation: 15,
+    },
+    gradientContainer: {
+      width: '100%',
+      height: '100%',
+      borderRadius: 30,
+      padding: width * 0.04,
+      alignItems: 'center',
+      borderWidth: 2,
+      borderColor: '#FFFFFF15',
     },
     topDecoration: {
       position: 'relative',
@@ -300,7 +291,6 @@ const playSound = useSound();
       elevation: 10,
     },
     buttonGradient: {
-
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',

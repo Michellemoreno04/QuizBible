@@ -225,6 +225,7 @@ const styles = StyleSheet.create({
         marginBottom: 15,
       },
       modal: {
+        
         margin: 0,
         justifyContent: 'center',
         alignItems: 'center',
@@ -240,9 +241,9 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         position: 'absolute',
-        top: -30,
-        right: -15,
-        zIndex: 1,
+        top: 0,
+        right: 0,
+        zIndex: 1000,
         backgroundColor: 'red',
         borderRadius: 50,
         justifyContent: 'center',
@@ -250,6 +251,18 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderColor: 'white',
         padding: 5,
+        ...Platform.select({
+            ios: {
+                elevation: 5,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+            },
+            android: {
+                elevation: 5,
+            }
+        })
       },
       modalImage: {
         width: '100%',

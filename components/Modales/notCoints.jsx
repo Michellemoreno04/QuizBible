@@ -148,49 +148,51 @@ export const NoCoinsModal = ({ visible, onClose }) => {
             ]
           }
         ]}>
-          <LinearGradient
-            colors={['#FFFFFF', '#F8F9FA']}
-            style={styles.gradient}
-            start={{ x: 0.1, y: 0 }}
-            end={{ x: 0.9, y: 1 }}>
+          <View style={styles.gradientWrapper}>
+            <LinearGradient
+              colors={['#FFFFFF', '#F8F9FA']}
+              style={styles.gradient}
+              start={{ x: 0.1, y: 0 }}
+              end={{ x: 0.9, y: 1 }}>
             
-            <TouchableOpacity 
-              style={styles.closeButton}
-              onPress={onClose}
-              hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}>
-              <Ionicons name="close" size={24} color="#6C757D" />
-            </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.closeButton}
+                onPress={onClose}
+                hitSlop={{ top: 15, bottom: 15, left: 15, right: 15 }}>
+                <Ionicons name="close" size={24} color="#6C757D" />
+              </TouchableOpacity>
 
-            <View style={styles.iconContainer}>
-              <Ionicons name="alert-circle" size={48} color="#FFD700" />
-            </View>
+              <View style={styles.iconContainer}>
+                <Ionicons name="alert-circle" size={48} color="#FFD700" />
+              </View>
 
-            <Text style={styles.modalTitle}>¡Monedas Insuficientes!</Text>
-            <Text style={styles.modalText}>
-              Necesitas más monedas para realizar este quiz. Mira un anuncio para obtener monedas gratis.
-            </Text>
+              <Text style={styles.modalTitle}>¡Monedas Insuficientes!</Text>
+              <Text style={styles.modalText}>
+                Necesitas más monedas para realizar este quiz. Mira un anuncio para obtener monedas gratis.
+              </Text>
 
-            <TouchableOpacity 
-              style={[styles.primaryButton, loaded ? {opacity: 1} : {opacity: 0.9}]}
-              onPress={handleShowAd}
-              >
-              <LinearGradient
-                colors={['#4CAF50', '#45A049']}
-                style={styles.buttonGradient}
-                start={{ x: 0, y: 0.5 }}
-                end={{ x: 1, y: 0.5 }}>
-                <Ionicons name="play-circle" size={24} color="white" />
-                <Text style={styles.buttonText}>{loaded ? 'Ver Anuncio' : 'Cargando...'}</Text>
-              </LinearGradient>
-            </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.primaryButton, loaded ? {opacity: 1} : {opacity: 0.9}]}
+                onPress={handleShowAd}
+                >
+                <LinearGradient
+                  colors={['#4CAF50', '#45A049']}
+                  style={styles.buttonGradient}
+                  start={{ x: 0, y: 0.5 }}
+                  end={{ x: 1, y: 0.5 }}>
+                  <Ionicons name="play-circle" size={24} color="white" />
+                  <Text style={styles.buttonText}>{loaded ? 'Ver Anuncio' : 'Cargando...'}</Text>
+                </LinearGradient>
+              </TouchableOpacity>
 
-            <TouchableOpacity 
-              style={styles.secondaryButton}
-              onPress={onClose}
-              activeOpacity={0.7}>
-              <Text style={styles.secondaryButtonText}>Cancelar</Text>
-            </TouchableOpacity>
-          </LinearGradient>
+              <TouchableOpacity 
+                style={styles.secondaryButton}
+                onPress={onClose}
+                activeOpacity={0.7}>
+                <Text style={styles.secondaryButtonText}>Cancelar</Text>
+              </TouchableOpacity>
+            </LinearGradient>
+          </View>
         </Animated.View>
       </View>
     </Modal>
@@ -200,26 +202,28 @@ export const NoCoinsModal = ({ visible, onClose }) => {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContainer: {
     width: '85%',
-    maxWidth: 400,
-    borderRadius: 25,
+    borderRadius: 20,
     overflow: 'hidden',
-    position: 'absolute',
-    top: '25%',
+  },
+  gradientWrapper: {
+    width: '100%',
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
-    elevation: 12,
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 15,
   },
   gradient: {
-    padding: 25,
-    borderRadius: 25,
+    width: '100%',
+    padding: 20,
     alignItems: 'center',
   },
   closeButton: {

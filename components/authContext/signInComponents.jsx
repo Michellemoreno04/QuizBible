@@ -1,13 +1,11 @@
-import { View, StyleSheet, ActivityIndicator, Platform } from "react-native";
-import { GoogleSigninButton } from "@react-native-google-signin/google-signin";
+import { View, StyleSheet, ActivityIndicator, Platform, Dimensions, TouchableOpacity, Text, Image } from "react-native";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { auth, db } from "../firebase/firebaseConfig";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { useNavigation } from "@react-navigation/native";
 import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
 import { useState, useEffect } from "react";
-
-
+import { Ionicons } from '@expo/vector-icons';
 
 export default function SignInComponents() {
   const [vidas, setVidas] = useState(2);
@@ -25,7 +23,6 @@ export default function SignInComponents() {
   hoy.setHours(0, 0, 0, 0); // Establecer solo la fecha (sin hora)
   const ayer = new Date(hoy);
   ayer.setDate(hoy.getDate() - 1); // Restar un día para setear la racha
-
 
  //configuracion de google sign in
  useEffect(() => {
@@ -103,33 +100,72 @@ export default function SignInComponents() {
 
   return (
     <View style={styles.container}>
-{ Platform.OS === 'android' && (
-  googleLoading  ? (
-    <ActivityIndicator size="large" color="#0000ff" />
-  ) : (
-    <GoogleSigninButton
-      style={styles.googleSigninButton}
-      size={GoogleSigninButton.Size.Wide}
-      color={GoogleSigninButton.Color.Dark}
-      onPress={handleGoogleSignIn}
-    />
-  )
-)}
-</View>
-  )
+      {googleLoading ? (
+        <ActivityIndicator size="large" color="#4285F4" />
+      ) : (
+        <TouchableOpacity
+          style={styles.customGoogleButton}
+          onPress={handleGoogleSignIn}
+          activeOpacity={0.8}
+        >
+          <View style={styles.googleIconContainer}>
+            <Ionicons name="logo-google" size={24} color="#4285F4" />
+          </View>
+          <Text style={styles.googleButtonText}>Continuar con Google</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    
+   
+   // paddingHorizontal: 20,
   },
-  googleSigninButton: {
+  customGoogleButton: {
     width: "100%",
     height: 55,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    backgroundColor: '#FFFFFF',
     borderRadius: 10,
-
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    ...Platform.select({
+      ios: {
+        shadowColor: '#000',
+        shadowOffset: {
+          width: 0,
+          height: 2,
+        },
+        shadowOpacity: 0.1,
+        shadowRadius: 3,
+      },
+      android: {
+        elevation: 2,
+      },
+    }),
+  },
+  googleIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+   // marginRight: 12,
+  },
+  googleButtonText: {
+    color: '#757575',
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: Platform.select({
+      ios: 'System',
+      android: 'Roboto',
+    }),
   },
 });

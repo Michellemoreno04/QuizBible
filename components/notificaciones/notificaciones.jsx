@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Platform } from 'react-native';
+import { Platform, Alert } from 'react-native';
 import * as Notifications from 'expo-notifications';
 
 Notifications.setNotificationHandler({
@@ -47,6 +47,11 @@ async function scheduleDailyNotifications() {
   });
 }
 
+async function requestNotificationPermission() {
+  const { status } = await Notifications.requestPermissionsAsync();
+  return status;
+}
+
 async function registerForPushNotificationsAsync() {
   if (Platform.OS === 'android') {
     Notifications.setNotificationChannelAsync('default', {
@@ -60,12 +65,40 @@ async function registerForPushNotificationsAsync() {
   if (Platform.OS !== 'web') {
     const { status: existingStatus } = await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
+    
     if (existingStatus !== 'granted') {
-      const { status } = await Notifications.requestPermissionsAsync();
-      finalStatus = status;
-    }
-    if (finalStatus !== 'granted') {
-      console.log('¡Permiso no concedido para notificaciones!');
+      const showPermissionAlert = () => {
+        Alert.alert(
+          "Permiso de Notificaciones",
+          "Las notificaciones son importantes para recibir tu versículo diario y recordatorios de tus lecturas. ¿Te gustaría activarlas?",
+          [
+            {
+              text: "no permitir",
+              style: "cancel"
+            },
+            {
+              text: "Aceptar",
+              onPress: async () => {
+                const newStatus = await requestNotificationPermission();
+                if (newStatus === 'granted') {
+                  try {
+                    const token = await Notifications.getDevicePushTokenAsync();
+                    if (token) {
+                      await scheduleDailyNotifications();
+                    }
+                  } catch (error) {
+                    console.log('Error al obtener el token:', error);
+                  }
+                } else {
+                  showPermissionAlert(); // Mostrar la alerta nuevamente si aún no acepta
+                }
+              }
+            }
+          ]
+        );
+      };
+
+      showPermissionAlert();
       return;
     }
     
@@ -75,7 +108,7 @@ async function registerForPushNotificationsAsync() {
         await scheduleDailyNotifications();
       }
     } catch (error) {
-     // console.log('Error al obtener el token:', error);
+      console.log('Error al obtener el token:', error);
     }
   }
 }

@@ -10,7 +10,9 @@
 
 # cosas hecha 
 
-1. notificaciones modificadas
-2. bugs arreglados para ios
+1. 
 
 
+
+# ERRORES
+1. en eas.json olvide poner en development simulator: false porque si esta true solo funciona en el simulador y no en el dispositivo fisico.

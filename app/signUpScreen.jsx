@@ -73,8 +73,8 @@ export default function SignUpScreen() {
               <Text style={styles.loginLink}>Inicia sesión</Text>
             </Pressable>
           </View>
-
           <SignInComponents />
+
         </View>
       </ScrollView>
       </SafeAreaView>
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 32,
-    justifyContent: 'center',
+    //justifyContent: 'center',
   
   },
   header: {
@@ -156,7 +156,8 @@ const styles = StyleSheet.create({
   },
   loginLinkContainer: {
     flexDirection: 'row',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    marginBottom: 20
   },
   loginText: {
     color: 'rgba(255, 255, 255, 0.9)'

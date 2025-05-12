@@ -241,8 +241,8 @@ const styles = StyleSheet.create({
         width: 50,
         height: 50,
         position: 'absolute',
-        top: 0,
-        right: 0,
+        top: -35,
+        right: -15,
         zIndex: 1000,
         backgroundColor: 'red',
         borderRadius: 50,
@@ -251,6 +251,15 @@ const styles = StyleSheet.create({
         borderWidth: 2,
         borderColor: 'white',
         padding: 5,
+        ...Platform.select({
+            ios: {
+              width:50,
+              height:50,
+              top:0,
+              right:0,
+                backgroundColor: 'red',
+            }
+        })
       
       },
       modalImage: {

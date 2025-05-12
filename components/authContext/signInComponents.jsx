@@ -1,4 +1,4 @@
-import { View, StyleSheet, ActivityIndicator } from "react-native";
+import { View, StyleSheet, ActivityIndicator, Platform } from "react-native";
 import { GoogleSigninButton } from "@react-native-google-signin/google-signin";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { auth, db } from "../firebase/firebaseConfig";
@@ -103,8 +103,8 @@ export default function SignInComponents() {
 
   return (
     <View style={styles.container}>
-{
-  googleLoading ? (
+{ Platform.OS === 'android' && (
+  googleLoading  ? (
     <ActivityIndicator size="large" color="#0000ff" />
   ) : (
     <GoogleSigninButton
@@ -114,9 +114,9 @@ export default function SignInComponents() {
       onPress={handleGoogleSignIn}
     />
   )
-}      
-    </View>
-  );
+)}
+</View>
+  )
 }
 
 const styles = StyleSheet.create({

@@ -151,10 +151,7 @@ const styles = StyleSheet.create({
     },
     badgeShadowContainer: {
         backgroundColor: '#1a1003', // Color sólido que coincide con el gradiente
-        shadowColor: '#FFD700',
-        shadowOffset: { width: 0, height: 4 },
-        shadowRadius: 15,
-        shadowOpacity: 0.4,
+     
         borderRadius: 23, // Un poco más grande que el borderRadius del badgeBorder
     },
     badgeBorder: {

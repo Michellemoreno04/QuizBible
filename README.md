@@ -1,15 +1,16 @@
 
 # cosas pendientes por hacer 
 
-1.Notificaciones 
+1.
 2.implementar pagos en la app para remover ads
-3.verificar que link me dara play store para poner ese link en share verse ect...
+
 
  
 
 
 # cosas hecha 
 
-1. Chat con Nilu agregado
+1. notificaciones modificadas
+2. bugs arreglados para ios
 
 

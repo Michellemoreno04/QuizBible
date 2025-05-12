@@ -19,8 +19,8 @@ import { Colors } from '@/constants/Colors';
 import { useToast } from 'react-native-toast-notifications';
 import Notificaciones from '@/components/notificaciones/notificaciones';
 import { useNavigation } from '@react-navigation/native';
-import NetInfo from '@react-native-community/netinfo';
-
+//import NetInfo from '@react-native-community/netinfo';
+//import * as Device from 'expo-device';
 
 const bannerAdUnitId = __DEV__ 
   ? TestIds.BANNER 
@@ -40,7 +40,7 @@ export default function AppComponent() {
   const toast = useToast();
 
   // Monitorear el estado de la conexión de internet
-  useEffect(() => {
+ /* useEffect(() => {
     const unsubscribe = NetInfo.addEventListener(state => {
       if (!state.isConnected) {
         toast.show("No tienes conexión a internet", {
@@ -56,7 +56,7 @@ export default function AppComponent() {
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, []);*/
 
   // obtener los datos del usuario
   useEffect(() => {

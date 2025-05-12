@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { View, Text, Pressable, KeyboardAvoidingView, ScrollView, StyleSheet, SafeAreaView, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import useAuth from "../components/authContext/authContext";
@@ -9,7 +9,13 @@ import  SignInComponents  from "../components/authContext/signInComponents";
 export default function SignUpScreen() {
 
   const navigation = useNavigation();
+  const animationRef = useRef(null);
 
+  useEffect(() => {
+    if (animationRef.current) {
+      animationRef.current.play();
+    }
+  }, []);
 
   return (
     <LinearGradient 
@@ -42,10 +48,12 @@ export default function SignUpScreen() {
           {/* Animación Lottie */}
           <View style={styles.animationContainer}>
             <LottieView
+              ref={animationRef}
               source={require("../assets/lottieFiles/llegaste.json")}
-              autoPlay
-              loop
+              autoPlay={false}
+              loop={true}
               style={styles.animation}
+              onAnimationFailure={(error) => console.log('Error en la animación:', error)}
             />
           </View>
 
@@ -76,19 +84,24 @@ export default function SignUpScreen() {
 
 const styles = StyleSheet.create({
   gradient: {
-    flex: 1
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center'  
   },
   safeArea: {
-    flex: 1
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   scrollContent: {
-    flexGrow: 1
+    flexGrow: 1, // Añadimos flexGrow para que el contenido se expanda
   },
   container: {
     flex: 1,
     paddingHorizontal: 32,
     justifyContent: 'center',
-    paddingBottom: 64
+  
   },
   header: {
     alignItems: 'center',

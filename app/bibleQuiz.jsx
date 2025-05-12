@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ImageBackground, Animated,Platform, ActivityIndicator,Dimensions, ScrollView, StatusBar } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ImageBackground, Animated, Platform, ActivityIndicator, Dimensions, ScrollView, StatusBar } from 'react-native';
 import { AntDesign, FontAwesome5, MaterialCommunityIcons, Octicons } from '@expo/vector-icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,24 +20,23 @@ import { useIsFocused } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { InterstitialAd, AdEventType, TestIds } from 'react-native-google-mobile-ads';
 import { useToast } from 'react-native-toast-notifications';
+import Modal from 'react-native-modal';
+import LottieView from 'lottie-react-native';
 
+// Dimensiones y constantes globales
+const { width, height } = Dimensions.get('window');
+const responsiveWidth = width * 0.9;
+
+// Configuración de anuncios
 const adUnitId = __DEV__ 
   ? TestIds.INTERSTITIAL
   : Platform.OS === 'ios' 
   ? process.env.EXPO_PUBLIC_INTERSTITIAL_ID_IOS 
   : process.env.EXPO_PUBLIC_INTERSTITIAL_ID_ANDROID;
 
-// Crea la instancia del anuncio
 const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
   keywords: ['religion', 'bible']
 });
-
-const { width, height } = Dimensions.get('window');
-
-const responsiveWidth = width * 0.9; // 90% del ancho de pantalla
-
-
-
 
 const BibleQuiz = () => {
   const navigation = useNavigation();
@@ -66,6 +65,8 @@ const BibleQuiz = () => {
   const { user } = useAuth();
   const userId = user?.uid;
   const toast = useToast();
+  const [respuestasCorrectasConsecutivas, setRespuestasCorrectasConsecutivas] = useState(0);
+  const [showCelebracionModal, setShowCelebracionModal] = useState(false);
 
   // Cierra los modales al salir
   useFocusEffect(
@@ -234,6 +235,17 @@ useEffect(() => {
       setRespuestaSeleccionada(respuesta);
       // Reproducir sonido de respuesta correcta.
       await playSound(require('../assets/sound/correct-choice.mp3'));
+  
+      // Incrementar contador de respuestas correctas consecutivas
+      const nuevasRespuestasConsecutivas = respuestasCorrectasConsecutivas + 1;
+      setRespuestasCorrectasConsecutivas(nuevasRespuestasConsecutivas);
+      
+      // Verificar si alcanzó 4 respuestas correctas consecutivas
+      if (nuevasRespuestasConsecutivas === 4) {
+        setShowCelebracionModal(true);
+        // Reproducir sonido de celebración
+        await playSound(require('../assets/sound/levelUpSound.mp3'));
+      }
   
       // Sumamos 15 puntos de experiencia.
       setExpGanada((prevExp) => prevExp + 15);
@@ -684,6 +696,27 @@ useEffect(() => {
         }}
       />
       <RewardedAdModal isVisible={showModalNotVidas} setIsVisible={setShowModalNotVidas} setShowModal={setShowModal} onClose={cerrarRewardModal} userId={userId} vidas={userInfo.Vidas} />
+      <Modal
+        isVisible={showCelebracionModal}
+        onBackdropPress={() => setShowCelebracionModal(false)}
+        backdropOpacity={0.2}
+        animationIn="zoomIn"
+        animationOut="zoomOut"
+        style={styles.modal}
+      >
+        <View style={styles.celebracionContainer}>
+         
+            <LottieView
+              source={require('../assets/lottieFiles/angel-nivel.json')}
+              autoPlay
+              loop={false}
+              style={styles.celebracionAnimation}
+              onAnimationFinish={() => setShowCelebracionModal(false)}
+            />
+            <Text style={styles.celebracionText}> 🎉 ¡Sigue asi! 🎉</Text>
+          
+        </View>
+      </Modal>
 <ImageBackground 
         source={require('../assets/images/bg-quiz.png')} 
          resizeMode="cover" 
@@ -973,6 +1006,41 @@ const styles = StyleSheet.create({
     bottom: height * 0.05, 
     paddingHorizontal: 10,
    // backgroundColor: 'red',
+  },
+  modal: {
+    margin: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: -1,
+  },
+  celebracionContainer: {
+    width: width * 0.8,
+    height: height * 0.4,
+    borderRadius: 20,
+    overflow: 'hidden',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+  },
+  celebracionAnimation: {
+    width: 400,
+    height: 400,
+  },
+  celebracionText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'yellow',
+    textAlign: 'center',
+    marginTop: 20,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 3,
+    position: 'absolute',
+    bottom: 0,
+    left: 30,
+    
+   top:80,
+    
   },
 });
 

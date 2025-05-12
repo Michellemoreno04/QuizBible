@@ -162,6 +162,7 @@ export default function RootLayout() {
               name="settingMenu/soporte"
               options={{
                 headerShown: true,
+                headerTitle: "Soporte",
                 headerBackTitle: "volver",
                 presentation: "modal",
               }}

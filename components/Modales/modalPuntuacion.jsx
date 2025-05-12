@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Dimensions,StatusBar } from 'react-native';
 import Modal from 'react-native-modal';
 import LottieView from 'lottie-react-native';
 import { FontAwesome5, FontAwesome6 } from '@expo/vector-icons';
@@ -30,7 +30,7 @@ export function ModalPuntuacion({
   monedasGanadas, 
   userInfo, 
   isPlaying,
-  stopMusic
+  stopMusic,
 }) {
   const [loaded, setLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -118,8 +118,13 @@ const showAd = () => {
     return () => clearTimeout(timer)
   }, [isVisible]);
 
+  // Calcular la experiencia relativa al nivel actual
+  const expRelativa = userInfo.Exp % 400;
+  const nivelActual = Math.floor(userInfo.Exp / 400) + 1;
+  const expParaSiguienteNivel = 400 - expRelativa;
+
   return (
-    <Modal isVisible={isVisible} backdropOpacity={0.3}>
+    <Modal isVisible={isVisible} backdropOpacity={0.6}>
       <View style={styles.gradientWrapper}>
         <LinearGradient
           colors={['#fdf2ff', '#e6d4ff', '#d8c4ff']}
@@ -169,13 +174,45 @@ const showAd = () => {
 
             <View style={styles.progressContainer}>
               <Text style={styles.progressText}>
-                {respuestasCorrectas}/{7}
+                {
+                  `Respuestas correctas: ${respuestasCorrectas}/10`
+                }
               </Text>
               <View style={styles.progressBarBackground}>
-                <LinearGradient
-                  colors={['#76ff03', '#4CAF50']}
-                  style={[styles.progressBarFill, { width: `${(respuestasCorrectas / 7) * 100}%` }]}
-                />
+                <View style={[styles.progressBarFill, { 
+                  width: `${(respuestasCorrectas / 10) * 100}%`,
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  bottom: 0
+                }]}>
+                  <LinearGradient
+                    colors={['#76ff03', '#4CAF50']}
+                    style={styles.progressBarGradient}
+                  />
+                </View>
+              </View>
+            </View>
+
+            <View style={styles.progressContainer}>
+              <Text style={styles.progressText}>
+                {
+                  `Nivel ${nivelActual} \n - Obten solo ${expParaSiguienteNivel} de experiencia para subir al siguiente nivel!`
+                }
+              </Text>
+              <View style={[styles.progressBarBackground, styles.expProgressBar]}>
+                <View style={[styles.progressBarFill, { 
+                  width: `${(expRelativa / 400) * 100}%`,
+                  position: 'absolute',
+                  left: 0,
+                  top: 0,
+                  bottom: 0
+                }]}>
+                  <LinearGradient
+                    colors={['#6a5acd', '#7b68ee']}
+                    style={styles.progressBarGradient}
+                  />
+                </View>
               </View>
             </View>
 
@@ -197,21 +234,23 @@ const showAd = () => {
 const styles = StyleSheet.create({
   gradientWrapper: {
     width: width * 0.9,
-    maxHeight: height * 0.8,
+   // height: height * 0.8,
     borderRadius: 25,
     backgroundColor: '#fdf2ff',
   
   },
   gradientContainer: {
     width: '100%',
-    height: '100%',
+   // height: '100%',
+    
+    padding: 25,
     borderRadius: 25,
     overflow: 'hidden',
   },
   contentContainer: {
     alignItems: 'center',
-    padding: 15,
-    paddingTop: 25,
+   // padding: 15,
+   // paddingTop: 25,
   },
   subtitle: {
     fontSize: 18,
@@ -307,8 +346,9 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-SemiBold',
   },
   progressContainer: {
-    width: '90%',
+    width: 280,
     marginVertical: 10,
+    alignItems: 'center',
   },
   progressText: {
     fontSize: 16,
@@ -318,28 +358,38 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-SemiBold',
   },
   progressBarBackground: {
+    width: '100%',
     height: 20,
     borderRadius: 10,
     backgroundColor: '#fff',
     overflow: 'hidden',
     borderWidth: 2,
     borderColor: '#4a148c',
+    position: 'relative',
   },
   progressBarFill: {
     height: '100%',
     borderRadius: 8,
+    overflow: 'hidden',
+  },
+  progressBarGradient: {
+    width: '100%',
+    height: '100%',
   },
   buttonContainer: {
     width: '100%',
     marginTop: 5,
     backgroundColor: '#ff6b6b',
-   
+   overflow:'hidden',
+   borderRadius: 15,
   },
   buttonGradient: {
-    paddingVertical: 16,
-    borderRadius: 15,
+    width: '100%',
+    padding: 16,
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#ff6b6b',
+    
   },
   buttonText: {
     color: 'white',
@@ -347,5 +397,8 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     fontFamily: 'Inter-Black',
     letterSpacing: 0.5,
+  },
+  expProgressBar: {
+    borderColor: '#6a5acd',
   },
 });

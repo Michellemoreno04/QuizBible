@@ -85,11 +85,16 @@ const playSound = useSound();
     try {
       if (vidas === 0) {
         setIsVisible(false);
-        setShowModal(true);
+
+        setTimeout(() => {
+          setShowModal(true);
+        }, 1000);
+       
+      } else {
+        setIsVisible(false);
       }
     } catch (error) {
       console.error('Error al cerrar el modal:', error);
-    } finally {
       setIsVisible(false);
     }
   }, [vidas, setIsVisible, setShowModal]);
@@ -152,7 +157,7 @@ const playSound = useSound();
             {/* Contenido principal */}
             <Text style={styles.title}>¡Necesitas más Corazones! 💖</Text>
             <Text style={styles.subtitle}>
-              Completa acciones para obtener vidas extras y{"\n"}
+              Ve un anuncio para obtener vidas extras! {"\n"}
             </Text>
     
             
@@ -227,14 +232,14 @@ const playSound = useSound();
     },
     gradientWrapper: {
       width: width * 0.9,
-      height: height * 0.7,
+     // height: height * 0.7,
       borderRadius: 30,
       backgroundColor: '#1A1A2E',
      
     },
     gradientContainer: {
       width: '100%',
-      height: '100%',
+      //height: '100%',
       borderRadius: 30,
       padding: width * 0.04,
       alignItems: 'center',
@@ -243,8 +248,8 @@ const playSound = useSound();
     },
     topDecoration: {
       position: 'relative',
-      marginTop: -100,
-      marginBottom: 20,
+      //marginTop: -100,
+      //marginBottom: 20,
     },
     lambImage: {
       width: 120,

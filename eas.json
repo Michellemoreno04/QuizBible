@@ -4,7 +4,6 @@
     "appVersionSource": "remote"
   },
   "build": {
-    
     "development": {
       "ios": {
         "simulator": true
@@ -28,8 +27,5 @@
         "buildType": "app-bundle"
       }
     }
-  },
-  "submit": {
-    "production": {}
   }
 }

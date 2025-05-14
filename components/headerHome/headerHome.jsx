@@ -254,10 +254,9 @@ const styles = StyleSheet.create({
         ...Platform.select({
             ios: {
               width:50,
-              height:50,
               top:0,
               right:0,
-                backgroundColor: 'red',
+                backgroundColor: 'blue',
             }
         })
       

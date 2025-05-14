@@ -2,7 +2,7 @@
   "expo": {
     "name": "QuizBible",
     "slug": "QuizBible",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/quizBible-logo.png",
     "scheme": "myapp",
@@ -31,7 +31,7 @@
         "com.android.vending.BILLING"
       ],
       "googleServicesFile": "./google-services.json",
-      "versionCode": 7
+      "versionCode": 8
     },
     "web": {
       "bundler": "metro",
@@ -39,6 +39,13 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "cameraPermission": "Permite tomar una foto de perfil para personalizar tu cuenta.",
+          "photosPermission": "Permite seleccionar una imagen desde tu galería para establecerla como foto de perfil."
+        }
+      ],
       ["@react-native-google-signin/google-signin", {
         "iosUrlScheme": "com.googleusercontent.apps.1001847642825-mqg5h7s4n72rn3u1t9lv8osli9aamc59"
       }],

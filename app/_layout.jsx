@@ -67,10 +67,7 @@ export default function RootLayout() {
               name="(tabs)"
               options={{ headerShown: false, gestureEnabled: false }}
             />
-            <Stack.Screen
-              name="subscriptions-paywall"
-              options={{ headerShown: false, gestureEnabled: false }}
-            />
+            
             <Stack.Screen
               name="login"
               options={{

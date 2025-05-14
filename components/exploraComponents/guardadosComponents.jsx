@@ -10,7 +10,7 @@ import {
   import { LinearGradient } from "expo-linear-gradient";
   import { AntDesign, FontAwesome5 } from "@expo/vector-icons";
   import { useNavigation } from "expo-router";
-  
+      
   // Helpers para dimensiones responsivas
   const { width, height } = Dimensions.get("window");
   const normalizeText = (size) => Math.round(size * (width / 375));
@@ -37,12 +37,7 @@ import {
               colors={["#FF7E1F", "#FEB27B"]}
               style={[
                 styles.card, 
-                { 
-                  width: cardWidth,
-                  padding: cardPadding,
-                  minWidth: 160,
-                  maxWidth: 200
-                }
+                
               ]}
             >
               <View style={styles.iconContainer}>
@@ -68,16 +63,7 @@ import {
           >
             <LinearGradient
               colors={["#6A65FB", "#8C9EFF"]}
-              style={[
-                styles.card, 
-                { 
-                  width: cardWidth,
-                  padding: cardPadding,
-                  minWidth: 160,
-                  maxWidth: 200
-                }
-              ]}
-            >
+              style={styles.card}>
               <View style={styles.iconContainer}>
                 <FontAwesome5 
                   name="book-open" 
@@ -121,16 +107,10 @@ import {
       borderRadius: normalizeText(20),
       borderWidth: 2,
       borderColor: "rgba(255, 255, 255, 0.5)",
-      aspectRatio: 1,
       justifyContent: "space-between",
-      shadowColor: "#000",
-      shadowOffset: { 
-        width: 0, 
-        height: normalizeText(4) 
-      },
-      shadowOpacity: 0.1,
-      shadowRadius: normalizeText(10),
-      elevation: 5,
+      width: width * 0.43,
+      padding: width * 0.03,
+      minWidth: 160,
     },
     iconContainer: {
       backgroundColor: "rgba(255, 255, 255, 0.2)",

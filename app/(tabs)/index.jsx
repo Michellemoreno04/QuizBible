@@ -93,9 +93,9 @@ export default function AppComponent() {
           const currentVidas = userDoc.data()?.Vidas || 0;
 
           // Paso 2: Actualizar solo si tiene menos de 2 vidas
-          if (currentVidas < 2) {
+          if (currentVidas < 3) {
             await updateDoc(userRef, {
-               Vidas: 2,
+               Vidas: 3,
               Monedas: increment(200),
               });
             setNotVidasModalVisible(true); // Mostrar modal solo si se actualizó
@@ -161,7 +161,9 @@ export default function AppComponent() {
            <Notificaciones />
             <VersiculosDiarios />
            
-           
+           {/*<TouchableOpacity onPress={() => navigation.navigate('subscriptions-paywall')}>
+            <Text>SubscriptionsPaywall</Text>
+           </TouchableOpacity>*/}
             <ExploraComponent />
             <GuardadosComponents />
             <View style={styles.bannerContainer}>

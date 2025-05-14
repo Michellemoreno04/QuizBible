@@ -71,9 +71,11 @@ export default function Lecturas() {
   const handleShare = async () => {
     try {
       const titulo = selectedTema?.titulo || 'Lectura diaria';
+      const appStoreLink = 'https://apps.apple.com/do/app/quizbible/id6745747418?|=en-GB';
+      const playStoreLink = 'https://play.google.com/store/apps/details?id=com.moreno.dev.QuizBible';
       await Share.share({
-        message: `📖 *${titulo}*\n\n${selectedTema.texto} \n\n ${'https://play.google.com/store/apps/details?id=com.moreno.dev.QuizBible'}`,
-      });
+        message: `📖 *${titulo}*\n\n${selectedTema.texto} \n\n ${'Aprende sobre la palabra de Dios en esta App:'} \n\n📱 Descarga QuizBible:\n🍎 iOS: ${appStoreLink}\n\n🤖 Android: ${playStoreLink}`,
+         });
     } catch (error) {
       console.error('Error compartiendo:', error);
     }

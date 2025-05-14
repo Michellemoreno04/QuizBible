@@ -340,10 +340,12 @@ const DailyReading = () => {
   const handleShareReading = async () => {
     try {
       // Se comparte el título y el texto concatenados
+      const appStoreLink = 'https://apps.apple.com/do/app/quizbible/id6745747418?|=en-GB';
+      const playStoreLink = 'https://play.google.com/store/apps/details?id=com.moreno.dev.QuizBible';
       await Share.share({
         title: 'Reflexión Diaria',
-        message: `${readingText[0].titulo}. ${readingText[0].texto} \n\n ${'Obtén más lecturas como esta con la siguiente App: '}\n ${'https://play.google.com/store/apps/details?id=com.moreno.dev.QuizBible'}`,
-      });
+        message: `${readingText[0].titulo}. ${readingText[0].texto}  \n\n ${'Aprende sobre la palabra de Dios en esta App:'} \n\n📱 Descarga QuizBible:\n🍎 iOS: ${appStoreLink}\n\n🤖 Android: ${playStoreLink}`,
+        });
     } catch (error) {
       Alert.alert('Error al compartir la lectura.');
     }

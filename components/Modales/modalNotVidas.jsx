@@ -51,7 +51,7 @@ const playSound = useSound();
       setIsLoading(true);
       const userDocRef = doc(db, 'users', userId);
       await updateDoc(userDocRef, {
-        Vidas: increment(2),
+        Vidas: increment(3),
       });
     } catch (error) {
       console.error('Error al actualizar las vidas:', error);

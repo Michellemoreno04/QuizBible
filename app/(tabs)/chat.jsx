@@ -252,9 +252,11 @@ const LambChat = () => {
   );
 
   return (
-    <KeyboardAvoidingView // para que el teclado no tape el input
+    <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 70 : 0}
+      enabled
     >
       <LinearGradient
         colors={Colors.bgApp}
@@ -265,6 +267,8 @@ const LambChat = () => {
         ref={scrollViewRef}
         contentContainerStyle={styles.messagesContainer}
         onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
       >
         {messages.map((item, index) => (
           <View key={item.id}>
@@ -467,7 +471,9 @@ const styles = StyleSheet.create({
   },
   mensajesPredefinidosContainer: {
     marginTop: 5,
-  
+  width: '100%',
+  alignItems: 'center',
+  justifyContent: 'center',
    // paddingHorizontal: 16,
   },
   mensajesPredefinidosTitulo: {

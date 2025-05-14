@@ -10,57 +10,19 @@ import useAuth from '../authContext/authContext';
 import { useSound } from '../soundFunctions/soundFunction';
 import { LinearGradient } from 'expo-linear-gradient';
 
-
+const {width, height} = Dimensions.get('window');
 export function ModalRacha({ isVisible, setModalRachaVisible }) {
   const { user } = useAuth();
   const playSound = useSound();
   const [userInfo, setUserInfo] = useState({});
 
-  // Referencias para las animaciones
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0.8)).current;
-  const slideAnim = useRef(new Animated.Value(50)).current;
+ 
 
   useEffect(() => {
     if (isVisible) {
       playSound(require('../../assets/sound/rachasound.mp3'));
       
-      // Secuencia de animaciones
-      Animated.sequence([
-        Animated.parallel([
-          Animated.timing(fadeAnim, {
-            toValue: 1,
-            duration: 500,
-            useNativeDriver: true,
-          }),
-          Animated.spring(scaleAnim, {
-            toValue: 1,
-            friction: 8,
-            tension: 40,
-            useNativeDriver: true,
-          }),
-          Animated.spring(slideAnim, {
-            toValue: 0,
-            friction: 8,
-            tension: 40,
-            useNativeDriver: true,
-          })
-        ])
-      ]).start();
-    } else {
-      // Animación de salida
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 0.8,
-          duration: 300,
-          useNativeDriver: true,
-        })
-      ]).start();
+   
     }
   }, [isVisible]);
 
@@ -87,18 +49,7 @@ export function ModalRacha({ isVisible, setModalRachaVisible }) {
       onBackdropPress={closeModal}
       style={styles.modalContainer}
     >
-      <Animated.View 
-        style={[
-          styles.container,
-          {
-            opacity: fadeAnim,
-            transform: [
-              { scale: scaleAnim },
-              { translateY: slideAnim }
-            ]
-          }
-        ]}
-      >
+    
         <View style={styles.gradientWrapper}>
           <LinearGradient
             colors={['#1A1A2E', '#2D2D4A', '#1A1A2E']}
@@ -164,34 +115,28 @@ export function ModalRacha({ isVisible, setModalRachaVisible }) {
             </View>
           </LinearGradient>
         </View>
-      </Animated.View>
+      
     </Modal>
   );
 }
 
 const styles = StyleSheet.create({
   modalContainer: {
-    flex: 1,
+   flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  container: {
-    width: '100%',
-    height: '100%',
-    
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+ 
   gradientWrapper: {
-    width: '100%',
-    height: '75%',
+  //  width: '100%',
+   // height: '75%',
     borderRadius: 30,
-    backgroundColor: '#1A1A2E',
+    //backgroundColor: 'red',
    
   },
   gradientContainer: {
     width: '100%',
-    height: '100%',
+    height: height * 0.75,
     borderRadius: 30,
     padding: 25,
     alignItems: 'center',

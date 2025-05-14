@@ -1,4 +1,4 @@
-import { View, StyleSheet, ActivityIndicator, Platform, Dimensions, TouchableOpacity, Text, Image } from "react-native";
+import { View, StyleSheet, ActivityIndicator, Platform, Dimensions, TouchableOpacity, Text, Image, Alert } from "react-native";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { auth, db } from "../firebase/firebaseConfig";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
@@ -30,8 +30,10 @@ export default function SignInComponents() {
     const has = await GoogleSignin.hasPlayServices();
     if (has) {
       GoogleSignin.configure({
-        iosClientId: "1001847642825-mqg5h7s4n72rn3u1t9lv8osli9aamc59.apps.googleusercontent.com",
+        iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
         webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+        scopes: ['profile', 'email'],
+        offlineAccess: false,
       });
     }
   };
@@ -42,13 +44,13 @@ export default function SignInComponents() {
   const handleGoogleSignIn = async () => {
     setGoogleLoading(true);
     try {
-      // Primero asegurarnos de que el usuario está desconectado
       await GoogleSignin.signOut();
       
-      // Obtener los datos del usuario
-      const signInResult = await GoogleSignin.signIn();
+      const signInResult = await GoogleSignin.signIn({
+        prompt: 'select_account',
+        hostedDomain: '',
+      });
       
-      // Obtener los tokens
       const { accessToken } = await GoogleSignin.getTokens();
       
       if (!accessToken) {
@@ -60,14 +62,11 @@ export default function SignInComponents() {
         accessToken
       );
 
-      // Iniciar sesión con la credencial
       const result = await signInWithCredential(auth, googleCredential);
       
-      // Verificar si el usuario ya existe en Firestore
       const userDoc = await getDoc(doc(db, "users", result.user.uid));
       
       if (!userDoc.exists()) {
-        // Si el usuario no existe, crear su perfil
         await setDoc(doc(db, "users", result.user.uid), {
           Name: result.user.displayName || "Usuario",
           Email: result.user.email,
@@ -80,12 +79,31 @@ export default function SignInComponents() {
           RachaMaxima: rachaMaxima,
           modalRachaShow: ayer.toISOString(),
           Genero: selectedAvatar || "masculino",
-          FotoPerfil: result.user.photoURL || '',    
+          FotoPerfil: '',
+          EmailPrivado: false,
+          ConsentimientoPublicidad: false,
         });
-        // Usuario nuevo, redirigir a welcomeScreen
-        navigate.replace("welcomeScreen");
+        
+        Alert.alert(
+          "Configuración de Privacidad",
+          "¿Deseas mantener tu correo electrónico privado?",
+          [
+            {
+              text: "No",
+              onPress: () => navigate.replace("welcomeScreen")
+            },
+            {
+              text: "Sí",
+              onPress: async () => {
+                await setDoc(doc(db, "users", result.user.uid), {
+                  EmailPrivado: true
+                }, { merge: true });
+                navigate.replace("welcomeScreen");
+              }
+            }
+          ]
+        );
       } else {
-        // Usuario existente, redirigir a tabs
         navigate.replace("(tabs)");
       }
 

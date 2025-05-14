@@ -15,6 +15,7 @@ functions/
 .env
 
 google-services.json
+GoogleService-Info.plist
 
 # Native
 *.orig.*

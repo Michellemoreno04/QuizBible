@@ -5,6 +5,8 @@ import {
   Pressable,
   StyleSheet,
   ActivityIndicator,
+  Platform,
+  ImageBackground
 } from "react-native";
 import { Feather, AntDesign } from "@expo/vector-icons";
 import { db } from "../firebase/firebaseConfig";
@@ -40,10 +42,6 @@ export const VersiculosDiarios = () => {
 
   const userId = user?.uid;
   const toast = useToast();
-
-
-
-
 
   // Estado para controlar si se muestran los botones o no.
   const [hideButtons, setHideButtons] = useState(false);
@@ -160,19 +158,21 @@ export const VersiculosDiarios = () => {
         format: "png",
         quality: 0.9,
       });
+
+      const appStoreLink = 'https://apps.apple.com/do/app/quizbible/id6745747418?|=en-GB';
+      const playStoreLink = 'https://play.google.com/store/apps/details?id=com.moreno.dev.QuizBible';
   
       // Compartir la imagen directamente
       const shareOptions = {
         title: 'Compartir versículo',
-        url: uri, // URI local de la imagen
-        message: `¡Mira este versículo de la Biblia! \n${versiculo?.versiculo}\n\n ${'https://play.google.com/store/apps/details?id=com.moreno.dev.QuizBible'}`,
-        social: Share.Social.WHATSAPP, // Opcional: fuerza WhatsApp
+        url: uri,
+        message: `¡Mira este versículo de la Biblia! \n${versiculo?.versiculo}\n\n ${'Aprende sobre la palabra de Dios en esta App:'} \n\n📱 Descarga QuizBible:\n🍎 iOS: ${appStoreLink}\n\n🤖 Android: ${playStoreLink}`,
+        social: Share.Social.WHATSAPP,
       };
   
       await Share.open(shareOptions);
     } catch (error) {
       console.error("Error al compartir:", error);
-     // toast.show("😢 Error al compartir", { type: "danger" });
     } finally {
       setHideButtons(false);
     }
@@ -227,16 +227,17 @@ toast.show("⭐ Guardando...",{
 
     setVersiculoGuardado(true); // Actualizar estado inmediatamente
   } catch (error) {
-    console.error("Error:", error);
+    console.log("Error:", error);
   //  toast.show("😢 Error al guardar", { type: "danger" });
   } finally {
+    toast.hide();
     setHideButtons(false);
     setIsProcessing(false);
   }
   
 };
 
-
+// #663B12
 return (
   <LinearGradient
  ref={viewRef} collapsable={false}
@@ -244,13 +245,13 @@ return (
     style={styles.container}
   >
 
-    <View style={styles.card} >
+    <ImageBackground source={require('../../assets/images/bg-versiculo.png')} style={styles.card} >
      <Text style={styles.reference}>- {versiculo?.versiculo}</Text>
       <Text style={styles.text}>{versiculo?.texto}</Text>
       {!hideButtons && (
       <View style={styles.actionsContainer}>
         <Pressable style={styles.actionButton} onPress={share}>
-          <Feather name="share-2" size={18} color="white" />
+          <Feather name="share-2" size={20} color="#597EAA" />
           <Text style={styles.actionText}>Compartir</Text>
         </Pressable>
         
@@ -262,7 +263,7 @@ return (
           <AntDesign
             name={versiculoGuardado ? "heart" : "hearto"}
             size={18}
-            color={versiculoGuardado ? "#FF3B30" : "white"}
+            color={versiculoGuardado ? "#FF3B30" : "#597EAA"}
           />
           <Text style={styles.actionText}>
             {versiculoGuardado ? 'Guardado' : 'Guardar'}
@@ -270,7 +271,7 @@ return (
         </Pressable>
       </View>
     )}
-    </View>
+    </ImageBackground>
     
     
   </LinearGradient>
@@ -282,7 +283,7 @@ return (
   const styles = StyleSheet.create({
     container: {
       borderRadius: 20,
-    //  overflow: "hidden",
+    overflow: "hidden",
      marginBottom: 10
     },
    
@@ -290,15 +291,16 @@ return (
       minHeight: 235, // Altura aumentada
 //backgroundColor: "black",
       //opacity: 0.5,
-   // borderRadius: 20,
+     // borderRadius: 20,
+      overflow: "hidden",
       justifyContent: 'center',
       alignContent: 'center'
     },
    
     text: {
       fontSize: 20, // Tamaño de fuente aumentado
-      color: "white",
-      //fontWeight: "500",
+      color: "#597EAA",
+      fontWeight: "500",
       lineHeight: 26, // Interlineado mayor
       textAlign: "center",
       //fontFamily: 'serif', // Fuente serif si está disponible
@@ -308,7 +310,7 @@ return (
     },
     reference: {
       fontSize: 16,
-      color: "white",
+      color: "#597EAA",
       fontWeight: "400",
       textAlign: "center",
       fontStyle: "italic",
@@ -335,9 +337,9 @@ return (
       
     },
     actionText: {
-      color: "white",
+      color: "#597EAA",
       fontSize: 14,
-      fontWeight: "500",
+      fontWeight: "700",
       
     },
     image: {

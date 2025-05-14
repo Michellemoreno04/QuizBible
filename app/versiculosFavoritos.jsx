@@ -95,12 +95,13 @@ const VersiculosFavoritos = () => {
       // Solo activamos loading después de capturar la imagen
       setLoading(true);
 
-      const appLink = 'https://play.google.com/store/apps/details?id=com.moreno.dev.QuizBible';
+      const appStoreLink = 'https://apps.apple.com/do/app/quizbible/id6745747418?|=en-GB';
+      const playStoreLink = 'https://play.google.com/store/apps/details?id=com.moreno.dev.QuizBible';
       const shareOptions = {
         title: 'Compartir versículo',
         url: uri,
-        message: `${selectedVerse?.versiculo}\n\nDescarga esta app para estudiar la Biblia en el siguiente enlace: ${appLink}`,
-        social: Share.Social.WHATSAPP,
+        message: `${selectedVerse?.versiculo}\n\n ${'Aprende sobre la palabra de Dios en esta App:'} \n\n📱 Descarga QuizBible:\n🍎 iOS: ${appStoreLink}\n\n🤖 Android: ${playStoreLink}`,
+        //social: Share.Social.WHATSAPP,
       };
 
       await Share.open(shareOptions);

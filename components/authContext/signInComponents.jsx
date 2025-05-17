@@ -6,9 +6,13 @@ import { useNavigation } from "@react-navigation/native";
 import { doc, getDoc, setDoc, Timestamp } from "firebase/firestore";
 import { useState, useEffect } from "react";
 import { Ionicons } from '@expo/vector-icons';
+import AppleSignIn from "./appleSignIn";
+
+
+
 
 export default function SignInComponents() {
-  const [vidas, setVidas] = useState(2);
+  const [vidas, setVidas] = useState(3);
   const [monedas, setMonedas] = useState(500);
   const [exp, setExp] = useState(100);
   const [nivel, setNivel] = useState(0);
@@ -132,6 +136,7 @@ export default function SignInComponents() {
           <Text style={styles.googleButtonText}>Continuar con Google</Text>
         </TouchableOpacity>
       )}
+      <AppleSignIn />
     </View>
   );
 }

@@ -670,7 +670,7 @@ useEffect(() => {
    }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <ModalPuntuacion 
         userInfo={userInfo} 
         mostrarModalRacha={mostrarModalRacha} 
@@ -725,7 +725,7 @@ useEffect(() => {
         
     
           <View style={styles.header}>
-            <TouchableOpacity onPress={salir} style={{backgroundColor: 'rgba(0, 16, 61, 0.7)', borderRadius: 50, padding: 5}}>
+            <TouchableOpacity onPress={salir} style={{backgroundColor: 'rgba(0, 16, 61, 0.7)', borderRadius: 50, padding: 5,marginLeft:10}}>
               <MaterialCommunityIcons 
                 name="home" 
                 color="blue" 
@@ -772,33 +772,33 @@ useEffect(() => {
 
             <View style={styles.answersContainer}  key={questions[currentQuestion]?.questionId}>
               {respuestas.map((respuesta, index) => {
-                
                 const uniqueKey = `${questions[currentQuestion]?.questionId}-${index}`;
                 return (
                   <Animated.View
-                  key={uniqueKey}
-                  style={{ opacity: answerAnimations[index] || 0 }}
-                >
-                  <TouchableOpacity 
+                    key={uniqueKey}
+                    style={{ opacity: answerAnimations[index] || 0 }}
+                  >
+                    <TouchableOpacity 
                       style={[
                         styles.answerButton,
                         respuestaSeleccionada === respuesta && styles.selectedAnswer,
-                        //mostrarRespuestaCorrecta && respuesta === correcta && styles.correctAnswer,
-                       // mostrarRespuestaCorrecta && respuesta !== correcta && styles.incorrectAnswer
-                      // respuestaSeleccionada === respuesta && respuesta === correcta && styles.correctAnswer,
-                       respuestaSeleccionada === respuesta && respuesta !== correcta && styles.incorrectAnswer
-                    ]}
-                    onPress={() => {
-                    
-                      comprobarRespuesta(respuesta);
-                  }}
-                    
-                    disabled={mostrarRespuestaCorrecta}
-                  >
-                    <Text style={styles.answerText}>{respuesta}</Text>
-                  </TouchableOpacity>
-                </Animated.View>
-                )
+                        respuestaSeleccionada === respuesta && respuesta !== correcta && styles.incorrectAnswer,
+                        respuestaSeleccionada && respuestaSeleccionada !== respuesta && styles.disabledAnswer
+                      ]}
+                      onPress={() => {
+                        if (!respuestaSeleccionada) {
+                          comprobarRespuesta(respuesta);
+                        }
+                      }}
+                      disabled={respuestaSeleccionada !== null}
+                    >
+                      <Text style={[
+                        styles.answerText,
+                        respuestaSeleccionada && respuestaSeleccionada !== respuesta && styles.disabledAnswerText
+                      ]}>{respuesta}</Text>
+                    </TouchableOpacity>
+                  </Animated.View>
+                );
               })}
             </View>
 
@@ -829,17 +829,19 @@ useEffect(() => {
 
           </View>
       </ImageBackground>
-    </SafeAreaView>
+      <StatusBar hidden />
+      </View>
   );
 };
 
 const styles = StyleSheet.create({
   safeArea: {
-    flex: 1
+    flex: 1,
   },
   backgroundImage: {
     flex: 1,
     opacity: 0.9,
+paddingTop:30,
   },
   mainContainer: {
     height: height * 0.8,
@@ -1041,6 +1043,14 @@ const styles = StyleSheet.create({
     
    top:80,
     
+  },
+  disabledAnswer: {
+    opacity: 0.5,
+    backgroundColor: 'rgba(0, 16, 61, 0.5)',
+    borderColor: 'rgba(0, 247, 255, 0.2)',
+  },
+  disabledAnswerText: {
+    color: 'rgba(255, 255, 255, 0.5)',
   },
 });
 

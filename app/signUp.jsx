@@ -37,7 +37,7 @@ const SignUp = () => {
     confirmPassword: "",
   });
   const [error, setError] = useState("");
-  const [vidas, setVidas] = useState(2);
+  const [vidas, setVidas] = useState(3);
   const [monedas, setMonedas] = useState(500);
   const [exp, setExp] = useState(100);
   const [nivel, setNivel] = useState(0);

@@ -2,7 +2,7 @@
   "expo": {
     "name": "QuizBible",
     "slug": "QuizBible",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "orientation": "portrait",
     "icon": "./assets/images/quizBible-logo.png",
     "scheme": "myapp",
@@ -15,7 +15,8 @@
       "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "usesAppleSignIn": true
     },
     "android": {
       "adaptiveIcon": {
@@ -39,6 +40,7 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      ["expo-apple-authentication"],
       [
         "expo-image-picker",
         {
@@ -47,7 +49,7 @@
         }
       ],
       ["@react-native-google-signin/google-signin", {
-        "iosUrlScheme": "com.googleusercontent.apps.1001847642825-mqg5h7s4n72rn3u1t9lv8osli9aamc59"
+        "iosUrlScheme": "com.googleusercontent.apps.1001847642825-mqg5h7s4n72rn3u1t9lv8osli9aamcz"
       }],
     
       

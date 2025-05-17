@@ -59,6 +59,7 @@ export default function Profile() {
       colors={['#1E3A5F', '#3C6E9F']}
       style={styles.gradientContainer}
     >
+      <ScrollView contentContainerStyle={styles.content}>
       <SafeAreaView style={styles.container}>
         {/* Header */}
         <View style={styles.header}>
@@ -71,7 +72,7 @@ export default function Profile() {
           </Pressable>
         </View>
 
-        <ScrollView contentContainerStyle={styles.content}>
+        
           {/* Profile Card */}
           <LinearGradient
             colors={['rgba(255,255,255,0.15)', 'rgba(255,255,255,0.05)']}
@@ -200,8 +201,8 @@ export default function Profile() {
               onAdFailedToLoad={(error) => console.log('Error cargando banner:', error)}
             />
           </View>
-        </ScrollView>
       </SafeAreaView>
+        </ScrollView>
     </LinearGradient>
   );
 }
@@ -209,6 +210,7 @@ export default function Profile() {
 const styles = StyleSheet.create({
   gradientContainer: {
     flex: 1,
+    
   },
   container: {
     flex: 1,

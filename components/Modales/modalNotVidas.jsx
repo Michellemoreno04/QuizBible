@@ -179,7 +179,7 @@ const playSound = useSound();
                   <>
                     <MaterialIcons name="play-circle-filled" size={28} color="white" />
                     <Text style={styles.buttonText}>
-                      {loaded ? 'Obtener 2 corazones ' : 'Cargando...'}
+                      {loaded ? 'Obtener 3 corazones ' : 'Cargando...'}
                     </Text>
                     
                     {loaded && (

@@ -3,7 +3,7 @@
 
 1.obtener el token para notifiaciones (y asi envia notificacione spersonalizadas por ejemplo para la racha de cada usuario si no la ha hecho ese dia)
 2.implementar pagos en la app para remover ads
-
+3. mover la key que esta en app.json para el .env 
 
  
 

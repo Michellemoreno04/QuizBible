@@ -18,7 +18,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { RewardedAd, RewardedAdEventType, TestIds } from 'react-native-google-mobile-ads';
 import { useSound } from '../soundFunctions/soundFunction';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
+import { PremiumButton } from '@/constants/premiumBoton';
 const { width, height } = Dimensions.get('screen');
 
 const adUnitId = __DEV__ 
@@ -27,7 +27,7 @@ const adUnitId = __DEV__
   ? process.env.EXPO_PUBLIC_REWARDED_ID_IOS 
   : process.env.EXPO_PUBLIC_REWARDED_ID_ANDROID;
 
-export const RewardedAdModal = ({ isVisible,setIsVisible, onClose,userId,vidas,setShowModal }) => {
+export const RewardedAdModal = ({ isVisible,setIsVisible, onClose,userId,vidas,setShowModal,userInfo }) => {
   const [loaded, setLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [rewardedAd, setRewardedAd] = useState(null);
@@ -99,6 +99,7 @@ const playSound = useSound();
     }
   }, [vidas, setIsVisible, setShowModal]);
 
+
   // para que el sonido se reproduzca solo la primera vez que se abre el modal
   useEffect(() => {
     if (!isVisible) return;
@@ -158,6 +159,7 @@ const playSound = useSound();
             <Text style={styles.title}>¡Necesitas más Corazones! 💖</Text>
             <Text style={styles.subtitle}>
               Ve un anuncio para obtener vidas extras! {"\n"}
+              O compra el plan premium para obtener vidas ilimitadas!
             </Text>
     
             
@@ -210,6 +212,7 @@ const playSound = useSound();
                 <Ionicons name="close" size={20} color="#666" />
               </LinearGradient>
             </TouchableOpacity>
+        <PremiumButton  />
           </LinearGradient>
         </View>
       </View>
@@ -282,7 +285,7 @@ const playSound = useSound();
     
     button: {
       width: '100%',
-      borderRadius: 15,
+      borderRadius: 30,
       overflow: 'hidden',
       marginBottom: 15,
       shadowColor: '#FF3366',

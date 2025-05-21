@@ -9,6 +9,7 @@ import { db } from '../../components/firebase/firebaseConfig';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import {NoCoinsModal} from '../Modales/notCoints';
 import { BannerAd, TestIds } from 'react-native-google-mobile-ads';
+import { PremiumButton } from '@/constants/premiumBoton';
 
 const bannerAdUnitId = __DEV__ 
   ? TestIds.BANNER 
@@ -24,8 +25,12 @@ const ExploraComponent = () => {
   const [hasReadTheDailyVerse, setHasReadTheDailyVerse] = useState(false);
   const [showFullScreen, setShowFullScreen] = useState(false);
   const [showNoCoinsModal, setShowNoCoinsModal] = useState(false);
-  const animationRef = useRef(null);
+  const [userInfo, setUserInfo] = useState(null);
 
+
+
+  const animationRef = useRef(null);
+  
   // Verificar si el usuario ha hecho el quiz hoy
   useEffect(() => {
     const checkQuizStatus = async () => {
@@ -66,6 +71,16 @@ const ExploraComponent = () => {
 
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    const fetchUserInfo = async () => {
+      const userRef = doc(db, 'users', userId);
+      const userDoc = await getDoc(userRef);
+      setUserInfo(userDoc.data());
+    };
+    fetchUserInfo();
+  }, [userId]);
+  
 
   const menuItems = [
     { 
@@ -112,9 +127,16 @@ const ExploraComponent = () => {
   return (
     <View >
       <NoCoinsModal visible={showNoCoinsModal} onClose={() => setShowNoCoinsModal(false)} />
-      <View>
+      <View style={styles.exploraTituloContainer}>
         <Text style={styles.title}>Explora</Text>
+        <View style={styles.premiumContainer}>
+        {!userInfo?.Premium && (
+          <PremiumButton containerStyle={styles.premiumButton} textStyle={styles.premiumText} lottieStyle={styles.lottieStyle} />
+        )}
+        </View>
       </View>
+     
+      
       <ScrollView 
         horizontal
         showsHorizontalScrollIndicator={false} 
@@ -186,7 +208,8 @@ const ExploraComponent = () => {
             <Text style={styles.modalText}>-100</Text>
             <FontAwesome5 name="coins" size={24} color="yellow" />
           </View>
-          <BannerAd
+         {!userInfo?.Premium && (
+            <BannerAd
             unitId={bannerAdUnitId}
             size="BANNER"
             requestOptions={{
@@ -195,6 +218,9 @@ const ExploraComponent = () => {
             onAdLoaded={() => console.log('Banner cargado')}
             onAdFailedToLoad={(error) => console.log('Error cargando banner:', error)}
           />
+          )
+
+         }
         </View>
       </Modal>
     </View>
@@ -207,6 +233,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5,
   },
 
+  exploraTituloContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 10,
+    
+    
+  },
+  premiumButton: {
+    width: 70,
+    height: 30,
+    alignSelf: 'flex-end',
+  },
+  premiumText: {
+    fontSize: 8,
+    fontWeight: 'bold',
+    color: 'white',
+    marginLeft: -5,
+    //textAlign: 'center',
+  },
+  lottieStyle: {
+    width: 30,
+    height: 30,
+    marginLeft: -5,
+    
+  },
   title: {
     color: 'white',
     fontSize: 24,
@@ -271,6 +323,8 @@ const styles = StyleSheet.create({
     width: 300,
     height: 300,
   },
+
+  
 });
 
 export default ExploraComponent;

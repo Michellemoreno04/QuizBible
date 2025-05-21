@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert, ImageBackground, Animated, Platform, ActivityIndicator, Dimensions, ScrollView, StatusBar } from 'react-native';
-import { AntDesign, FontAwesome5, MaterialCommunityIcons, Octicons } from '@expo/vector-icons';
+import { Entypo, FontAwesome5, MaterialCommunityIcons, Octicons } from '@expo/vector-icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { doc, updateDoc, onSnapshot, getDocs, collection, limit, query, orderBy, startAfter, serverTimestamp, increment, setDoc, getDoc } from 'firebase/firestore';
 import useAuth from '../components/authContext/authContext';
 import { db } from '../components/firebase/firebaseConfig';
@@ -17,7 +16,6 @@ import { niveles } from '@/components/Niveles/niveles';
 import {RewardedAdModal} from '../components/Modales/modalNotVidas';
 import QuizActions from '@/components/quizFunctions/quizFuncion';
 import { useIsFocused } from '@react-navigation/native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { InterstitialAd, AdEventType, TestIds } from 'react-native-google-mobile-ads';
 import { useToast } from 'react-native-toast-notifications';
 import Modal from 'react-native-modal';
@@ -67,20 +65,9 @@ const BibleQuiz = () => {
   const toast = useToast();
   const [respuestasCorrectasConsecutivas, setRespuestasCorrectasConsecutivas] = useState(0);
   const [showCelebracionModal, setShowCelebracionModal] = useState(false);
+  const [isAdShowing, setIsAdShowing] = useState(false);
 
-  // Cierra los modales al salir
-  useFocusEffect(
-    useCallback(() => {
-      return () => {
-        stopMusic(backgroundMusic);
-        setShowModalNotVidas(false); // Cierra modal al salir
-        setShowModal(false);
-        setShowModalRacha(false);
-        setShowModalRachaPerdida(false);
-        setShowNivelModal(false);
-      };
-    }, [])
-  );
+
 
   // verifica si el nivel ha cambiado
   useEffect(() => {
@@ -295,65 +282,67 @@ useEffect(() => {
       setTimeout(async () => {
         const userDocRef = doc(db, 'users', userId);
   
-        if (userInfo.Vidas >= 1) {
-          const newVidas = userInfo.Vidas - 1;
-          try {
-            // Se resta una vida.
-            await updateDoc(userDocRef, {
-              Vidas: newVidas,
-            });
-            
-            setUserInfo((prevUserInfo) => ({
-              ...prevUserInfo,
-              Vidas: newVidas,
-            }));
-
-            if(newVidas === 0) {
-              const totalMonedas = resultadoRespuestas * 10;
+        // Solo restar vidas si el usuario NO es Premium
+        if (!userInfo.Premium) {
+          if (userInfo.Vidas >= 1) {
+            const newVidas = userInfo.Vidas - 1;
+            try {
+              // Se resta una vida.
               await updateDoc(userDocRef, {
-                Monedas: userInfo.Monedas + totalMonedas,
+                Vidas: newVidas,
               });
               
-              const today = new Date().toDateString();
-              await AsyncStorage.setItem("lastQuizDate", today);
-              setShowModalNotVidas(true);
-            }
-  
-            // Esperamos 2 segundos antes de avanzar
-            setTimeout(() => {
-              // Si quedan preguntas, avanzamos a la siguiente.
-              if (currentQuestion < questions.length - 1) {
-                setMostrarRespuestaCorrecta(false);
-                setCurrentQuestion(currentQuestion + 1);
-                setRespuestaSeleccionada(null);
-              } else {
-                // Al finalizar el quiz, actualizamos las monedas con las respuestas correctas acumuladas.
+              setUserInfo((prevUserInfo) => ({
+                ...prevUserInfo,
+                Vidas: newVidas,
+              }));
+
+              if(newVidas === 0) {
                 const totalMonedas = resultadoRespuestas * 10;
-                updateDoc(userDocRef, {
+                await updateDoc(userDocRef, {
                   Monedas: userInfo.Monedas + totalMonedas,
                 });
+                
                 const today = new Date().toDateString();
-                AsyncStorage.setItem("lastQuizDate", today);
-                stopMusic(backgroundMusic);
-                setShowModal(true);
+                await AsyncStorage.setItem("lastQuizDate", today);
+                setShowModalNotVidas(true);
               }
-            }, 2000);
-          } catch (error) {
-            console.error('Error al actualizar las vidas:', error);
-            Alert.alert('Error', 'No se pudieron actualizar las vidas.');
+            } catch (error) {
+              console.error('Error al actualizar las vidas:', error);
+              Alert.alert('Error', 'No se pudieron actualizar las vidas.');
+            }
+          } else {
+            // Si no quedan vidas y no es Premium
+            setShowModalNotVidas(true);
+            const totalMonedas = resultadoRespuestas * 10;
+            await updateDoc(userDocRef, {
+              Monedas: userInfo.Monedas + totalMonedas,
+            });
+            const today = new Date().toDateString();
+            await AsyncStorage.setItem("lastQuizDate", today);
+            stopMusic(backgroundMusic);
           }
-        } else {
-          // Si no quedan vidas.
-          setShowModalNotVidas(true);
-          // Calculamos las monedas ganadas usando el total de respuestas correctas acumuladas.
-          const totalMonedas = resultadoRespuestas * 10;
-          await updateDoc(userDocRef, {
-            Monedas: userInfo.Monedas + totalMonedas,
-          });
-          const today = new Date().toDateString();
-          await AsyncStorage.setItem("lastQuizDate", today);
-          stopMusic(backgroundMusic);
         }
+  
+        // Esperamos 2 segundos antes de avanzar (tanto para usuarios Premium como no Premium)
+        setTimeout(() => {
+          // Si quedan preguntas, avanzamos a la siguiente.
+          if (currentQuestion < questions.length - 1) {
+            setMostrarRespuestaCorrecta(false);
+            setCurrentQuestion(currentQuestion + 1);
+            setRespuestaSeleccionada(null);
+          } else {
+            // Al finalizar el quiz, actualizamos las monedas con las respuestas correctas acumuladas.
+            const totalMonedas = resultadoRespuestas * 10;
+            updateDoc(userDocRef, {
+              Monedas: userInfo.Monedas + totalMonedas,
+            });
+            const today = new Date().toDateString();
+            AsyncStorage.setItem("lastQuizDate", today);
+            stopMusic(backgroundMusic);
+            setShowModal(true);
+          }
+        }, 1200);
       }, 1000);
     }
   };
@@ -375,6 +364,13 @@ useEffect(() => {
               await stopMusic(backgroundMusic);
               // Pequeña pausa para asegurar que la música se detuvo
               await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            if(userInfo.Premium) {
+              navigation.reset({
+                index: 0,
+                routes: [{ name: '(tabs)' }],
+              });
+              return;
             }
             showInterstitial();
           } catch (error) {
@@ -509,13 +505,12 @@ useEffect(() => {
   useEffect(() => {
    if(!userId) return null;
    const checkVidas = async () => {
-    if(userInfo.Vidas === 0){
+    if(userInfo.Vidas === 0 && !userInfo.Premium){
       setShowModalNotVidas(true)
     }
-
    }
     checkVidas();
-  }, [userInfo.Vidas])
+  }, [userInfo.Vidas, userInfo.Premium])
 
   // Efecto para el temporizador
   useEffect(() => {
@@ -530,7 +525,8 @@ useEffect(() => {
         !showModalRachaPerdida && 
         !showModalNotVidas && 
         !showNivelModal && 
-        !isLoading) {
+        !isLoading &&
+        !isAdShowing) {
       timer = setInterval(() => {
         setTiempoRestante((prev) => {
           // Reproducir sonido cuando quedan 5 segundos o menos
@@ -557,7 +553,7 @@ useEffect(() => {
     }
     return () => clearInterval(timer);
     }
-  }, [tiempoRestante, mostrarRespuestaCorrecta, currentQuestion, questions.length, showModal, showModalRacha, showModalRachaPerdida, showModalNotVidas, showNivelModal, isLoading,isFocused]);
+  }, [tiempoRestante, mostrarRespuestaCorrecta, currentQuestion, questions.length, showModal, showModalRacha, showModalRachaPerdida, showModalNotVidas, showNivelModal, isLoading, isFocused, isAdShowing]);
 
   // Resetear el temporizador cuando cambia la pregunta
   useEffect(() => {
@@ -695,7 +691,7 @@ useEffect(() => {
           setShowNivelModal(false);
         }}
       />
-      <RewardedAdModal isVisible={showModalNotVidas} setIsVisible={setShowModalNotVidas} setShowModal={setShowModal} onClose={cerrarRewardModal} userId={userId} vidas={userInfo.Vidas} />
+      <RewardedAdModal isVisible={showModalNotVidas} setIsVisible={setShowModalNotVidas} setShowModal={setShowModal} onClose={cerrarRewardModal} userId={userId} vidas={userInfo.Vidas} userInfo={userInfo} />
       <Modal
         isVisible={showCelebracionModal}
         onBackdropPress={() => setShowCelebracionModal(false)}
@@ -736,7 +732,7 @@ useEffect(() => {
 
             <View style={styles.statusBar}>
             <Text style={styles.heartIcon}>❤️</Text>
-              <Text style={styles.statusText}>{userInfo.Vidas}</Text>
+              <Text style={styles.statusText}>{userInfo.Premium ? <Entypo name="infinity" size={24} color="white" /> : userInfo.Vidas}</Text>
               <FontAwesome5 name="coins" size={24} color="yellow" />
               <Text style={styles.statusText}>{userInfo.Monedas}</Text>
             </View>
@@ -825,6 +821,9 @@ useEffect(() => {
               setTiempoAgregado={setTiempoAgregado}
               setIsLoading={setIsLoading}
               isLoading={isLoading}
+              stopMusic={stopMusic}
+              backgroundMusic={backgroundMusic}
+              isPlaying={isPlaying}
             />
 
           </View>

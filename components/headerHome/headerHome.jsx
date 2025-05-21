@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Platform, TouchableOpacity, Pressable, Image } from 'react-native'
+import { View, Text, StyleSheet, Platform, TouchableOpacity, Image } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { Avatar } from '@rneui/base';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -11,7 +11,6 @@ import { ModalRacha } from '../Modales/modalRacha';
 import Modal from 'react-native-modal';
 
 
-
 export const HeaderHome = () => {
  const { user } = useAuth();
  const userId = user?.uid;
@@ -19,7 +18,9 @@ const [userAuthenticated, setUserAuthenticated] = useState({});
 const [isModalRachaVisible, setIsModalRachaVisible] = useState(false);
 const [isImageOpen, setIsImageOpen] = useState(false);
 const [isInsigniaModalVisible, setIsInsigniaModalVisible] = useState(false);
-  
+
+
+
   const openModalRacha = () => {
     setIsModalRachaVisible(true);
   }
@@ -45,7 +46,9 @@ const [isInsigniaModalVisible, setIsInsigniaModalVisible] = useState(false);
     setIsInsigniaModalVisible(false);
   }
 
+ 
 
+ 
 
 
       useEffect(() => {
@@ -98,7 +101,9 @@ const [isInsigniaModalVisible, setIsInsigniaModalVisible] = useState(false);
     return (
         <View style={styles.headerContainer}>
         <ModalRacha isVisible={isModalRachaVisible} setModalRachaVisible={closeModalRacha} />
-        <Modal isVisible={isImageOpen} animationIn="zoomIn" animationOut="zoomOut" backdropTransitionOutTiming={0} backdropOpacity={0.7} onBackdropPress={closeImage} style={styles.modal}>
+       
+           
+        <Modal isVisible={isImageOpen} animationIn="zoomIn" animationOut="zoomOut" backdropTransitionOutTiming={0} backdropOpacity={0.7} onBackdropPress={closeImage} style={styles.modal}> 
             <LinearGradient
                 colors={[ '#1E3A5F', '#3C6E9F']}
                 start={{ x: 0, y: 0 }}
@@ -160,7 +165,7 @@ const [isInsigniaModalVisible, setIsInsigniaModalVisible] = useState(false);
                 </Text>
             </LinearGradient>
         </Modal>
-
+     <View style={styles.container}>
         <View style={styles.leftContainer}>
             <TouchableOpacity onPress={openImage}>
                 <Avatar
@@ -179,7 +184,8 @@ const [isInsigniaModalVisible, setIsInsigniaModalVisible] = useState(false);
 
             <View style={styles.userInfo}>
                 <Text style={styles.greeting}>
-                    {`Hola!, ${userAuthenticated?.Name || '...'}`}
+                    {`Hola!, ${userAuthenticated?.Name || '...'}`} 
+
                 </Text>
                 <TouchableOpacity onPress={openInsigniaModal}>
                     <View style={styles.levelContainer}>
@@ -199,7 +205,8 @@ const [isInsigniaModalVisible, setIsInsigniaModalVisible] = useState(false);
                 </TouchableOpacity>
             </View>
         </View>
-
+        
+        <View style={styles.rachaIconsContainer}>
         <TouchableOpacity onPress={openModalRacha}>
             <LinearGradient
                 colors={['#FFD700', '#D4AF37', '#FFD700']}
@@ -211,6 +218,11 @@ const [isInsigniaModalVisible, setIsInsigniaModalVisible] = useState(false);
                 <FontAwesome5 name="fire-alt" size={24} color="white" />
             </LinearGradient>
         </TouchableOpacity>
+
+    
+       
+        </View>
+      </View>
       </View>
     )
 }
@@ -221,7 +233,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 10,
+       // paddingHorizontal: 10,
         marginBottom: 15,
       },
       modal: {
@@ -261,6 +273,7 @@ const styles = StyleSheet.create({
         })
       
       },
+  
       modalImage: {
         width: '100%',
         height: '100%',
@@ -281,9 +294,16 @@ const styles = StyleSheet.create({
         borderColor: 'white',
        
       },
+      container: {
+        width: '100%',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      },
       leftContainer: {
         flexDirection: 'row',
         alignItems: 'center',
+        
       },
       userInfo: {
         marginLeft: 10,
@@ -292,6 +312,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         color: '#FFFFFF', // Texto blanco para contrastar con el fondo oscuro
+       
       },
       levelContainer: {
          
@@ -313,11 +334,12 @@ const styles = StyleSheet.create({
         color: '#FFFFFF', // Texto blanco
         textAlign: 'center',
       },
+     
       rachaContainer: {
-        position: 'relative',
-       top: 8,
+       
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center',
         backgroundColor: 'rgba(255, 255, 255, 0.2)', // Fondo semi-transparente
         paddingVertical: 5,
         paddingHorizontal: 10,
@@ -328,7 +350,7 @@ const styles = StyleSheet.create({
         fontSize: 18,
         fontWeight: 'bold',
         color: 'white', // Texto dorado
-        marginLeft: 5,
+       // marginLeft: 5,
       },
       modalInsigniaContent: {
         
@@ -357,6 +379,10 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         marginTop: 5,
     },
+    
+   
+
+    
 
 
 })

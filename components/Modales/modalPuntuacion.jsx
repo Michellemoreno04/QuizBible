@@ -41,6 +41,10 @@ export function ModalPuntuacion({
     AsyncStorage.setItem("lastQuizDate", today);
     AsyncStorage.setItem("quizCompleted", "true");
 
+    if(userInfo.Premium) {
+      return;
+    } 
+
     const unsubscribeLoaded = interstitial.addAdEventListener(AdEventType.LOADED, () => {
       setLoaded(true);
       setError(null);
@@ -78,6 +82,13 @@ export function ModalPuntuacion({
   }, [isVisible]);
 
   const showAd = () => {
+    if(userInfo.Premium) {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: '(tabs)' }],
+      });
+      return;
+    }
     if(isPlaying) stopMusic();
     if(loaded) {
       interstitial.show();
@@ -108,7 +119,7 @@ export function ModalPuntuacion({
       isVisible={isVisible} 
       backdropOpacity={0.6}
       style={styles.modal}
-      avoidKeyboard={true}
+      //avoidKeyboard={true} // 
     >
       
         <LinearGradient
@@ -220,21 +231,25 @@ export function ModalPuntuacion({
 
 const styles = StyleSheet.create({
   modal: {
-    margin: 0,
+    margin: '4%',
     justifyContent: 'center',
     alignItems: 'center',
   },
  
   gradientContainer: {
+  
     width: '100%',
-    height: height * 0.8,
+   // height: height * 0.8,
     paddingHorizontal: width * 0.05,
+    paddingBottom: height * 0.03,
     borderRadius: 20,
-
+    alignItems: 'center',
+    
   },
   contentContainer: {
-    
+    marginTop: 15,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   subtitle: {
     fontSize: width * 0.045,

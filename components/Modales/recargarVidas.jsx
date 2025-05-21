@@ -3,7 +3,7 @@ import { Modal, View, Text, TouchableOpacity, StyleSheet, Animated, Easing } fro
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSound } from '../soundFunctions/soundFunction';
 
-export const NotVidasModal = ({ visible, setNotVidasModalVisible }) => {
+export const NotVidasModal = ({ visible, setNotVidasModalVisible, userInfo }) => {
  // const scaleValue = new Animated.Value(0);
   const pulseAnim = new Animated.Value(1);
   const playSound = useSound();
@@ -76,11 +76,11 @@ export const NotVidasModal = ({ visible, setNotVidasModalVisible }) => {
                   <View style={styles.rewardsContainer}>
                   <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
                   <Text style={styles.heart}>❤️</Text>
-                  <Text style={styles.lifeText}>3</Text>
+                  <Text style={styles.lifeText}>{userInfo?.Premium ? '♾️' : '3'}</Text>
                   </View>
                   <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
                     <Text style={styles.heart}>💰</Text>
-                    <Text style={styles.lifeText}>+200</Text>
+                    <Text style={styles.lifeText}>{userInfo?.Premium ? '+200' : '+200'}</Text>
                   </View>
 
                   </View>

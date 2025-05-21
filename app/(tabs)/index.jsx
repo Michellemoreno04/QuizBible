@@ -1,4 +1,4 @@
-import { View, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, Platform,  StatusBar as RNStatusBar, Alert, TouchableOpacity, Text} from 'react-native';
+import { View, StyleSheet, SafeAreaView, ScrollView, ActivityIndicator, Platform,  StatusBar as RNStatusBar, Alert, TouchableOpacity, Text, Button} from 'react-native';
 import React, { useEffect, useState } from 'react';
 import {VersiculosDiarios} from '@/components/VersiculoDiario/versiculoDiario';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -19,8 +19,9 @@ import { Colors } from '@/constants/Colors';
 import { useToast } from 'react-native-toast-notifications';
 import Notificaciones from '@/components/notificaciones/notificaciones';
 import { useNavigation } from '@react-navigation/native';
+import { PremiumButton } from '@/constants/premiumBoton';
 //import NetInfo from '@react-native-community/netinfo';
-//import * as Device from 'expo-device';
+
 
 const bannerAdUnitId = __DEV__ 
   ? TestIds.BANNER 
@@ -81,7 +82,6 @@ export default function AppComponent() {
 
     const checkAndUpdateVidas = async () => {
       try {
-
         const hoy = new Date();
         const hoyString = hoy.toISOString().split('T')[0];
         const fechaGuardada = await AsyncStorage.getItem('hoy');
@@ -90,14 +90,22 @@ export default function AppComponent() {
         if (fechaGuardada !== hoyString) {
           const userRef = doc(db, 'users', userId);
           const userDoc = await getDoc(userRef);
-          const currentVidas = userDoc.data()?.Vidas || 0;
+          const userData = userDoc.data();
+          const currentVidas = userData?.Vidas || 0;
+          const isPremium = userData?.Premium || false;
 
-          // Paso 2: Actualizar solo si tiene menos de 2 vidas
-          if (currentVidas < 3) {
-            await updateDoc(userRef, {
-               Vidas: 3,
-              Monedas: increment(200),
-              });
+          // Paso 2: Actualizar vidas y monedas según el tipo de usuario
+          if (currentVidas < 3 || isPremium) {
+            const updateData = {
+              Monedas: increment(200)
+            };
+            
+            // Solo actualizar vidas si no es premium y tiene menos de 3 vidas
+            if (!isPremium && currentVidas < 3) {
+              updateData.Vidas = 3;
+            }
+            
+            await updateDoc(userRef, updateData);
             setNotVidasModalVisible(true); // Mostrar modal solo si se actualizó
           }
 
@@ -154,29 +162,34 @@ export default function AppComponent() {
        Platform.OS === 'android' && { paddingTop: RNStatusBar.currentHeight }]}>
         <ScrollView> 
           <View style={styles.screen}>
-           <NotVidasModal visible={isNotVidasModalVisible} setNotVidasModalVisible={setNotVidasModalVisible} />
+           <NotVidasModal visible={isNotVidasModalVisible} setNotVidasModalVisible={setNotVidasModalVisible} userInfo={userInfo} />
            <ModalRacha userInfo={userInfo} isVisible={isModalRachaVisible} setModalRachaVisible={setModalRachaVisible}  />
            <ModalRachaPerdida userInfo={userInfo} isVisible={isModalRachaPerdidaVisible} setModalRachaPerdidaVisible={setModalRachaPerdidaVisible}  />
            <HeaderHome />
            <Notificaciones />
+           {/*!userInfo?.Premium && (
+            <View style={styles.premiumButtonContainer}>
+           <PremiumButton containerStyle={styles.dinamicStyle} textStyle={styles.dinamicText} lottieStyle={styles.lottieStyle} />
+           </View>
+           )*/}
             <VersiculosDiarios />
-           
-           {/*<TouchableOpacity onPress={() => navigation.navigate('subscriptions-paywall')}>
-            <Text>SubscriptionsPaywall</Text>
-           </TouchableOpacity>*/}
             <ExploraComponent />
             <GuardadosComponents />
-            <View style={styles.bannerContainer}>
-            <BannerAd
-              unitId={bannerAdUnitId}
-              size="BANNER"
-              requestOptions={{
-                keywords: ['religion', 'bible'],
-              }}
-              onAdLoaded={() => console.log('Banner cargado')}
-              onAdFailedToLoad={(error) => console.log('Error cargando banner:', error)}
-            />
-            </View>
+
+            {!userInfo?.Premium && (
+              <View style={styles.bannerContainer}>
+                <BannerAd
+                  unitId={bannerAdUnitId}
+                  size="BANNER"
+                  requestOptions={{
+                    keywords: ['religion', 'bible'],
+                  }}
+                  onAdLoaded={() => console.log('Banner cargado')}
+                  onAdFailedToLoad={(error) => console.log('Error cargando banner:', error)}
+                />
+              </View>
+            )}
+
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -198,5 +211,25 @@ const styles = StyleSheet.create({
   },
   bannerContainer: {
     alignItems: 'center',
+  },
+  premiumButtonContainer: {
+    width: 100,
+    alignSelf: 'flex-end',
+    justifyContent: 'center',
+    marginBottom: 5,
+    marginTop: -15,
+  },
+  dinamicStyle: {
+    width: 100,
+    height: 35,
+  },
+  dinamicText: {
+    fontSize: 8,
+  },
+  lottieStyle: {
+    width: 40,
+    height: 40,
+    marginLeft: -10,
+    
   }
 });

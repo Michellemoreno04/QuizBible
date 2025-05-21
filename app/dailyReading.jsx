@@ -34,6 +34,7 @@ const DailyReading = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
   const [currentTextPosition, setCurrentTextPosition] = useState(0);
+  const [userInfo, setUserInfo] = useState(null);
   const userId = user?.uid;
 
   const animatedStyle = useAnimatedStyle(() => {
@@ -74,8 +75,27 @@ const DailyReading = () => {
     };
   });
 
+
+  // Obtener información del usuario
   useEffect(() => {
-    let isMounted = true; // Para prevenir actualizaciones en componentes desmontados
+    const fetchUserInfo = async () => {
+      const userRef = doc(db, 'users', userId);
+      const userDoc = await getDoc(userRef);
+      setUserInfo(userDoc.data());
+    };
+    fetchUserInfo();
+  }, [userId]);
+
+
+  // Cargar interstitial ads 
+  useEffect(() => {
+    // Si el usuario es premium, no cargar anuncios
+    if (userInfo?.Premium) {
+      console.log('Usuario premium - no se cargarán anuncios');
+      return;
+    }
+
+    let isMounted = true;
     let loadAttempts = 0;
     const MAX_LOAD_ATTEMPTS = 3;
 
@@ -138,15 +158,21 @@ const DailyReading = () => {
         unsubscribeError();
       };
     }
-  }, [navigation]);
+  }, [navigation, userInfo]);
 
 
   const showInterstitial = () => {
+    // Si el usuario es premium, navegar directamente
+    if (userInfo?.Premium) {
+      navigation.navigate('(tabs)');
+      return;
+    }
+
     if (interstitialLoaded) {
       try {
         interstitial.show();
         console.log('Mostrando anuncio');
-        setInternitialLoaded(false); // Resetear estado para próxima carga
+        setInternitialLoaded(false);
       } catch (error) {
         console.log('Error al mostrar anuncio:', error);
         navigation.navigate('(tabs)');

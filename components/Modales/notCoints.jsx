@@ -5,8 +5,6 @@ import {
   Modal, 
   TouchableOpacity, 
   StyleSheet, 
-  Animated,
-  Easing,
   TouchableWithoutFeedback
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,15 +15,14 @@ import  useAuth  from '../authContext/authContext';
 import {doc,updateDoc,increment} from 'firebase/firestore';
 import {db} from '../../components/firebase/firebaseConfig';
 import { useSound } from '../soundFunctions/soundFunction';
-
+import { PremiumButton } from '../../constants/premiumBoton';
 const adUnitId = __DEV__ 
 ? TestIds.REWARDED 
 : Platform.OS === 'ios' ? process.env.EXPO_PUBLIC_REWARDED_ID_IOS 
 : process.env.EXPO_PUBLIC_REWARDED_ID_ANDROID;
 
 export const NoCoinsModal = ({ visible, onClose }) => {
-  const scaleValue = React.useRef(new Animated.Value(0)).current;
-  const translateY = React.useRef(new Animated.Value(0)).current;
+ 
   const [isVisible, setIsVisible] = React.useState(visible);
   const [loaded, setLoaded] = useState(false);
   const rewardedAd = useRef(null);
@@ -76,7 +73,7 @@ export const NoCoinsModal = ({ visible, onClose }) => {
     try {
       const userDocRef = doc(db, 'users', userId);
       await updateDoc(userDocRef, {
-        Monedas: increment(100),
+        Monedas: increment(200),
       });
     } catch (error) {
       console.log('Error al agregar monedas:', error);
@@ -95,59 +92,22 @@ export const NoCoinsModal = ({ visible, onClose }) => {
     }
   };
 
-  // animacion del modal
-  React.useEffect(() => {
-    if (visible) {
-      setIsVisible(true);
-      Animated.parallel([
-        Animated.spring(scaleValue, {
-          toValue: 1,
-          useNativeDriver: true,
-          bounciness: 8
-        }),
-        Animated.timing(translateY, {
-          toValue: 0,
-          duration: 300,
-          easing: Easing.out(Easing.cubic),
-          useNativeDriver: true
-        })
-      ]).start();
-    } else {
-      Animated.parallel([
-        Animated.spring(scaleValue, {
-          toValue: 0,
-          useNativeDriver: true,
-          speed: 20
-        }),
-        Animated.timing(translateY, {
-          toValue: 100,
-          duration: 200,
-          useNativeDriver: true
-        })
-      ]).start(() => setIsVisible(false));
-    }
-  }, [visible]);
+
 
   return (
-    <Modal
+    <Modal  
       animationType="fade"
       transparent={true}
       visible={isVisible}
-      onRequestClose={onClose}>
+      onRequestClose={onClose}
+      >
+
       <View style={styles.overlay}>
         <TouchableWithoutFeedback onPress={onClose}>
           <View style={StyleSheet.absoluteFill}/>
         </TouchableWithoutFeedback>
         
-        <Animated.View style={[
-          styles.modalContainer,
-          {
-            transform: [
-              { scale: scaleValue },
-              { translateY: translateY }
-            ]
-          }
-        ]}>
+        <View style={styles.modalContainer}>
           <View style={styles.gradientWrapper}>
             <LinearGradient
               colors={['#FFFFFF', '#F8F9FA']}
@@ -185,15 +145,10 @@ export const NoCoinsModal = ({ visible, onClose }) => {
                 </LinearGradient>
               </TouchableOpacity>
 
-              <TouchableOpacity 
-                style={styles.secondaryButton}
-                onPress={onClose}
-                activeOpacity={0.7}>
-                <Text style={styles.secondaryButtonText}>Cancelar</Text>
-              </TouchableOpacity>
+             <PremiumButton/>
             </LinearGradient>
           </View>
-        </Animated.View>
+        </View>
       </View>
     </Modal>
   );
@@ -208,6 +163,7 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     width: '85%',
+        
     borderRadius: 20,
     overflow: 'hidden',
   },

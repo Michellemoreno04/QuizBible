@@ -134,7 +134,7 @@ export default function Profile() {
             </Modal>
 
             <Text style={styles.userName}>{userInfo?.Name || 'Usuario'}</Text>
-            <Text style={styles.userHandle}>@{userInfo?.username || 'usuario123'}</Text>
+            <Text style={styles.userHandle}>@{userInfo?.Apodo || 'usuario123'}</Text>
 
             {/* Stats */}
             <View style={styles.statsContainer}>
@@ -191,7 +191,8 @@ export default function Profile() {
             </View>
           </View>
           <View style={styles.bannerContainer}>
-            <BannerAd
+            {!userInfo?.Premium && (
+              <BannerAd
               unitId={bannerAdUnitId}
               size="BANNER"
               requestOptions={{
@@ -200,6 +201,7 @@ export default function Profile() {
               onAdLoaded={() => console.log('Banner cargado')}
               onAdFailedToLoad={(error) => console.log('Error cargando banner:', error)}
             />
+            )}
           </View>
       </SafeAreaView>
         </ScrollView>

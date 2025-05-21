@@ -35,11 +35,14 @@ const QuizActions = ({
   tiempoAgregado,
   setTiempoAgregado,
   isLoading,
-  setIsLoading
+  setIsLoading,
+  stopMusic,
+  backgroundMusic,
+  isPlaying
 }) => {
-// como firmar un apk? 
     const [rewardedLoaded, setRewardedLoaded] = useState(false);
     const [rewardedAd, setRewardedAd] = useState(null);
+    const [isAdShowing, setIsAdShowing] = useState(false);
    
  
 // aquicargamos el anuncio
@@ -63,8 +66,9 @@ useEffect(() => {
       );
       // Cargar el anuncio
       newRewarded.load();
-      setRewardedAd(newRewarded);//guardamos el anuncio
+      setRewardedAd(newRewarded);
       setIsLoading(false);
+
       // Limpiar al cerrar
       return () => {
         unsubscribeLoaded();
@@ -73,31 +77,32 @@ useEffect(() => {
         setRewardedAd(null);
       };
     
-  }, [currentQuestion]);
+  }, [currentQuestion, isPlaying]);
 
   const handleShowAd = async () => {
     setIsLoading(true);
-      if (rewardedLoaded ) {
-          try {
-         
-            await newRewarded.show();
-            setIsLoading(false);
-
+    setIsAdShowing(true);
+    if (isPlaying) {
+      await stopMusic(backgroundMusic);
+    }
+    
+    if (rewardedLoaded) {
+      try {
+        await newRewarded.show();
+        setIsLoading(false);
       } catch (error) {
         console.log('Error al mostrar el anuncio:', error);
-        if(error){
+        if(error) {
           newRewarded.load();
           setIsLoading(true);
-        
         }
-        
       } finally {
-       
-        setIsVisible(false);
-         setIsLoading(false);
-        
+        setIsAdShowing(false);
+        setIsLoading(false);
+        if (isPlaying) {
+          startMusic(backgroundMusic);
+        }
       }
-
     }
   };
   

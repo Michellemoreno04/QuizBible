@@ -117,6 +117,22 @@ export default function RootLayout() {
                 headerBackTitle: "back",
               }}
             />
+
+            <Stack.Screen
+              name="paywallScreen"
+              options={{
+                headerShown: false,
+                headerTitle: "",
+                headerBackTitle: "volver",
+                presentation: "modal",
+              }}
+            />
+            <Stack.Screen
+              name="premiumWelcomeScreen"
+              options={{
+                headerShown: false,
+              }}
+            />
             <Stack.Screen
               name="dailyReading"
               options={{

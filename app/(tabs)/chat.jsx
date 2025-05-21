@@ -25,7 +25,7 @@ import { db } from '../../components/firebase/firebaseConfig';
 import { doc, onSnapshot, getDoc, updateDoc, increment } from 'firebase/firestore';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Colors } from '@/constants/Colors';
-
+import { useNavigation } from '@react-navigation/native';
 
 
 // Inicializar Firebase Functions
@@ -51,7 +51,7 @@ const LambChat = () => {
   const [userInfo, setUserInfo] = useState({});
   const [messages, setMessages] = useState([]);
   const [hasShownWelcome, setHasShownWelcome] = useState(false);
-
+  const navigation = useNavigation();
   const { user } = useAuth();
   const userId = user?.uid;
 
@@ -81,7 +81,7 @@ const LambChat = () => {
       const userData = snapshot.data() || {};
       if (userData) {
         setUserInfo(userData);
-        setIsPremium(userData.isPremium || false);
+        setIsPremium(userInfo?.Premium || false);
         setDailyMessageCount(userData.dailyMessageCount || 0);
       }
     });
@@ -91,7 +91,6 @@ const LambChat = () => {
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const scrollViewRef = useRef(null);
-  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const playSound = async (sound) => {
     const { sound: audioSound } = await Audio.Sound.createAsync(
@@ -123,7 +122,7 @@ const LambChat = () => {
     }
     
     // Verificar límite para usuarios no premium
-    if (!userData.isPremium && userData.dailyMessageCount >= 3) {
+    if (!userData.Premium && userData.dailyMessageCount >= 3) {
       Alert.alert(
         "Límite de mensajes alcanzado",
         "Has alcanzado el límite diario de mensajes. ¡Actualiza a premium para mensajes ilimitados o regresa mañana!",
@@ -132,10 +131,8 @@ const LambChat = () => {
           { 
             text: "Obtener Premium", 
             onPress: () => {
-              // Aquí puedes agregar la navegación a la pantalla de premium
-              // navigation.navigate('Premium');
-              //console.log('obtener premium')
-              Alert.alert('No disponible por el momento','Mas adelante podras adquirir el plan premium')
+              navigation.navigate('paywallScreen');
+              
             }
           }
         ]
@@ -251,6 +248,7 @@ const LambChat = () => {
     </Animatable.View>
   );
 
+  
   return (
     <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -280,7 +278,7 @@ const LambChat = () => {
           <Animatable.View 
             animation="pulse" 
             iterationCount="infinite"
-            style={styles.loadingContainer}
+            style={[styles.loadingContainer, styles.aiMessage]}
           >
             <Image
               source={require('../../assets/images/cordero_saludando.png')}
@@ -430,7 +428,10 @@ const styles = StyleSheet.create({
     padding: 12,
     backgroundColor: 'rgba(255,255,255,0.9)',
     borderRadius: 20,
-    marginTop: 8
+    marginTop: 8,
+    maxWidth: '80%',
+    alignSelf: 'flex-start',
+    marginLeft: 8,
   },
   loadingAvatar: {
     width: 30,
@@ -460,6 +461,7 @@ const styles = StyleSheet.create({
   firstMessageContent: {
     width: '100%',
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#1a365d'
   },
   firstMessageText: {
@@ -484,14 +486,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   mensajesPredefinidosScroll: {
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+   
     paddingBottom: 16,
   },
   mensajesPredefinidosGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
+    alignItems: 'center',
     gap: 8,
-    width: 400, // Ancho fijo para permitir el scroll horizontal
+   // width: 400, // Ancho fijo para permitir el scroll horizontal
   },
   mensajePredefinido: {
     backgroundColor: 'white',

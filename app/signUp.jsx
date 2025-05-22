@@ -47,6 +47,7 @@ const SignUp = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [Premium, setPremium] = useState(false);
   const navigate = useNavigation();
   const { user } = useAuth();
   const userId = user?.uid;
@@ -75,7 +76,7 @@ const SignUp = () => {
         );
         const user = userCredential.user;
 
-        await setDoc(doc(db, "users", user.uid), {
+        await setDoc(doc(db, "users", userId), {
           Name: credenciales.name,
           Email: credenciales.email,
           TiempoRegistrado: Timestamp.now(),
@@ -87,6 +88,7 @@ const SignUp = () => {
           RachaMaxima: rachaMaxima,
           modalRachaShow: ayer.toISOString(),
           Genero: selectedAvatar,
+          Premium: Premium,
         });
 
         setCredenciales({

@@ -33,6 +33,7 @@ export default function AppleSignIn() {
   const racha = 0;
   const rachaMaxima = 0;
   const selectedAvatar = "";
+  const Premium = false;
 
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0);
@@ -83,6 +84,7 @@ export default function AppleSignIn() {
           FotoPerfil: '',
           EmailPrivado: false,
           ConsentimientoPublicidad: false,
+          Premium: Premium,
         };
 
         await setDoc(doc(db, "users", result.user.uid), userData);

@@ -20,6 +20,7 @@ export default function SignInComponents() {
   const [rachaMaxima, setRachaMaxima] = useState(0);
   const [selectedAvatar, setSelectedAvatar] = useState(null);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [Premium, setPremium] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigation();
 
@@ -86,6 +87,7 @@ export default function SignInComponents() {
           FotoPerfil: '',
           EmailPrivado: false,
           ConsentimientoPublicidad: false,
+          Premium: Premium,
         });
         
         Alert.alert(

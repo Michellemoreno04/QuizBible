@@ -249,14 +249,16 @@ const styles = StyleSheet.create({
   avatarContainer: {
     marginBottom: 20,
     position: 'relative',
-  },
-  avatar: {
-    borderWidth: 3,
-    borderColor: 'white',
+    backgroundColor: 'white',
+    borderRadius: 60,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 8,
+  },
+  avatar: {
+    borderWidth: 3,
+    borderColor: 'white',
   },
   avatarText: {
     fontSize: 48,

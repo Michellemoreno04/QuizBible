@@ -53,6 +53,8 @@ export const NoCoinsModal = ({ visible, onClose }) => {
       (reward) => {
         console.log('Recompensa obtenida:', reward);
         addCoin();
+        setIsVisible(false);
+        onClose();
       }
     );
 
@@ -84,8 +86,6 @@ export const NoCoinsModal = ({ visible, onClose }) => {
     if (loaded && rewardedAd.current) {
       try {
         await rewardedAd.current.show();
-        setIsVisible(false);
-        onClose();
       } catch (error) {
         console.log('Error al mostrar el anuncio:', error);
       }
@@ -98,7 +98,7 @@ export const NoCoinsModal = ({ visible, onClose }) => {
     <Modal  
       animationType="fade"
       transparent={true}
-      visible={isVisible}
+      visible={visible}
       onRequestClose={onClose}
       >
 

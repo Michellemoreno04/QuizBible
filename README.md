@@ -10,7 +10,7 @@
 
 # cosas hecha 
 
-1. aumentamos la vida a 3
+1. App star review added
 
 
 

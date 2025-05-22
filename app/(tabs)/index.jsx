@@ -19,7 +19,6 @@ import { Colors } from '@/constants/Colors';
 import { useToast } from 'react-native-toast-notifications';
 import Notificaciones from '@/components/notificaciones/notificaciones';
 import { useNavigation } from '@react-navigation/native';
-import { PremiumButton } from '@/constants/premiumBoton';
 //import NetInfo from '@react-native-community/netinfo';
 
 
@@ -38,6 +37,7 @@ export default function AppComponent() {
   const [isModalRachaVisible, setModalRachaVisible] = useState(false);
   const [isModalRachaPerdidaVisible, setModalRachaPerdidaVisible] = useState(false);
   const [userInfo, setUserInfo] = useState({});
+  const [hasRequestedReview, setHasRequestedReview] = useState(false);
   const toast = useToast();
 
   // Monitorear el estado de la conexión de internet
@@ -76,7 +76,7 @@ export default function AppComponent() {
     return () => unsubscribe();
   }, [userId]);
 
-  // aqui vamos a mostrar el modal de not vidas si es un nuevo dia y el usuario tiene menos de 2 vidas
+  // aqui vamos a mostrar el modal de not vidas si es un nuevo dia y el usuario tiene menos de 3 vidas
   useEffect(() => {
     if (!userId ) return;
 
@@ -123,8 +123,10 @@ export default function AppComponent() {
   }, [userId]);
 
 
+  
 
-  // aqui vamos a verificar si el usuario ha completado el quiz
+
+  // Modificar el efecto que maneja la racha y reseña 
   useEffect(() => {
     if (!userId) return;
 
@@ -135,6 +137,7 @@ export default function AppComponent() {
         if (quizCompleted === "true") {
           // Ejecutar manejarRachaDiaria
           await manejarRachaDiaria(userId, setModalRachaVisible, setModalRachaPerdidaVisible);
+          
           // Limpiar el estado de quiz completado
           await AsyncStorage.removeItem("quizCompleted");
         }
@@ -145,6 +148,9 @@ export default function AppComponent() {
 
     checkQuizCompletion();
   }, [userId]);
+
+ 
+ 
 
   if(!userId){
     return <ActivityIndicator size="large" color="white" />
@@ -167,6 +173,7 @@ export default function AppComponent() {
            <ModalRachaPerdida userInfo={userInfo} isVisible={isModalRachaPerdidaVisible} setModalRachaPerdidaVisible={setModalRachaPerdidaVisible}  />
            <HeaderHome />
            <Notificaciones />
+
            {/*!userInfo?.Premium && (
             <View style={styles.premiumButtonContainer}>
            <PremiumButton containerStyle={styles.dinamicStyle} textStyle={styles.dinamicText} lottieStyle={styles.lottieStyle} />
@@ -184,7 +191,6 @@ export default function AppComponent() {
                   requestOptions={{
                     keywords: ['religion', 'bible'],
                   }}
-                  onAdLoaded={() => console.log('Banner cargado')}
                   onAdFailedToLoad={(error) => console.log('Error cargando banner:', error)}
                 />
               </View>

@@ -9,12 +9,17 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import useAuth from '../authContext/authContext';
 import { useSound } from '../soundFunctions/soundFunction';
 import { LinearGradient } from 'expo-linear-gradient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as StoreReview from 'expo-store-review';
+
+
 
 const {width, height} = Dimensions.get('window');
 export function ModalRacha({ isVisible, setModalRachaVisible }) {
   const { user } = useAuth();
   const playSound = useSound();
   const [userInfo, setUserInfo] = useState({});
+
 
  
 
@@ -36,8 +41,24 @@ export function ModalRacha({ isVisible, setModalRachaVisible }) {
     return () => unsubscribe();
   }, []);
 
-  const closeModal = () => {
+  const closeModal = async () => {
     setModalRachaVisible(false);
+    
+    // Verificar si ya se mostró la reseña anteriormente
+    const reseñaMostrada = await AsyncStorage.getItem('reseñaMostrada');
+    
+    if (!reseñaMostrada) {
+      console.log('mostrando reseña');
+      // Esperar 2 segundos y luego mostrar la reseña
+      setTimeout(async () => {
+        const isAvailable = await StoreReview.isAvailableAsync();
+        if (isAvailable) {
+          await StoreReview.requestReview();
+          // Guardar que ya se mostró la reseña
+          await AsyncStorage.setItem('reseñaMostrada', 'true');
+        }
+      }, 2000);
+    }
   };
 
   return (

@@ -3,7 +3,17 @@ import { db } from '../firebase/firebaseConfig';
 import { Alert } from 'react-native';
 
 
+
+
 export const manejarRachaDiaria = async (userId, setModalRachaVisible, setShowModalRachaPerdida) => {
+  
+  const formatearFecha = (fecha) => {
+    const dia = fecha.getDate();
+    const mes = fecha.getMonth() + 1;
+    const año = fecha.getFullYear();
+    return `${dia}-${mes}-${año}`;
+  }
+ 
   try {
     const userDocRef = doc(db, 'users', userId);
     const userDoc = await getDoc(userDocRef);
@@ -61,10 +71,12 @@ export const manejarRachaDiaria = async (userId, setModalRachaVisible, setShowMo
         });
         setModalRachaVisible(true);
       } else {
-        // Racha perdida
+        // Racha perdida - guardamos la racha anterior antes de reiniciar
         await updateDoc(userDocRef, {
           modalRachaShow: hoy.toISOString(),
-          Racha: 1
+          RachaAnterior: rachaActual, // Guardamos la racha anterior
+          Racha: 1,
+          FechaRachaPerdida: formatearFecha(hoy)
         });
         setShowModalRachaPerdida(true);
       }

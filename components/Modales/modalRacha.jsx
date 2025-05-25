@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, Animated, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Dimensions, Image } from 'react-native';
 import Modal from 'react-native-modal';
-import LottieView from 'lottie-react-native';
 import { FontAwesome5, MaterialIcons } from '@expo/vector-icons';
 import { Pressable } from 'react-native';
 import { db } from '../../components/firebase/firebaseConfig';

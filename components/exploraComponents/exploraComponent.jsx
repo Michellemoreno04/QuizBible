@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ScrollView, TouchableOpacity, View, Text, StyleSheet, Modal,Pressable, Alert, Platform } from 'react-native';
+import { ScrollView, TouchableOpacity, View, Text, StyleSheet, Modal,Pressable, Alert, Platform,Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { MaterialIcons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import LottieView from 'lottie-react-native';
@@ -10,6 +10,8 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import {NoCoinsModal} from '../Modales/notCoints';
 import { BannerAd, TestIds } from 'react-native-google-mobile-ads';
 import { PremiumButton } from '@/constants/premiumBoton';
+
+const { width } = Dimensions.get('window');
 
 const bannerAdUnitId = __DEV__ 
   ? TestIds.BANNER 
@@ -242,16 +244,18 @@ const styles = StyleSheet.create({
     
   },
   premiumButton: {
-    width: 70,
+    width: width * 0.2,
     height: 30,
-    alignSelf: 'flex-end',
+    alignItems: 'center',
+    justifyContent: 'center',
+   // alignSelf: 'flex-end',
   },
   premiumText: {
-    fontSize: 8,
+    fontSize: width * 0.02,
     fontWeight: 'bold',
     color: 'white',
     marginLeft: -5,
-    //textAlign: 'center',
+    textAlign: 'center',
   },
   lottieStyle: {
     width: 30,

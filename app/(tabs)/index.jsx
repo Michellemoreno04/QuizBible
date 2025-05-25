@@ -9,7 +9,7 @@ import { StatusBar } from 'expo-status-bar';
 import  useAuth  from '@/components/authContext/authContext';
 import {NotVidasModal} from '@/components/Modales/recargarVidas';
 import { ModalRacha } from '@/components/Modales/modalRacha';
-import { doc, onSnapshot, updateDoc,getDoc, increment } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc,getDoc, increment, collectionGroup } from 'firebase/firestore';
 import { db } from '@/components/firebase/firebaseConfig';
 import { manejarRachaDiaria } from '@/components/Racha/manejaRacha';
 import { ModalRachaPerdida } from '@/components/Modales/rachaPerdida';
@@ -20,6 +20,8 @@ import { useToast } from 'react-native-toast-notifications';
 import Notificaciones from '@/components/notificaciones/notificaciones';
 import { useNavigation } from '@react-navigation/native';
 //import NetInfo from '@react-native-community/netinfo';
+
+
 
 
 const bannerAdUnitId = __DEV__ 
@@ -37,8 +39,9 @@ export default function AppComponent() {
   const [isModalRachaVisible, setModalRachaVisible] = useState(false);
   const [isModalRachaPerdidaVisible, setModalRachaPerdidaVisible] = useState(false);
   const [userInfo, setUserInfo] = useState({});
-  const [hasRequestedReview, setHasRequestedReview] = useState(false);
   const toast = useToast();
+
+
 
   // Monitorear el estado de la conexión de internet
  /* useEffect(() => {
@@ -94,20 +97,18 @@ export default function AppComponent() {
           const currentVidas = userData?.Vidas || 0;
           const isPremium = userData?.Premium || false;
 
-          // Paso 2: Actualizar vidas y monedas según el tipo de usuario
-          if (currentVidas < 3 || isPremium) {
-            const updateData = {
-              Monedas: increment(200)
-            };
-            
-            // Solo actualizar vidas si no es premium y tiene menos de 3 vidas
-            if (!isPremium && currentVidas < 3) {
-              updateData.Vidas = 3;
-            }
-            
-            await updateDoc(userRef, updateData);
-            setNotVidasModalVisible(true); // Mostrar modal solo si se actualizó
+          // Paso 2: Actualizar vidas y monedas
+          const updateData = {
+            Monedas: increment(200)  // Siempre dar 200 monedas
+          };
+          
+          // Solo actualizar vidas si no es premium y tiene menos de 3 vidas
+          if (!isPremium && currentVidas < 3) {
+            updateData.Vidas = 3;
           }
+          
+          await updateDoc(userRef, updateData);
+          setNotVidasModalVisible(true);
 
           // Paso 3: Guardar la nueva fecha
           await AsyncStorage.setItem('hoy', hoyString);
@@ -121,10 +122,6 @@ export default function AppComponent() {
     checkAndUpdateVidas();
 
   }, [userId]);
-
-
-  
-
 
   // Modificar el efecto que maneja la racha y reseña 
   useEffect(() => {
@@ -149,7 +146,7 @@ export default function AppComponent() {
     checkQuizCompletion();
   }, [userId]);
 
- 
+  
  
 
   if(!userId){
@@ -174,11 +171,7 @@ export default function AppComponent() {
            <HeaderHome />
            <Notificaciones />
 
-           {/*!userInfo?.Premium && (
-            <View style={styles.premiumButtonContainer}>
-           <PremiumButton containerStyle={styles.dinamicStyle} textStyle={styles.dinamicText} lottieStyle={styles.lottieStyle} />
-           </View>
-           )*/}
+         
             <VersiculosDiarios />
             <ExploraComponent />
             <GuardadosComponents />

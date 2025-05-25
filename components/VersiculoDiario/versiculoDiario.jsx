@@ -172,7 +172,7 @@ export const VersiculosDiarios = () => {
   
       await Share.open(shareOptions);
     } catch (error) {
-      console.error("Error al compartir:", error);
+      console.log("Error al compartir:", error);
     } finally {
       setHideButtons(false);
     }
@@ -181,7 +181,7 @@ export const VersiculosDiarios = () => {
  // Función de guardado simplificada
  const guardar = async () => {
   
-  if ( versiculoGuardado){
+  if (versiculoGuardado){
     toast.show("⭐ Ya guardaste este versículo!",{
       type: "success",
       placement: "top",

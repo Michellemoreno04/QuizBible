@@ -80,7 +80,7 @@ export const NotVidasModal = ({ visible, setNotVidasModalVisible, userInfo }) =>
                   </View>
                   <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
                     <Text style={styles.heart}>💰</Text>
-                    <Text style={styles.lifeText}>{userInfo?.Premium ? '+200' : '+200'}</Text>
+                    <Text style={styles.lifeText}>{userInfo?.Premium ? '+300' : '+200'}</Text>
                   </View>
 
                   </View>
@@ -90,11 +90,11 @@ export const NotVidasModal = ({ visible, setNotVidasModalVisible, userInfo }) =>
               </View>
 
               <Text style={styles.message}>
-                ¡Energía al máximo! Responde preguntas y mantén tu racha
+                ¡Energía al máximo! Responde preguntas y aumenta tu racha diaria
               </Text>
 
               <TouchableOpacity 
-                style={styles.button}
+                style={styles.button} 
                 onPress={() => setNotVidasModalVisible(false)}
                 activeOpacity={0.95}
               >
@@ -116,7 +116,7 @@ export const NotVidasModal = ({ visible, setNotVidasModalVisible, userInfo }) =>
                   colors={['#75643F', '#3A2F0F']}
                   style={styles.closeButtonGradient}
                 >
-                  <Text style={styles.closeText}>×</Text>
+                  <Text style={styles.closeText}>x</Text>
                 </LinearGradient>
               </TouchableOpacity>
             </LinearGradient>

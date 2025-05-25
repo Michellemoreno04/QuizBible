@@ -17,8 +17,7 @@ import {
   
   export default function GuardadosComponents() {
     const navigation = useNavigation();
-    const cardWidth = width * 0.43;
-    const cardPadding = width * 0.05;
+  
   
     return (
       <View style={styles.container}>
@@ -71,7 +70,7 @@ import {
                   color="white" 
                 />
               </View>
-              <Text style={styles.cardTitle}>Lecturas Recientes</Text>
+              <Text style={styles.cardTitle}>Lecturas{'\n'}Recientes</Text>
               <AntDesign
                 name="arrowright"
                 size={normalizeText(20)}
@@ -109,8 +108,9 @@ import {
       borderColor: "rgba(255, 255, 255, 0.5)",
       justifyContent: "space-between",
       width: width * 0.43,
+      height: height* 0.20,
       padding: width * 0.03,
-      minWidth: 160,
+      
     },
     iconContainer: {
       backgroundColor: "rgba(255, 255, 255, 0.2)",
@@ -120,18 +120,26 @@ import {
       justifyContent: "center",
       alignItems: "center",
       marginBottom: height * 0.01,
+      
     },
     cardTitle: {
+      position: 'absolute',
+      bottom: 5,
+      left: 10,
       color: "white",
       fontSize: normalizeText(16),
       fontWeight: "600",
       lineHeight: normalizeText(24),
       fontFamily: "Inter-SemiBold",
-      position:'relative',
-      top: height * 0.03
+      marginTop: 'auto',
+     // marginBottom: height * 0.01,
     },
     arrow: {
-      alignSelf: "flex-end",
+      position: 'relative',
+      bottom: 5,
+      //right: 8,
      
+      alignSelf: "flex-end",
+      marginTop: 'auto',
     },
   });

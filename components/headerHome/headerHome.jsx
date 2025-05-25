@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Platform, TouchableOpacity, Image } from 'react-native'
+import { View, Text, StyleSheet, Platform, TouchableOpacity, Image, Alert,Dimensions } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import { Avatar } from '@rneui/base';
 import { FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -9,10 +9,14 @@ import { niveles } from '../Niveles/niveles';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ModalRacha } from '../Modales/modalRacha';
 import Modal from 'react-native-modal';
+import { useNavigation } from '@react-navigation/native';
+
+const { width, height} = Dimensions.get('screen');
 
 
 export const HeaderHome = () => {
  const { user } = useAuth();
+ const navigation = useNavigation();
  const userId = user?.uid;
 const [userAuthenticated, setUserAuthenticated] = useState({});
 const [isModalRachaVisible, setIsModalRachaVisible] = useState(false);
@@ -97,6 +101,37 @@ const [isInsigniaModalVisible, setIsInsigniaModalVisible] = useState(false);
           guardarInsignia();
         }, [userAuthenticated.Exp, userId]);
 
+  const esHoyLaFechaRachaPerdida = () => {
+    if (!userAuthenticated?.FechaRachaPerdida) return false;
+    
+    const hoy = new Date();
+    const [dia, mes, año] = userAuthenticated.FechaRachaPerdida.split('-').map(Number);
+    const fechaRachaPerdida = new Date(año, mes - 1, dia);
+    
+    return hoy.getDate() === fechaRachaPerdida.getDate() &&
+           hoy.getMonth() === fechaRachaPerdida.getMonth() &&
+           hoy.getFullYear() === fechaRachaPerdida.getFullYear();
+  };
+
+
+  const handleRecuperarRacha = async () => {
+   const cantidadMonedas = userAuthenticated?.Monedas;
+
+   if(cantidadMonedas >= 1000){
+    const userRef = doc(db, 'users', userId);
+    await updateDoc(userRef, {
+      Monedas: cantidadMonedas - 1000,
+      Racha: userAuthenticated?.RachaAnterior || 0,
+      FechaRachaPerdida: null,
+      RachaAnterior: null
+    });
+   }else{
+    Alert.alert('No tienes suficientes monedas para recuperar la racha', 'Puedes comprar monedas en la tienda.', [{text: 'OK', onPress: () => {
+      navigation.navigate('buyMonedasScreen');
+    }}]);
+   }
+  };
+
         
     return (
         <View style={styles.headerContainer}>
@@ -123,6 +158,7 @@ const [isInsigniaModalVisible, setIsInsigniaModalVisible] = useState(false);
                     style={styles.modalImage}  
                     resizeMode="stretch"
                 />
+                
             </LinearGradient>
         </Modal>
 
@@ -150,7 +186,6 @@ const [isInsigniaModalVisible, setIsInsigniaModalVisible] = useState(false);
                 </TouchableOpacity>
 
                 <View style={styles.modalHeader}>
-                    <MaterialCommunityIcons name="crown" size={40} color="#FFD700" />
                     <Text style={styles.modalTitle}>
                         {userAuthenticated?.Exp >= 200 
                             ? niveles(userAuthenticated?.Exp || 0).insignia 
@@ -168,18 +203,25 @@ const [isInsigniaModalVisible, setIsInsigniaModalVisible] = useState(false);
      <View style={styles.container}>
         <View style={styles.leftContainer}>
             <TouchableOpacity onPress={openImage}>
-                <Avatar
-                    size={60}
-                    rounded
-                    containerStyle={{
-                        backgroundColor: userAuthenticated?.FotoPerfil ? 'transparent' : 'orange',
-                    }}
-                    {...(userAuthenticated?.FotoPerfil
-                        ? { source: { uri: userAuthenticated?.FotoPerfil} }
-                        : { title: userAuthenticated?.Name?.charAt(0).toUpperCase() }
+                <View style={styles.avatarContainer}>
+                    <Avatar
+                        size={60}
+                        rounded
+                        containerStyle={{
+                            backgroundColor: userAuthenticated?.FotoPerfil ? 'transparent' : 'orange',
+                        }}
+                        {...(userAuthenticated?.FotoPerfil
+                            ? { source: { uri: userAuthenticated?.FotoPerfil} }
+                            : { title: userAuthenticated?.Name?.charAt(0).toUpperCase() }
+                        )}
+                        avatarStyle={styles.avatar} 
+                    />
+                    {userAuthenticated?.Premium && (
+                        <View style={styles.crownContainer}>
+                            <FontAwesome5 name="crown" size={10} color="#FFD700" style={styles.crownIcon} />
+                        </View>
                     )}
-                    avatarStyle={styles.avatar} 
-                />
+                </View>
             </TouchableOpacity>
 
             <View style={styles.userInfo}>
@@ -207,6 +249,47 @@ const [isInsigniaModalVisible, setIsInsigniaModalVisible] = useState(false);
         </View>
         
         <View style={styles.rachaIconsContainer}>
+        <TouchableOpacity 
+            onPress={() => navigation.navigate('buyMonedasScreen')}
+            style={styles.tiendaButton}
+        >
+            <LinearGradient
+                colors={['#FFD700', '#D4AF37', '#FFD700']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.tiendaGradient}
+            >
+                <FontAwesome5 name="store" size={width * 0.05} color="white" />
+                <Text style={styles.tiendaText}></Text>
+            </LinearGradient>
+        </TouchableOpacity>
+        {userAuthenticated?.FechaRachaPerdida && esHoyLaFechaRachaPerdida() && (
+          <TouchableOpacity 
+            onPress={() => {
+              Alert.alert('Recuperar Racha', 'Puedes usar 1000 monedas para recuperar tu racha anterior', 
+                [{ cancelable: true, text: 'Cancelar', onPress: () => {
+                  console.log('Cancelado');
+                } },
+                { text: 'Recuperar', onPress: () => {
+                  handleRecuperarRacha();
+                }}]);
+            }}
+
+            style={styles.recuperarRachaButton}
+          >
+            <LinearGradient
+              colors={['#FF4444', '#CC0000', '#FF4444']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.recuperarRachaGradient}
+            >
+              <FontAwesome5 name="undo" size={width * 0.03} color="white" />
+              <Text style={styles.recuperarRachaText}>Recuperar {'\n'} Racha</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        )}
+       
+
         <TouchableOpacity onPress={openModalRacha}>
             <LinearGradient
                 colors={['#FFD700', '#D4AF37', '#FFD700']}
@@ -215,11 +298,10 @@ const [isInsigniaModalVisible, setIsInsigniaModalVisible] = useState(false);
                 style={styles.rachaContainer}
             >
                 <Text style={styles.rachaText}>{userAuthenticated?.Racha || 0}</Text>
-                <FontAwesome5 name="fire-alt" size={24} color="white" />
+                <FontAwesome5 name="fire-alt" size={width * 0.05} color="white" />
             </LinearGradient>
         </TouchableOpacity>
 
-    
        
         </View>
       </View>
@@ -268,7 +350,7 @@ const styles = StyleSheet.create({
               width:50,
               top:0,
               right:0,
-                backgroundColor: 'blue',
+                backgroundColor: 'red',
             }
         })
       
@@ -292,6 +374,7 @@ const styles = StyleSheet.create({
         borderRadius: 100,
         borderWidth: 2,
         borderColor: 'white',
+        zIndex: 1000,
        
       },
       container: {
@@ -299,6 +382,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
+        zIndex: 2000,
+        position: 'relative',
       },
       leftContainer: {
         flexDirection: 'row',
@@ -336,21 +421,20 @@ const styles = StyleSheet.create({
       },
      
       rachaContainer: {
-       
+        width: 50,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'rgba(255, 255, 255, 0.2)', // Fondo semi-transparente
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
         paddingVertical: 5,
         paddingHorizontal: 10,
         borderRadius: 50,
-        gap: 5,
+        gap: 3,
       },
       rachaText: {
-        fontSize: 18,
+        fontSize: width * 0.05,
         fontWeight: 'bold',
-        color: 'white', // Texto dorado
-       // marginLeft: 5,
+        color: 'white',
       },
       modalInsigniaContent: {
         
@@ -380,7 +464,62 @@ const styles = StyleSheet.create({
         marginTop: 5,
     },
     
+    rachaIconsContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 3,
+        justifyContent: 'flex-end',
+    },
+    recuperarRachaButton: {
+      marginLeft: 5,
+    },
+    recuperarRachaGradient: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingVertical: 5,
+      paddingHorizontal: 5,
+      borderRadius: 20,
+      gap: 2,
+    },
+    recuperarRachaText: {
+      color: 'white',
+      fontSize: width * 0.02,
+      fontWeight: 'bold',
+    },
+    tiendaButton: {
+       // marginRight: 5,
+    },
+    
+    tiendaGradient: {
+        width: 50,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 5,
+        paddingHorizontal: 10,
+        borderRadius: 50,
+        gap: 5,
+    },
+    tiendaText: {
+        color: 'white',
+        fontSize: 14,
+        fontWeight: 'bold',
+    },
    
+    crownContainer: {
+        position: 'absolute',
+        top: 40,
+        left: 40,
+        backgroundColor: 'rgba(0,0,0,0.7)',
+        borderRadius: 15,
+        padding: 5,
+        borderWidth: 2,
+        borderColor: '#FFD700',
+    },
+    crownIcon: {
+        //transform: [{ rotate: '10deg' }],
+        zIndex: 1000,
+    },
 
     
 

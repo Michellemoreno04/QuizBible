@@ -9,7 +9,6 @@ import {
   ScrollView, 
   KeyboardAvoidingView, 
   Platform, 
-  Animated,
   ActivityIndicator,
   Alert,
   StatusBar
@@ -54,13 +53,14 @@ const LambChat = () => {
   const navigation = useNavigation();
   const { user } = useAuth();
   const userId = user?.uid;
+  const scrollViewRef = useRef(null);
 
   // Efecto para mostrar el mensaje de bienvenida solo una vez
   useEffect(() => {
     if (!hasShownWelcome) {
       setMessages([{
         id: '1',
-        text: "¡Hola! Soy Nilu, tu corderito guia 🐑. ¿Que te gustaria saber de la palabra de Dios?",
+        text: "¡Hola! Soy Nilu, tu corderito guia!",
         user: 'ai',
         createdAt: new Date(),
         image: require('../../assets/images/cordero_saludando.png')
@@ -68,6 +68,15 @@ const LambChat = () => {
       setHasShownWelcome(true);
     }
   }, [hasShownWelcome]);
+
+  // Efecto para hacer scroll automático cuando los mensajes cambien
+  useEffect(() => {
+    if (scrollViewRef.current && messages.length > 0) {
+      setTimeout(() => {
+        scrollViewRef.current.scrollToEnd({ animated: true });
+      }, 100);
+    }
+  }, [messages]);
 
   const [dailyMessageCount, setDailyMessageCount] = useState(0);
   const [isPremium, setIsPremium] = useState(false);
@@ -90,11 +99,10 @@ const LambChat = () => {
 
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const scrollViewRef = useRef(null);
 
   const playSound = async (sound) => {
     const { sound: audioSound } = await Audio.Sound.createAsync(
-      sound === 'send' 
+      sound === 'user' 
         ? require('../../assets/sound/mensaje-usuario.mp3')
         : require('../../assets/sound/mensaje-cordero.mp3')
     );
@@ -121,21 +129,29 @@ const LambChat = () => {
       return true;
     }
     
-    // Verificar límite para usuarios no premium
-    if (!userData.Premium && userData.dailyMessageCount >= 3) {
+    // Verificar límite para usuarios premium y no premium
+    const messageLimit = userData.Premium ? 50 : 5;
+    if (userData.dailyMessageCount >= messageLimit) {
+      const message = userData.Premium 
+        ? "Has alcanzado el límite diario de mensajes premium (50 mensajes). Por favor, regresa mañana."
+        : "Has alcanzado el límite diario de mensajes. ¡Actualiza a premium para más mensajes o regresa mañana!";
+      
+      const buttons = userData.Premium 
+        ? [{ text: "OK", style: "cancel" }]
+        : [
+            { text: "OK", style: "cancel" },
+            { 
+              text: "Obtener Premium", 
+              onPress: () => {
+                navigation.navigate('paywallScreen');
+              }
+            }
+          ];
+
       Alert.alert(
         "Límite de mensajes alcanzado",
-        "Has alcanzado el límite diario de mensajes. ¡Actualiza a premium para mensajes ilimitados o regresa mañana!",
-        [
-          { text: "OK", style: "cancel" },
-          { 
-            text: "Obtener Premium", 
-            onPress: () => {
-              navigation.navigate('paywallScreen');
-              
-            }
-          }
-        ]
+        message,
+        buttons
       );
       return false;
     }
@@ -158,7 +174,7 @@ const LambChat = () => {
 
     setMessages(prev => [...prev, userMessage]);
     setInputText('');
-    await playSound('mensaje-usuario');
+    await playSound('user');
 
     // Actualizar el contador de mensajes
     const userRef = doc(db, 'users', userId);
@@ -202,7 +218,7 @@ const LambChat = () => {
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
-      await playSound('receive');
+      await playSound('ai');
     }
   };
 
@@ -251,66 +267,64 @@ const LambChat = () => {
   
   return (
     <KeyboardAvoidingView 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 70 : 0}
-      enabled
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      style={[styles.mainContainer, { backgroundColor: Colors.bgApp[0] }]}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
     >
+      <StatusBar barStyle="light-content" backgroundColor={Colors.bgApp[0]} />
       <LinearGradient
         colors={Colors.bgApp}
-        style={styles.container}
+        style={styles.gradientContainer}
       >
-      <StatusBar barStyle="dark-content" />
-      <ScrollView
-        ref={scrollViewRef}
-        contentContainerStyle={styles.messagesContainer}
-        onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
-        keyboardShouldPersistTaps="handled"
-        keyboardDismissMode="on-drag"
-      >
-        {messages.map((item, index) => (
-          <View key={item.id}>
-            {renderMessage({ item, index })}
-          </View>
-        ))}
-        
-        {isLoading && (
-          <Animatable.View 
-            animation="pulse" 
-            iterationCount="infinite"
-            style={[styles.loadingContainer, styles.aiMessage]}
-          >
-            <Image
-              source={require('../../assets/images/cordero_saludando.png')}
-              style={styles.loadingAvatar}
-            />
-            <ActivityIndicator size="small" color="#6C63FF" />
-          </Animatable.View>
-        )}
-
-        {messages.length === 1 && (
-          <View style={styles.mensajesPredefinidosContainer}>
-            <Text style={styles.mensajesPredefinidosTitulo}>
-              ¿Qué te gustaría saber?
-            </Text>
-            <ScrollView 
-              horizontal 
-              showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.mensajesPredefinidosScroll}
+        <ScrollView 
+          ref={scrollViewRef}
+          style={styles.messagesScrollView}
+          contentContainerStyle={styles.messagesScrollContent}
+          onContentSizeChange={() => scrollViewRef.current?.scrollToEnd({ animated: true })}
+        >
+          {messages.map((item, index) => (
+            <View key={item.id}>
+              {renderMessage({ item, index })}
+            </View>
+          ))}
+          
+          {isLoading && (
+            <Animatable.View 
+              animation="pulse" 
+              iterationCount="infinite"
+              style={[styles.loadingContainer, styles.aiMessage]}
             >
-              <View style={styles.mensajesPredefinidosGrid}>
-                {mensajesPredefinidos.map((mensaje, index) => (
-                  <MensajePredefinido
-                    key={index}
-                    mensaje={mensaje}
-                    onPress={handleMensajePredefinido}
-                  />
-                ))}
-              </View>
-            </ScrollView>
-          </View>
-        )}
-      </ScrollView>
+              <Image
+                source={require('../../assets/images/cordero_saludando.png')}
+                style={styles.loadingAvatar}
+              />
+              <ActivityIndicator size="small" color="#6C63FF" />
+            </Animatable.View>
+          )}
+
+          {messages.length === 1 && (
+            <View style={styles.mensajesPredefinidosContainer}>
+              <Text style={styles.mensajesPredefinidosTitulo}>
+                ¿Qué te gustaría saber sobre la Biblia?
+              </Text>
+              <ScrollView 
+                horizontal 
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.mensajesPredefinidosScroll}
+              >
+                <View style={styles.mensajesPredefinidosGrid}>
+                  {mensajesPredefinidos.map((mensaje, index) => (
+                    <MensajePredefinido
+                      key={index}
+                      mensaje={mensaje}
+                      onPress={handleMensajePredefinido}
+                    />
+                  ))}
+                </View>
+              </ScrollView>
+            </View>
+          )}
+        </ScrollView>
       </LinearGradient>
 
       <LinearGradient
@@ -344,12 +358,33 @@ const LambChat = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
+  mainContainer: {
     flex: 1,
-    backgroundColor: '#F5F7FB'
+   // backgroundColor: Colors.bgApp[0],
   },
-  messagesContainer: {
-    padding: 16
+  gradientContainer: {
+    flex: 1,
+    //backgroundColor: Colors.bgApp[0],
+    backgroundColor: 'red',
+  },
+  messagesScrollView: {
+    flex: 1,
+    backgroundColor: Colors.bgApp[1],
+    //backgroundColor: 'red',
+  },
+  messagesScrollContent: {
+    flexGrow: 1,
+    paddingBottom: 16,
+    //backgroundColor: Colors.bgApp[0],
+    
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 10,
+    borderTopWidth: 0.2,
+    borderTopColor: 'rgba(7, 2, 14, 0.9)',
+    backgroundColor: '#3C6E9F',
   },
   messageContainer: {
     flexDirection: 'row',
@@ -374,13 +409,13 @@ const styles = StyleSheet.create({
   messageContent: {
     backgroundColor: 'white',
     borderRadius: 16,
-   
     padding: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 2
+    elevation: 2,
+    
   },
   userText: {
     color: '#333',
@@ -396,13 +431,6 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 12
   },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderTopWidth: 0.3,
-    borderTopColor: 'rgba(7, 2, 14, 0.9)'
-  },
   input: {
     flex: 1,
     backgroundColor: 'rgba(255,255,255,0.1)',
@@ -411,7 +439,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     fontSize: 16,
     color: '#fff',
-    maxHeight: 120
   },
   sendButton: {
     backgroundColor: '#6C63FF',
@@ -476,6 +503,7 @@ const styles = StyleSheet.create({
   width: '100%',
   alignItems: 'center',
   justifyContent: 'center',
+  
    // paddingHorizontal: 16,
   },
   mensajesPredefinidosTitulo: {
@@ -498,9 +526,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     gap: 8,
+    
    // width: 400, // Ancho fijo para permitir el scroll horizontal
   },
   mensajePredefinido: {
+    width: '45%',
     backgroundColor: 'white',
     paddingHorizontal: 12,
     paddingVertical: 10,
@@ -512,11 +542,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
-    width: 180, // Ancho fijo para cada mensaje
   },
   mensajePredefinidoText: {
     color: '#3C6E9F',
-    fontSize: 13,
+    fontSize: 12,
+    textAlign: 'center',
   },
 });
 

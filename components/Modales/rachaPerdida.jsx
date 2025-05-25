@@ -1,14 +1,15 @@
-import { View, Text, StyleSheet, Pressable, Alert, Dimensions, Image, Animated } from 'react-native'
-import React, { useEffect, useRef } from 'react'
+import { View, Text, StyleSheet, Pressable, Alert, Dimensions, Image} from 'react-native'
+import React, { useEffect} from 'react'
 import Modal from 'react-native-modal' // Nota: Se recomienda usar "react-native-modal" para los props isVisible, animationIn, etc.
 import { FontAwesome5 } from '@expo/vector-icons'
 import { LinearGradient } from 'expo-linear-gradient'
-import LottieView from 'lottie-react-native'
 import { doc, updateDoc } from 'firebase/firestore'
 import { db } from '../../components/firebase/firebaseConfig'
 import useAuth from '../authContext/authContext'
 import { MaterialIcons } from '@expo/vector-icons'
 import { useSound } from '../soundFunctions/soundFunction'
+import { useNavigation } from '@react-navigation/native'
+
 
 const { width, height } = Dimensions.get('screen');
 
@@ -17,71 +18,56 @@ export function ModalRachaPerdida({ userInfo,isVisible, setModalRachaPerdidaVisi
   const playSound = useSound();
   const userId = user.uid;
   const coinsRequired = 1000;
+  const navigation = useNavigation();
+ 
 
-  // Referencias para las animaciones
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const scaleAnim = useRef(new Animated.Value(0.8)).current;
-  const slideAnim = useRef(new Animated.Value(50)).current;
 
   useEffect(() => {
     if (isVisible) {
       playSound(require('../../assets/sound/rachaPerdidaSound.mp3'));
-      
-      // Secuencia de animaciones
-      Animated.sequence([
-        Animated.parallel([
-          Animated.timing(fadeAnim, {
-            toValue: 1,
-            duration: 500,
-            useNativeDriver: true,
-          }),
-          Animated.spring(scaleAnim, {
-            toValue: 1,
-            friction: 8,
-            tension: 40,
-            useNativeDriver: true,
-          }),
-          Animated.spring(slideAnim, {
-            toValue: 0,
-            friction: 8,
-            tension: 40,
-            useNativeDriver: true,
-          })
-        ])
-      ]).start();
-    } else {
-      // Animación de salida
-      Animated.parallel([
-        Animated.timing(fadeAnim, {
-          toValue: 0,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-        Animated.timing(scaleAnim, {
-          toValue: 0.8,
-          duration: 300,
-          useNativeDriver: true,
-        })
-      ]).start();
     }
+    
   }, [isVisible]);
 
   // Funciones dummy para manejar las acciones de los botones.
   const userDocRef = doc(db, 'users', userId);
 
   const handlePay = () => {
-   const coins = userInfo.Monedas;
-if (coins >= coinsRequired) {
-  const coinsAfterPayment = coins - coinsRequired;
-  updateDoc(userDocRef, {
-    Monedas: coinsAfterPayment
-  });
-}else{
-  Alert.alert('No tienes suficientes monedas para pagar.');
-}
-  setModalRachaPerdidaVisible(false);  
-
+    const coins = userInfo.Monedas;
+    if (coins >= coinsRequired) {
+      const coinsAfterPayment = coins - coinsRequired;
+      // Recuperamos la racha anterior del usuario
+      const rachaActualizada = userInfo.RachaAnterior || userInfo.Racha;
+      updateDoc(userDocRef, {
+        Monedas: coinsAfterPayment,
+        Racha: rachaActualizada,
+        modalRachaShow: new Date().toISOString()
+      });
+      setModalRachaPerdidaVisible(false);
+      Alert.alert('Racha Recuperada', 'Has recuperado tu racha exitosamente.');
+    } else {
+      Alert.alert(
+        'No tienes suficientes monedas para pagar.',
+        'Puedes comprar monedas en la tienda.',
+        [
+          {
+            text: 'Cancelar',
+            style: 'cancel',
+            onPress: () => setModalRachaPerdidaVisible(false)
+          },
+          {
+            text: 'Comprar Monedas',
+            onPress: () => {
+              //setModalRachaPerdidaVisible(false);
+              navigation.navigate('buyMonedasScreen');
+            }
+          }
+        ]
+      );
+    }
   };
+
+
 
   // lógica para reiniciar la racha (sin pago).
   const handleReset = () => {
@@ -104,7 +90,7 @@ return (
     backdropOpacity={0.7}
     onBackdropPress={() => setModalRachaPerdidaVisible(false)}
   >
-    <Animated.View 
+    <View 
       style={styles.container} >
       <View style={styles.gradientWrapper}>
         <LinearGradient
@@ -124,7 +110,7 @@ return (
           {/* Contenido */}
           <View style={styles.content}>
             <Text style={styles.highlightedText}>
-              ❌ Has roto tu racha de {userInfo?.Racha} días
+              ❌ Has roto tu racha de {userInfo?.RachaAnterior} días
             </Text>
 
             {/* Estadísticas */}
@@ -134,7 +120,7 @@ return (
                 style={[styles.statBox, styles.glassEffect]}
               >
                 <FontAwesome5 name="calendar-times" size={24} color="#FF6B6B" />
-                <Text style={styles.statNumber}>{userInfo?.Racha}</Text>
+                <Text style={styles.statNumber}>{userInfo?.RachaAnterior}</Text>
                 <Text style={styles.statLabel}>Días Perdidos</Text>
               </LinearGradient>
 
@@ -192,7 +178,7 @@ return (
           </View>
         </LinearGradient>
       </View>
-    </Animated.View>
+    </View>
   </Modal>
 )
 }

@@ -188,7 +188,7 @@ export function ModalPuntuacion({
 
               <View style={styles.progressContainer}>
                 <Text style={styles.progressText}>
-                  Nivel {nivelActual} - {expParaSiguienteNivel} exp para subir de nivel
+                  Nivel {nivelActual} {'\n'} Gana {expParaSiguienteNivel} de exp para subir de nivel
                 </Text>
                 <View style={[styles.progressBarBackground, styles.expProgressBar]}>
                   <View style={[styles.progressBarFill, { 

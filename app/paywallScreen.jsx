@@ -1,17 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Platform, ScrollView, Dimensions, StatusBar} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { FontAwesome5, Ionicons, Feather, Entypo, AntDesign } from '@expo/vector-icons';
+import { FontAwesome5, Ionicons, Entypo, AntDesign } from '@expo/vector-icons';
 import Purchases from 'react-native-purchases';
 import { useNavigation } from '@react-navigation/native';
 import { Colors } from '../constants/Colors';
 import  useAuth  from '../components/authContext/authContext';
 import {db} from '../components/firebase/firebaseConfig';
-import { arrayUnion, doc, increment, updateDoc, collection, addDoc } from 'firebase/firestore';
+import { doc, increment, updateDoc, collection, addDoc } from 'firebase/firestore';
 import { useToast } from 'react-native-toast-notifications';
 
-
-const { width, height} = Dimensions.get('screen');
+const { width} = Dimensions.get('screen');
 
 
 
@@ -19,6 +18,7 @@ const Paywall = () => {
     const navigation = useNavigation();
     const appleKey = process.env.EXPO_PUBLIC_REVENEUCAT_API_KEY_IOS;
     const googleKey = process.env.EXPO_PUBLIC_REVENEUCAT_API_KEY_ANDROID;
+
     const [offerings, setOfferings] = useState(null);
     const [loading, setLoading] = useState(true);
     const [purchasing, setPurchasing] = useState(false);
@@ -28,6 +28,11 @@ const Paywall = () => {
 
     const { user } = useAuth();
     const toast = useToast();
+
+    useEffect(() => {
+        setupRevenueCat();
+    }, []);
+
     const setupRevenueCat = async () => {
         try {
             if (Platform.OS === 'ios') {
@@ -47,10 +52,8 @@ const Paywall = () => {
         }
     };
 
-    // aqui se configura la compra
-    useEffect(() => {
-        setupRevenueCat();
-    }, []);
+    
+   
 
     const handlePurchase = async (pkg) => {
         try {
@@ -103,7 +106,7 @@ const Paywall = () => {
                     offset: 30,
                 });
                 console.log('Compra exitosa!');
-                navigation.navigate('premiumWelcomeScreen');
+                navigation.replace('premiumWelcomeScreen');
             }
         
 
@@ -246,7 +249,7 @@ const Paywall = () => {
                         <View style={styles.premiumBadge}>
                             <Text style={styles.premiumBadgeText}>PREMIUM</Text>
                         </View>
-                        <Text style={styles.title}>Desbloquea una mejor experiencia bíblica</Text>
+                        <Text style={styles.title}>Desbloquea una mejor experiencia Bíblica</Text>
                         {offerings?.current?.availablePackages?.[0] && !selectedPlan && (
                             <View style={styles.priceContainer}>
                                 <Text style={styles.priceText}>

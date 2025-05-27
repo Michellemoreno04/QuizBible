@@ -2,7 +2,7 @@
   "expo": {
     "name": "QuizBible",
     "slug": "QuizBible",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./assets/images/quizBible-logo.png",
     "scheme": "myapp",
@@ -29,7 +29,13 @@
         "com.google.android.gms.permission.AD_ID",
         "android.permission.INTERNET",
         "android.permission.ACCESS_NETWORK_STATE",
-        "com.android.vending.BILLING"
+        "com.android.vending.BILLING",
+        "android.permission.RECORD_AUDIO",
+        "com.google.android.gms.permission.AD_ID",
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE",
+        "com.android.vending.BILLING",
+        "android.permission.RECORD_AUDIO"
       ],
       "googleServicesFile": "./google-services.json",
       "versionCode": 8
@@ -40,7 +46,9 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      ["expo-apple-authentication"],
+      [
+        "expo-apple-authentication"
+      ],
       [
         "expo-image-picker",
         {
@@ -48,11 +56,12 @@
           "photosPermission": "Permite seleccionar una imagen desde tu galería para establecerla como foto de perfil."
         }
       ],
-      ["@react-native-google-signin/google-signin", {
-        "iosUrlScheme": "com.googleusercontent.apps.1001847642825-mqg5h7s4n72rn3u1t9lv8osli9aamcz"
-      }],
-    
-      
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.1001847642825-mqg5h7s4n72rn3u1t9lv8osli9aamcz"
+        }
+      ],
       [
         "expo-build-properties",
         {
@@ -62,8 +71,6 @@
         }
       ],
       "expo-router",
-      
-      
       [
         "expo-splash-screen",
         {
@@ -110,6 +117,12 @@
         "projectId": "11200416-890e-443b-87b1-b16a625a5cc6"
       }
     },
-    "owner": "moreno.dev"
+    "owner": "moreno.dev",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/11200416-890e-443b-87b1-b16a625a5cc6"
+    }
   }
 }

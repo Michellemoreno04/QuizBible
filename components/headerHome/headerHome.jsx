@@ -225,9 +225,12 @@ const [isInsigniaModalVisible, setIsInsigniaModalVisible] = useState(false);
             </TouchableOpacity>
 
             <View style={styles.userInfo}>
-                <Text style={styles.greeting}>
-                    {`Hola!, ${userAuthenticated?.Name || '...'}`} 
-
+                <Text 
+                    style={styles.greeting}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                >
+                    {`Hola!, ${userAuthenticated?.Name || '...'}`}
                 </Text>
                 <TouchableOpacity onPress={openInsigniaModal}>
                     <View style={styles.levelContainer}>
@@ -263,31 +266,33 @@ const [isInsigniaModalVisible, setIsInsigniaModalVisible] = useState(false);
                 <Text style={styles.tiendaText}></Text>
             </LinearGradient>
         </TouchableOpacity>
-        {userAuthenticated?.FechaRachaPerdida && esHoyLaFechaRachaPerdida() && (
-          <TouchableOpacity 
-            onPress={() => {
-              Alert.alert('Recuperar Racha', 'Puedes usar 1000 monedas para recuperar tu racha anterior', 
-                [{ cancelable: true, text: 'Cancelar', onPress: () => {
-                  console.log('Cancelado');
-                } },
-                { text: 'Recuperar', onPress: () => {
-                  handleRecuperarRacha();
-                }}]);
-            }}
+        {userAuthenticated?.FechaRachaPerdida && 
+         esHoyLaFechaRachaPerdida() && 
+         userAuthenticated?.Racha === 1 && (
+            <TouchableOpacity 
+              onPress={() => {
+                Alert.alert('Recuperar Racha', 'Puedes usar 1000 monedas para recuperar tu racha anterior', 
+                  [{ cancelable: true, text: 'Cancelar', onPress: () => {
+                    console.log('Cancelado');
+                  } },
+                  { text: 'Recuperar', onPress: () => {
+                    handleRecuperarRacha();
+                  }}]);
+              }}
 
-            style={styles.recuperarRachaButton}
-          >
-            <LinearGradient
-              colors={['#FF4444', '#CC0000', '#FF4444']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={styles.recuperarRachaGradient}
+              style={styles.recuperarRachaButton}
             >
-              <FontAwesome5 name="undo" size={width * 0.03} color="white" />
-              <Text style={styles.recuperarRachaText}>Recuperar {'\n'} Racha</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        )}
+              <LinearGradient
+                colors={['#FF4444', '#CC0000', '#FF4444']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+                style={styles.recuperarRachaGradient}
+              >
+                <FontAwesome5 name="undo" size={width * 0.03} color="white" />
+                <Text style={styles.recuperarRachaText}>Recuperar {'\n'} Racha</Text>
+              </LinearGradient>
+            </TouchableOpacity>
+          )}
        
 
         <TouchableOpacity onPress={openModalRacha}>
@@ -388,16 +393,22 @@ const styles = StyleSheet.create({
       leftContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        
+        flex: 1,
+        width: '60%',
       },
       userInfo: {
+        width: '100%',
         marginLeft: 10,
+        flex: 1,
       },
       greeting: {
-        fontSize: 16,
+        width: '100%',
+        fontSize: width * 0.04,
         fontWeight: 'bold',
-        color: '#FFFFFF', // Texto blanco para contrastar con el fondo oscuro
-       
+        color: '#FFFFFF',
+        flexWrap: 'wrap',
+        numberOfLines: 1,
+        ellipsizeMode: 'tail',
       },
       levelContainer: {
          
@@ -469,6 +480,8 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 3,
         justifyContent: 'flex-end',
+       // minWidth: '40%',
+        zIndex: 1,
     },
     recuperarRachaButton: {
       marginLeft: 5,

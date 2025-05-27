@@ -134,7 +134,7 @@ export default function Profile() {
             </Modal>
 
             <Text style={styles.userName}>{userInfo?.Name || 'Usuario'}</Text>
-            <Text style={styles.userHandle}>@{userInfo?.Apodo || 'usuario123'}</Text>
+            <Text style={styles.userHandle}>@{userInfo?.Apodo || 'Seguidor de Dios'}</Text>
 
             {/* Stats */}
             <View style={styles.statsContainer}>

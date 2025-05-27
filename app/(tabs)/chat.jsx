@@ -130,10 +130,10 @@ const LambChat = () => {
     }
     
     // Verificar límite para usuarios premium y no premium
-    const messageLimit = userData.Premium ? 50 : 5;
+    const messageLimit = userData.Premium ? 70 : 5;
     if (userData.dailyMessageCount >= messageLimit) {
       const message = userData.Premium 
-        ? "Has alcanzado el límite diario de mensajes premium (50 mensajes). Por favor, regresa mañana."
+        ? "Has alcanzado el límite diario de mensajes . Por favor, regresa mañana."
         : "Has alcanzado el límite diario de mensajes. ¡Actualiza a premium para más mensajes o regresa mañana!";
       
       const buttons = userData.Premium 

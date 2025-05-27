@@ -76,7 +76,7 @@ export const NotVidasModal = ({ visible, setNotVidasModalVisible, userInfo }) =>
                   <View style={styles.rewardsContainer}>
                   <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
                   <Text style={styles.heart}>❤️</Text>
-                  <Text style={styles.lifeText}>{userInfo?.Premium ? '♾️' : '3'}</Text>
+                  <Text style={styles.lifeText}>{userInfo?.Premium ? '♾️' : '5'}</Text>
                   </View>
                   <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
                     <Text style={styles.heart}>💰</Text>

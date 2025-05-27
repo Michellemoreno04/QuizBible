@@ -278,7 +278,7 @@ useEffect(() => {
       // Caso: Respuesta incorrecta.
       setRespuestaSeleccionada(respuesta);
       await playSound(require('../assets/sound/incorrect-choice.mp3'));
-  
+      setRespuestasCorrectasConsecutivas(0);
       setTimeout(async () => {
         const userDocRef = doc(db, 'users', userId);
   

@@ -173,7 +173,7 @@ useEffect(() => {
   };
 
   const addTime = async () => {
-    if (userInfo.Monedas < 50) {
+    if (userInfo.Monedas < 30) {
       Alert.alert('No tienes suficientes monedas para agregar tiempo.');
       return;
     }
@@ -182,7 +182,7 @@ useEffect(() => {
       const userDocRef = doc(db, 'users', userId);
       try {
         await updateDoc(userDocRef, {
-          Monedas: userInfo.Monedas - 50,
+          Monedas: userInfo.Monedas - 30,
         });
         setTiempoRestante(prev => prev + 15); // Agregar 15 segundos
         setTiempoAgregado(true);
@@ -205,8 +205,11 @@ useEffect(() => {
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
         >
-          <MaterialCommunityIcons name="skip-next" size={24} color="white" />
+          <View style={styles.actionTextContainer}>
           <Text style={styles.actionText}>50</Text>
+          <Text style={styles.actionText}>Saltar</Text>
+          <MaterialCommunityIcons name="skip-next" size={width * 0.04} color="white" />
+          </View>
         </LinearGradient>
       </TouchableOpacity>
   
@@ -221,8 +224,11 @@ useEffect(() => {
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
         >
-          <FontAwesome5 name="eraser" size={20} color="white" />
+          <View style={styles.actionTextContainer}>
           <Text style={styles.actionText}>50</Text>
+          <Text style={styles.actionText}>Remover 2</Text>
+          <FontAwesome5 name="eraser" size={20} color="white" />
+          </View>
         </LinearGradient>
       </TouchableOpacity>
   
@@ -237,8 +243,11 @@ useEffect(() => {
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
         >
-          <MaterialCommunityIcons name="timer" size={24} color="white" />
-          <Text style={styles.actionText}>15</Text>
+          <View style={styles.actionTextContainer}>
+          <Text style={styles.actionText}>30</Text>
+          <Text style={styles.actionText}>Tiempo </Text>
+          <MaterialCommunityIcons name="timer" size={width * 0.04} color="white" />
+          </View>
         </LinearGradient>
       </TouchableOpacity>
   
@@ -249,13 +258,17 @@ useEffect(() => {
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
         >
-          <AntDesign name="videocamera" size={24} color="white" />
+          <View style={styles.actionTextContainer}>
+
           <Text style={styles.actionText}>
             {isLoading 
               ? <ActivityIndicator size="small" color="white" /> 
               : rewardedAd ? '+50' : ''
             }
           </Text>
+          <Text style={styles.actionText}>Monedas</Text>
+            <AntDesign name="videocamera" size={width * 0.04} color="white" />
+            </View>
         </LinearGradient>
       </TouchableOpacity>
     
@@ -295,10 +308,15 @@ const styles = StyleSheet.create({
     actionText: {
       color: 'white',
       fontWeight: 'bold',
-      fontSize: 14,
+      fontSize: width * 0.03,
       textShadowColor: 'rgba(0, 0, 0, 0.3)',
       textShadowOffset: { width: 1, height: 1 },
       textShadowRadius: 2,
+    },
+    actionTextContainer: {
+      flexDirection: 'column',
+      alignItems: 'center',
+
     },
   });
 

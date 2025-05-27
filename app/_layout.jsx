@@ -10,6 +10,10 @@ import  useAuth  from "../components/authContext/authContext";
 import { ToastProvider } from 'react-native-toast-notifications'
 import { View } from 'react-native';
 import { checkSubscriptionStatus, setupSubscriptionListener } from '@/components/suscriptionStatus/suscriptionStatus';
+//import * as Updates from 'expo-updates';
+
+
+
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -23,6 +27,43 @@ function AppContent() {
   const { user } = useAuth();
   const userId = user?.uid;
 
+  // Verificar actualizaciones en la app
+  /*
+  useEffect(() => {
+    const checkForUpdates = async () => {
+      try {
+        const update = await Updates.checkForUpdateAsync();
+        if (update.isAvailable) {
+          // Aquí puedes mostrar un modal o alerta al usuario
+          Alert.alert(
+            "Actualización disponible",
+            "Hay una nueva versión disponible. ¿Deseas actualizar ahora?",
+            [
+              {
+                text: "Más tarde",
+                style: "cancel"
+              },
+              {
+                text: "Actualizar",
+                onPress: async () => {
+                  try {
+                    await Updates.fetchUpdateAsync();
+                    await Updates.reloadAsync();
+                  } catch (error) {
+                    Alert.alert("Error", "No se pudo actualizar la aplicación");
+                  }
+                }
+              }
+            ]
+          );
+        }
+      } catch (error) {
+        console.log('Error al verificar actualizaciones:', error);
+      }
+    };
+    checkForUpdates();
+  }, []);
+  */
   // Verificar el estado de la suscripción solo cuando hay un usuario
   useEffect(() => {
     if (!userId) return;

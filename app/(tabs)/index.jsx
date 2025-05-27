@@ -103,8 +103,8 @@ export default function AppComponent() {
           };
           
           // Solo actualizar vidas si no es premium y tiene menos de 3 vidas
-          if (!isPremium && currentVidas < 3) {
-            updateData.Vidas = 3;
+          if (!isPremium && currentVidas < 5) {
+            updateData.Vidas = 5;
           }
           
           await updateDoc(userRef, updateData);

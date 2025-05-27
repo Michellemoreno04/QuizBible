@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
   },
   gradientWrapper: {
     width: width * 0.9,
-    height: height * 0.8,
+    height: height * 0.7,
     borderRadius: 30,
     backgroundColor: '#1A1E32',
     
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     
   },
   insigniaName: {
-    fontSize: width * 0.065,
+    fontSize: width * 0.045,
     fontWeight: '900',
     color: 'white',
     textAlign: 'center',

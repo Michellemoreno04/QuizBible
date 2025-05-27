@@ -51,7 +51,7 @@ const playSound = useSound();
       setIsLoading(true);
       const userDocRef = doc(db, 'users', userId);
       await updateDoc(userDocRef, {
-        Vidas: increment(3),
+        Vidas: increment(5),
       });
     } catch (error) {
       console.error('Error al actualizar las vidas:', error);
@@ -181,7 +181,7 @@ const playSound = useSound();
                   <>
                     <MaterialIcons name="play-circle-filled" size={28} color="white" />
                     <Text style={styles.buttonText}>
-                      {loaded ? 'Obtener 3 corazones ' : 'Cargando...'}
+                      {loaded ? 'Obtener 5 corazones ' : 'Cargando...'}
                     </Text>
                     
                     {loaded && (

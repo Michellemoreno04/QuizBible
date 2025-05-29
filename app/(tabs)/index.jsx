@@ -9,8 +9,8 @@ import { StatusBar } from 'expo-status-bar';
 import  useAuth  from '@/components/authContext/authContext';
 import {NotVidasModal} from '@/components/Modales/recargarVidas';
 import { ModalRacha } from '@/components/Modales/modalRacha';
-import { doc, onSnapshot, updateDoc,getDoc, increment, collectionGroup } from 'firebase/firestore';
-import { db } from '@/components/firebase/firebaseConfig';
+import { doc, onSnapshot, updateDoc,getDoc, increment} from 'firebase/firestore';
+import { auth, db } from '@/components/firebase/firebaseConfig';
 import { manejarRachaDiaria } from '@/components/Racha/manejaRacha';
 import { ModalRachaPerdida } from '@/components/Modales/rachaPerdida';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -61,6 +61,9 @@ export default function AppComponent() {
       unsubscribe();
     };
   }, []);*/
+
+
+ 
 
   // obtener los datos del usuario
   useEffect(() => {
@@ -147,10 +150,14 @@ export default function AppComponent() {
   }, [userId]);
 
   
- 
+  
 
   if(!userId){
-    return <ActivityIndicator size="large" color="white" />
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="gray" />
+      </View>
+    )
   }
 
   return (
@@ -198,6 +205,12 @@ export default function AppComponent() {
 }
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+  },
   safeArea: {
     flex: 1,
   },

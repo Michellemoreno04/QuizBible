@@ -1,0 +1,42 @@
+
+{
+    "welcome": {
+      "title": "Welcome to QuizBible",
+      "subtitle": "Your path to a deeper understanding of God's Word",
+      "features": {
+        "dailyVerses": {
+          "title": "Daily Verses",
+          "description": "Share with your friends and deepen your understanding of God's words"
+        },
+        "bibleQuiz": {
+          "title": "Bible Quiz",
+          "description": "Reinforce your knowledge with Bible questions and answers"
+        },
+        "dailyReading": {
+          "title": "Daily Readings",
+          "description": "Read about important topics like Love, Faith, and many other significant themes"
+        },
+        "studyControl": {
+          "title": "Daily Study Control",
+          "description": "Build a streak that keeps you motivated to study and learn every day"
+        }
+      }
+    },
+    "auth": {
+      "login": {
+        "title": "QuizBible",
+        "subtitle": "Your intelligent spiritual connection",
+        "email": "Email",
+        "password": "Password",
+        "loginButton": "Login",
+        "signUpButton": "Sign Up"
+      }
+    },
+    "common": {
+      "back": "Back",
+      "next": "Next",
+      "save": "Save",
+      "cancel": "Cancel",
+      "loading": "Loading..."
+    }
+  }

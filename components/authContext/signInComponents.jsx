@@ -1,4 +1,4 @@
-import { View, StyleSheet, ActivityIndicator, Platform, Dimensions, TouchableOpacity, Text, Image, Alert } from "react-native";
+import { View, StyleSheet, ActivityIndicator, Platform, Dimensions, TouchableOpacity, Text } from "react-native";
 import { GoogleAuthProvider, signInWithCredential } from "firebase/auth";
 import { auth, db } from "../firebase/firebaseConfig";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
@@ -90,25 +90,8 @@ export default function SignInComponents() {
           Premium: Premium,
         });
         
-        Alert.alert(
-          "Configuración de Privacidad",
-          "¿Deseas mantener tu correo electrónico privado?",
-          [
-            {
-              text: "No",
-              onPress: () => navigate.replace("welcomeScreen")
-            },
-            {
-              text: "Sí",
-              onPress: async () => {
-                await setDoc(doc(db, "users", result.user.uid), {
-                  EmailPrivado: true
-                }, { merge: true });
-                navigate.replace("welcomeScreen");
-              }
-            }
-          ]
-        );
+        navigate.replace("welcomeScreen");
+        
       } else {
         navigate.replace("(tabs)");
       }

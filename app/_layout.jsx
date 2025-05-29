@@ -10,7 +10,9 @@ import  useAuth  from "../components/authContext/authContext";
 import { ToastProvider } from 'react-native-toast-notifications'
 import { View } from 'react-native';
 import { checkSubscriptionStatus, setupSubscriptionListener } from '@/components/suscriptionStatus/suscriptionStatus';
-//import * as Updates from 'expo-updates';
+import { I18nextProvider } from 'react-i18next';
+import i18n from '../i18nConfig';
+import { useRouter } from 'expo-router';
 
 
 
@@ -24,46 +26,11 @@ function AppContent() {
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
-  const { user } = useAuth();
+  const { user, isAuthenticated, loading } = useAuth();
   const userId = user?.uid;
+  const router = useRouter();
 
-  // Verificar actualizaciones en la app
-  /*
-  useEffect(() => {
-    const checkForUpdates = async () => {
-      try {
-        const update = await Updates.checkForUpdateAsync();
-        if (update.isAvailable) {
-          // Aquí puedes mostrar un modal o alerta al usuario
-          Alert.alert(
-            "Actualización disponible",
-            "Hay una nueva versión disponible. ¿Deseas actualizar ahora?",
-            [
-              {
-                text: "Más tarde",
-                style: "cancel"
-              },
-              {
-                text: "Actualizar",
-                onPress: async () => {
-                  try {
-                    await Updates.fetchUpdateAsync();
-                    await Updates.reloadAsync();
-                  } catch (error) {
-                    Alert.alert("Error", "No se pudo actualizar la aplicación");
-                  }
-                }
-              }
-            ]
-          );
-        }
-      } catch (error) {
-        console.log('Error al verificar actualizaciones:', error);
-      }
-    };
-    checkForUpdates();
-  }, []);
-  */
+
   // Verificar el estado de la suscripción solo cuando hay un usuario
   useEffect(() => {
     if (!userId) return;
@@ -103,6 +70,17 @@ function AppContent() {
     }
     prepare();
   }, [loaded]);
+
+
+// Verificar el estado de autenticación y redirigir a signUpScreen si no hay usuario
+  useEffect(() => {
+    if (!isReady || loading) return;
+    
+    if (!loading && !user) {
+      //console.log('Redirigiendo a signUpScreen');
+      router.replace('/signUpScreen');
+    }
+  }, [isAuthenticated, isReady, user, loading]);
 
   if (!loaded || !isReady) {
     return (
@@ -270,10 +248,12 @@ function AppContent() {
 // Componente raíz que proporciona los contextos
 export default function RootLayout() {
   return (
+    <I18nextProvider i18n={i18n}>
     <AuthProvider>
       <ToastProvider offsetTop={60}>
         <AppContent />
       </ToastProvider>
     </AuthProvider>
+    </I18nextProvider>
   );
 }

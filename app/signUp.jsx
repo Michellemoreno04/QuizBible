@@ -37,7 +37,7 @@ const SignUp = () => {
     confirmPassword: "",
   });
   const [error, setError] = useState("");
-  const [vidas, setVidas] = useState(3);
+  const [vidas, setVidas] = useState(5);
   const [monedas, setMonedas] = useState(500);
   const [exp, setExp] = useState(100);
   const [nivel, setNivel] = useState(0);
@@ -49,8 +49,6 @@ const SignUp = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [Premium, setPremium] = useState(false);
   const navigate = useNavigation();
-  const { user } = useAuth();
-  const userId = user?.uid;
 
   const hoy = new Date();
   hoy.setHours(0, 0, 0, 0); // Establecer solo la fecha (sin hora)
@@ -74,9 +72,9 @@ const SignUp = () => {
           credenciales.email,
           credenciales.password
         );
-        const user = userCredential.user;
+        const newUser = userCredential.user;
 
-        await setDoc(doc(db, "users", userId), {
+        await setDoc(doc(db, "users", newUser.uid), {
           Name: credenciales.name,
           Email: credenciales.email,
           TiempoRegistrado: Timestamp.now(),

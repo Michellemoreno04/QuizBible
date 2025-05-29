@@ -2,7 +2,7 @@
   "expo": {
     "name": "QuizBible",
     "slug": "QuizBible",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/images/quizBible-logo.png",
     "scheme": "myapp",
@@ -104,7 +104,8 @@
             "./assets/sound/rachasound.mp3"
           ]
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true

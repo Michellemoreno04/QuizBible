@@ -82,22 +82,18 @@ export default function Profile() {
           >
             <View style={styles.avatarContainer}>
               <TouchableOpacity onPress={openImage}>
-                {userInfo?.FotoPerfil ? (
-                  <Avatar
-                    size={120}
-                    rounded
-                    source={{ uri: userInfo.FotoPerfil }}
-                    containerStyle={styles.avatar}
-                  />
-                ) : (
-                  <Avatar
-                    size={120}
-                    rounded
-                    title={userInfo?.Name?.charAt(0)}
-                    containerStyle={styles.avatar}
-                    titleStyle={styles.avatarText}
-                  />
-                )}
+                <Avatar
+                  size={120}
+                  rounded
+                  containerStyle={[
+                    styles.avatar,
+                    { backgroundColor: userInfo?.FotoPerfil ? 'transparent' : 'orange' }
+                  ]}
+                  {...(userInfo?.FotoPerfil
+                    ? { source: { uri: userInfo.FotoPerfil } }
+                    : { title: userInfo?.Name?.charAt(0).toUpperCase() }
+                  )}
+                />
               </TouchableOpacity>
             </View>
 

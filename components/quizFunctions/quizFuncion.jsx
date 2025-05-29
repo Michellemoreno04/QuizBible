@@ -227,7 +227,7 @@ useEffect(() => {
           <View style={styles.actionTextContainer}>
           <Text style={styles.actionText}>50</Text>
           <Text style={styles.actionText}>Remover 2</Text>
-          <FontAwesome5 name="eraser" size={20} color="white" />
+          <FontAwesome5 name="eraser" size={width * 0.04} color="white" />
           </View>
         </LinearGradient>
       </TouchableOpacity>

@@ -1,11 +1,17 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Text, Pressable, KeyboardAvoidingView, ScrollView, StyleSheet, SafeAreaView, Platform } from "react-native";
+import { View, Text, Pressable, ScrollView, StyleSheet, SafeAreaView, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import useAuth from "../components/authContext/authContext";
 import LottieView from "lottie-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar as RNStatusBar } from "react-native";
 import  SignInComponents  from "../components/authContext/signInComponents";
+
+
+
+
+
+
+
 export default function SignUpScreen() {
 
   const navigation = useNavigation();
@@ -29,10 +35,7 @@ export default function SignUpScreen() {
          Platform.OS === 'android' && { paddingTop: RNStatusBar.currentHeight }
        ]}
      >
-      <ScrollView 
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-      >
+     
         <View style={styles.container}>
           {/* Sección de Logo y Título */}
           <View style={styles.header}>
@@ -76,7 +79,7 @@ export default function SignUpScreen() {
           <SignInComponents />
 
         </View>
-      </ScrollView>
+    
       </SafeAreaView>
     </LinearGradient>
   );
@@ -94,9 +97,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
-  scrollContent: {
-    flexGrow: 1, // Añadimos flexGrow para que el contenido se expanda
-  },
+ 
   container: {
     flex: 1,
     paddingHorizontal: 32,
@@ -120,8 +121,6 @@ const styles = StyleSheet.create({
     color: '#e2e8f0'
   },
   description: {
-    
-
     textAlign: 'center',
     fontSize: 18,
     fontWeight: '500',

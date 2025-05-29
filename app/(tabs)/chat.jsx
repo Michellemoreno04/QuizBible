@@ -60,7 +60,7 @@ const LambChat = () => {
     if (!hasShownWelcome) {
       setMessages([{
         id: '1',
-        text: "¡Hola! Soy Nilu, tu corderito guia!",
+        text: "¡Hola! Soy Nilu, sere tu guia Biblico!",
         user: 'ai',
         createdAt: new Date(),
         image: require('../../assets/images/cordero_saludando.png')
@@ -365,7 +365,7 @@ const styles = StyleSheet.create({
   gradientContainer: {
     flex: 1,
     //backgroundColor: Colors.bgApp[0],
-    backgroundColor: 'red',
+   // backgroundColor: 'red',
   },
   messagesScrollView: {
     flex: 1,
@@ -410,11 +410,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 16,
     padding: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    
     
   },
   userText: {

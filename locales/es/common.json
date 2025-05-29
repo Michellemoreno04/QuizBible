@@ -1,0 +1,45 @@
+
+{
+    "signUpScreen": {
+      "title": "Bienvenido a QuizBible",
+      "description": "Una app está diseñada para ayudarte a estudiar la Biblia todos los días y fortalecer tus conocimientos biblicos.",
+      "haveAccount": "¿Ya tienes una cuenta?",
+      "haveAccountLink": "Inicia sesión",
+      
+      "features": {
+        "dailyVerses": {
+          "title": "Versículos Diarios",
+          "description": "Para que compartas con tus amistades y vayas profundizando con las palabras de Dios"
+        },
+        "bibleQuiz": {
+          "title": "Preguntas Sobre La Biblia",
+          "description": "Así vas reforzando tus conocimientos con preguntas y respuestas de la Biblia"
+        },
+        "dailyReading": {
+          "title": "Lecturas Diarias",
+          "description": "También vas a leer sobre temas importantes como el Amor, la Fe y muchos temas de gran importancia"
+        },
+        "studyControl": {
+          "title": "Control de Estudios Diarios",
+          "description": "Diariamente que estudies estarás aumentando una racha que te mantendrá motivado estudiando y aprendiendo todos los días"
+        }
+      }
+    },
+    "auth": {
+      "login": {
+        "title": "QuizBible",
+        "subtitle": "Tu conexión espiritual inteligente",
+        "email": "Correo electrónico",
+        "password": "Contraseña",
+        "loginButton": "Iniciar Sesión",
+        "signUpButton": "Registrarse"
+      }
+    },
+    "common": {
+      "back": "Volver",
+      "next": "Siguiente",
+      "save": "Guardar",
+      "cancel": "Cancelar",
+      "loading": "Cargando..."
+    }
+  }

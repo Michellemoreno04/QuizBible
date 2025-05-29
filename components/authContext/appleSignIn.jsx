@@ -89,7 +89,7 @@ export default function AppleSignIn() {
 
         await setDoc(doc(db, "users", result.user.uid), userData);
 
-        Alert.alert(
+       /* Alert.alert(
           "Configuración de Privacidad",
           "¿Deseas mantener tu correo electrónico privado?",
           [
@@ -107,11 +107,12 @@ export default function AppleSignIn() {
               }
             }
           ]
-        );
+        ) */
+       navigate.replace("welcomeScreen");
       } else {
         navigate.replace("(tabs)");
       }
-
+      
     } catch (e) {
       if (e.code === 'ERR_REQUEST_CANCELED') {
         console.log('Usuario canceló el inicio de sesión');

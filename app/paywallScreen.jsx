@@ -9,6 +9,8 @@ import  useAuth  from '../components/authContext/authContext';
 import {db} from '../components/firebase/firebaseConfig';
 import { doc, increment, updateDoc, collection, addDoc } from 'firebase/firestore';
 import { useToast } from 'react-native-toast-notifications';
+import { Linking } from 'react-native';
+
 
 const { width} = Dimensions.get('screen');
 
@@ -159,8 +161,8 @@ const Paywall = () => {
                     const price = pkg.product.priceString;
                     const period = pkg.identifier.includes('annual') ? 'Anual' : 'Mensual';
                     const savings = pkg.identifier.includes('annual') 
-                        ? `Ahorra un ${savingsPercentage.toFixed(1)}%` 
-                        : 'Facturación mensual';
+                        ? `Ahorra un ${savingsPercentage.toFixed(1)}% ${'\n' } duracion 12 meses ` 
+                        : `Facturación mensual ${'\n'} duracion 1 mes`;
                     const isSelected = selectedPlan?.identifier === pkg.identifier;
                     
                     return (
@@ -329,9 +331,26 @@ const Paywall = () => {
                     </TouchableOpacity>
       
                     {/* Legal Text */}
-                    <Text style={styles.legalText}>
-                      La suscripción se renueva automáticamente. Cancela cuando quieras desde la configuración de tu cuenta.
-                    </Text>
+                    <View style={styles.legalContainer}>
+                        <Text style={styles.legalText}>
+                            Suscripción Premium de QuizBible:
+                            {'\n'}- Renovación automática
+                        </Text>
+                        
+                        <View style={styles.legalLinks}>
+                            <TouchableOpacity onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')}>
+                                <Text style={styles.legalLink}>Términos de Uso (EULA)</Text>
+                            </TouchableOpacity>
+                            
+                            <TouchableOpacity onPress={() => Linking.openURL('https://docs.google.com/document/d/1rzBgeN8I0KuhB7rmxTLB7wfvlzUf8EGKzuA5P9hrb8g/edit?usp=sharing')}>
+                                <Text style={styles.legalLink}>Política de Privacidad</Text>
+                            </TouchableOpacity>
+                        </View>
+                        
+                        <Text style={styles.legalSubtext}>
+                            La suscripción se renueva automáticamente. Puedes cancelar en cualquier momento desde la configuración de tu cuenta de App Store o Google Play.
+                        </Text>
+                    </View>
                 </ScrollView>
             </LinearGradient>
         </View>
@@ -464,7 +483,7 @@ const styles = StyleSheet.create({
         color: '#FFD700',
         fontSize: 24,
         fontWeight: '800',
-        marginVertical: 8,
+       // marginVertical: 8,
     },
     pricingSubtext: {
         color: '#A0A0A0',
@@ -493,12 +512,33 @@ const styles = StyleSheet.create({
         fontSize: 12,
         marginTop: 5,
     },
+    legalContainer: {
+        paddingHorizontal: 20,
+        marginTop: 25,
+        marginBottom: 20,
+    },
     legalText: {
         color: '#A0A0A0',
-        fontSize: 10,
+        fontSize: 12,
         textAlign: 'center',
-        marginHorizontal: 30,
-        marginTop: 25,
+        lineHeight: 20,
+        marginBottom: 15,
+    },
+    legalLinks: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        marginBottom: 15,
+    },
+    legalLink: {
+        color: '#FFD700',
+        fontSize: 12,
+        textDecorationLine: 'underline',
+        marginHorizontal: 10,
+    },
+    legalSubtext: {
+        color: '#A0A0A0',
+        fontSize: 11,
+        textAlign: 'center',
         lineHeight: 16,
     },
     loadingContainer: {

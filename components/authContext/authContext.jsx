@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { auth } from '../../components/firebase/firebaseConfig';
-import { useNavigation } from '@react-navigation/native';
 
 
 const AuthContext = createContext(undefined);
@@ -8,37 +7,42 @@ const AuthContext = createContext(undefined);
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const navigation = useNavigation();
-// Función para verificar si el usuario está autenticado
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((user) => {
             setUser(user);
             setLoading(false);
             if (user) {
                 console.log('User signed in:', user.email);
+                setIsAuthenticated(true);
             } else {
-                console.log('User signed out');
-                navigation.navigate("signUpScreen");
+                console.log('No user signed in');
             }
-        })
+        });
 
-        return () => unsubscribe(); // Limpieza del listener
-    }, [user]);
+        return () => unsubscribe();
+    }, []);
 
     const signIn = async (email, password) => {
-        await auth.signInWithEmailAndPassword(email, password);
+        try {
+            await auth.signInWithEmailAndPassword(email, password);
+        } catch (error) {
+            throw error;
+        }
     };
 
-     const signOut = async () => {
-         await auth.signOut();
-         console.log('User signed out');
-         
-         navigation.navigate("signUpScreen"); 
-        
+    const signOut = async () => {
+        try {
+            await auth.signOut();
+            console.log('User signed out');
+        } catch (error) {
+            console.error('Error signing out:', error);
+        }
     };
 
     return (
-        <AuthContext.Provider value={{ user, loading, signIn, signOut }}>
+        <AuthContext.Provider value={{ user, loading, signIn, signOut, isAuthenticated }}>
             {children}
         </AuthContext.Provider>
     );

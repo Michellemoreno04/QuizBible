@@ -3,12 +3,16 @@ import { MaterialIcons } from '@expo/vector-icons';
 import useAuth from '@/components/authContext/authContext';
 import { useNavigation } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+
+
+
+
+
 const MenuScreen = () => {
 
 const { signOut } = useAuth();
 const navigation = useNavigation();
-
-
 
 
    // Función para cerrar sesión
@@ -19,7 +23,7 @@ const navigation = useNavigation();
         text: 'Salir',
         onPress: async () => {
           await signOut();
-          navigation.replace('signUpScreen');
+         // navigation.replace('signUpScreen');
         },
       },
     ]);
@@ -109,6 +113,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
     paddingHorizontal: 10,
   },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
   section: {
     backgroundColor: 'white',
     borderRadius: 12,
@@ -144,13 +153,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '500',
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginTop: 10,
-    marginBottom: 10,
-  },
+ 
 });
 
 export default MenuScreen;

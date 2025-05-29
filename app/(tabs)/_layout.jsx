@@ -53,7 +53,7 @@ export default function TabLayout() {
           title: 'Chat',
           headerShown: true,
           headerStyle: {
-            backgroundColor: '#1a365d',
+            backgroundColor: '#1E3A5F',
             height: 85,
           },
           headerTitleAlign: 'center', // Centra el titulo

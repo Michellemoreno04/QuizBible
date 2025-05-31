@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ImageBackground, Animated, Platform, ActivityIndicator, Dimensions, ScrollView, StatusBar } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ImageBackground, Animated, Platform, ActivityIndicator, Dimensions, ScrollView, StatusBar, Linking } from 'react-native';
 import { Entypo, FontAwesome5, MaterialCommunityIcons, Octicons } from '@expo/vector-icons';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { doc, updateDoc, onSnapshot, getDocs, collection, limit, query, orderBy, startAfter, serverTimestamp, increment, setDoc, getDoc } from 'firebase/firestore';
@@ -16,14 +16,13 @@ import { niveles } from '@/components/Niveles/niveles';
 import {RewardedAdModal} from '../components/Modales/modalNotVidas';
 import QuizActions from '@/components/quizFunctions/quizFuncion';
 import { useIsFocused } from '@react-navigation/native';
-import { InterstitialAd, AdEventType, TestIds } from 'react-native-google-mobile-ads';
+import { InterstitialAd, AdEventType, TestIds, BannerAd } from 'react-native-google-mobile-ads';
 import { useToast } from 'react-native-toast-notifications';
 import Modal from 'react-native-modal';
 import LottieView from 'lottie-react-native';
 
 // Dimensiones y constantes globales
 const { width, height } = Dimensions.get('window');
-const responsiveWidth = width * 0.9;
 
 // Configuración de anuncios
 const adUnitId = __DEV__ 
@@ -31,6 +30,14 @@ const adUnitId = __DEV__
   : Platform.OS === 'ios' 
   ? process.env.EXPO_PUBLIC_INTERSTITIAL_ID_IOS 
   : process.env.EXPO_PUBLIC_INTERSTITIAL_ID_ANDROID;
+
+  const bannerAdUnitId = __DEV__ 
+  ? TestIds.BANNER 
+  : Platform.OS === 'ios' 
+  ? process.env.EXPO_PUBLIC_BANNER_ID_IOS 
+  : process.env.EXPO_PUBLIC_BANNER_ID_ANDROID;
+
+
 
 const interstitial = InterstitialAd.createForAdRequest(adUnitId, {
   keywords: ['religion', 'bible']
@@ -133,6 +140,31 @@ const BibleQuiz = () => {
         
         if (querySnapshot.empty) {
           console.log('No hay más preguntas disponibles.');
+          // Mostrar modal de solicitud de preguntas
+          Alert.alert(
+            "¡Has completado todas las preguntas! 🎉",
+            "¿Te gustaría solicitar más preguntas?",
+            [
+              {
+                text: "Solicitar más preguntas",
+                onPress: () => {
+                  // Abrir correo con plantilla predefinida
+                  const email = 'morenov.dev@gmail.com';
+                  const subject = 'Solicitud de más preguntas - QuizBible';
+                  const body = `Hola equipo de QuizBible,\n\nMe gustaría solicitar más preguntas para el quiz.\n\nUsuario: ${user?.email}\nID: ${user?.uid}\n\nSaludos cordiales.`;
+                  
+                  Linking.openURL(`mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`);
+                }
+              },
+              {
+                text: "Volver al menú",
+                onPress: () => {
+                  navigation.replace('(tabs)');
+                },
+                style: "cancel"
+              }
+            ]
+          );
           return;
         }
         
@@ -731,7 +763,10 @@ useEffect(() => {
             </TouchableOpacity>
 
             <View style={styles.statusBar}>
-            <Text style={styles.heartIcon}>❤️</Text>
+              <Text style={styles.questionCounter}>
+                {`${currentQuestion + 1}/${questions.length}`}
+              </Text>
+              <Text style={styles.heartIcon}>❤️</Text>
               <Text style={styles.statusText}>{userInfo.Premium ? <Entypo name="infinity" size={24} color="white" /> : userInfo.Vidas}</Text>
               <FontAwesome5 name="coins" size={24} color="yellow" />
               <Text style={styles.statusText}>{userInfo.Monedas}</Text>
@@ -825,7 +860,18 @@ useEffect(() => {
               backgroundMusic={backgroundMusic}
               isPlaying={isPlaying}
             />
-
+ {!userInfo?.Premium && (
+              <View style={styles.bannerContainer}>
+                <BannerAd
+                  unitId={bannerAdUnitId}
+                  size="BANNER"
+                  requestOptions={{
+                    keywords: ['religion', 'bible'],
+                  }}
+                  onAdFailedToLoad={(error) => console.log('Error cargando banner:', error)}
+                />
+              </View>
+            )}
           </View>
       </ImageBackground>
       <StatusBar hidden />
@@ -878,7 +924,8 @@ paddingTop:30,
     color: 'red',
   },
   contentContainer: {
-    width: responsiveWidth,
+    width: '100%',
+   // width: responsiveWidth,
     alignItems: 'center',
     paddingHorizontal: 20,
   
@@ -898,7 +945,7 @@ paddingTop:30,
   },
  
   questionContainer: {
-    width: responsiveWidth,
+    width: '100%',
     minHeight: height * 0.25,
     maxHeight: height * 0.4,
     borderRadius: 30,
@@ -922,22 +969,22 @@ paddingTop:30,
     padding: 8
   },
   questionText: {
-    fontSize: width * 0.05,
+    fontSize: width * 0.052,
     maxWidth: '90%',
     fontWeight: 'bold',
     color: 'white',
     textAlign: 'center'
   },
   answersContainer: {
-    width: '100%',
-  
-    alignItems: 'center',
+   width: '100%',
+   // alignItems: 'center',
     
   },
   answerButton: {
+    
+    width: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    width: responsiveWidth,
     minHeight: 60,
     marginVertical: 8,
     borderRadius: 25,
@@ -950,11 +997,7 @@ paddingTop:30,
     borderWidth: 1,
     borderColor: '#00f7ff55',
   },
-  answerText: {
-    fontSize: width * 0.045,
-    color: 'white',
-    fontWeight: '600'
-  },
+  
   selectedAnswer: {
     backgroundColor: 'rgb(0, 255, 100)',
     borderColor: '#00ff88',
@@ -975,7 +1018,7 @@ paddingTop:30,
   },
   answerText: {
     
-    fontSize: width * 0.05,
+    fontSize: width * 0.045,
     textAlign: 'center',
     color: 'white',
     fontWeight: 'bold'
@@ -1050,6 +1093,23 @@ paddingTop:30,
   },
   disabledAnswerText: {
     color: 'rgba(255, 255, 255, 0.5)',
+  },
+  questionCounter: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginRight: 10,
+    backgroundColor: 'rgba(0, 16, 61, 0.7)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#00f7ff55',
+  },
+  bannerContainer: {
+    marginTop: 10,
+    width: '100%',
+   alignItems: 'center',
   },
 });
 

@@ -15,7 +15,7 @@ const VersiculosFavoritos = () => {
   const { user } = useAuth();
   const [versiculos, setVersiculos] = useState({});
   const [selectedVerse, setSelectedVerse] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [hideButtons, setHideButtons] = useState(false);
   const viewRef = useRef();
   const toast = useToast();
@@ -36,6 +36,7 @@ const VersiculosFavoritos = () => {
         ...doc.data()
       }));
       setVersiculos(data);
+      setLoading(false);
     });
 
     return unsubscribe;
@@ -114,6 +115,16 @@ const VersiculosFavoritos = () => {
     }
   };
   
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
+
   const renderItem = ({ item }) => (
     <Pressable 
       style={({ pressed }) => [
@@ -238,6 +249,12 @@ const styles = StyleSheet.create({
    
    
   },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  
   card: {
     width: (width - 40) / 2,
     height: (width - 40) / 2,

@@ -101,8 +101,10 @@ export function ModalRacha({ isVisible, setModalRachaVisible }) {
                   colors={['#FFFFFF08', '#FFFFFF03']}
                   style={[styles.statBox, styles.glassEffect]}
                 >
+                  <View style={styles.statBoxContent}>
                   <FontAwesome5 name="fire" size={24} color="#FF6B35" />
                   <Text style={styles.statNumber}>{userInfo.Racha}</Text>
+                  </View>
                   <Text style={styles.statLabel}>Días consecutivos</Text>
                 </LinearGradient>
 
@@ -110,8 +112,10 @@ export function ModalRacha({ isVisible, setModalRachaVisible }) {
                   colors={['#FFFFFF08', '#FFFFFF03']}
                   style={[styles.statBox, styles.glassEffect]}
                 >
+                  <View style={styles.statBoxContent}>
                   <FontAwesome5 name="trophy" size={24} color="#FFD700" />
                   <Text style={styles.statNumber}>{userInfo.RachaMaxima}</Text>
+                  </View>
                   <Text style={styles.statLabel}>Racha máxima</Text>
                 </LinearGradient>
               </View>
@@ -142,22 +146,19 @@ export function ModalRacha({ isVisible, setModalRachaVisible }) {
 
 const styles = StyleSheet.create({
   modalContainer: {
-   flex: 1,
+    margin: 0,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
   },
- 
   gradientWrapper: {
-  //  width: '100%',
-   // height: '75%',
+    width: width * 0.9,
+    maxHeight: height * 0.8,
     borderRadius: 30,
-    //backgroundColor: 'red',
-   
+    overflow: 'hidden',
   },
   gradientContainer: {
     width: '100%',
-    height: height * 0.75,
-    borderRadius: 30,
     padding: 25,
     alignItems: 'center',
     borderWidth: 2,
@@ -187,9 +188,9 @@ const styles = StyleSheet.create({
     marginTop: -10,
   },
   content: {
-    flex: 1,
     width: '100%',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
   highlightedText: {
     fontSize: 18,
@@ -219,9 +220,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#FFFFFF15',
   },
+  statBoxContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
   glassEffect: {
+    justifyContent: 'center',
     backgroundColor: '#FFFFFF08',
-    backdropFilter: 'blur(10px)',
+//backdropFilter: 'blur(50px)',
   },
   statNumber: {
     fontSize: 28,
@@ -230,6 +237,7 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   statLabel: {
+    textAlign: 'center',
     fontSize: 14,
     color: '#EEE',
     fontWeight: '600',

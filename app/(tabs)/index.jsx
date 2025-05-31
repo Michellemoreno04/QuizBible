@@ -10,7 +10,7 @@ import  useAuth  from '@/components/authContext/authContext';
 import {NotVidasModal} from '@/components/Modales/recargarVidas';
 import { ModalRacha } from '@/components/Modales/modalRacha';
 import { doc, onSnapshot, updateDoc,getDoc, increment} from 'firebase/firestore';
-import { auth, db } from '@/components/firebase/firebaseConfig';
+import {  db } from '@/components/firebase/firebaseConfig';
 import { manejarRachaDiaria } from '@/components/Racha/manejaRacha';
 import { ModalRachaPerdida } from '@/components/Modales/rachaPerdida';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -20,7 +20,6 @@ import { useToast } from 'react-native-toast-notifications';
 import Notificaciones from '@/components/notificaciones/notificaciones';
 import { useNavigation } from '@react-navigation/native';
 //import NetInfo from '@react-native-community/netinfo';
-
 
 
 
@@ -149,7 +148,8 @@ export default function AppComponent() {
     checkQuizCompletion();
   }, [userId]);
 
-  
+
+
   
 
   if(!userId){

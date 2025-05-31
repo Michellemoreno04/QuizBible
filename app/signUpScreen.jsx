@@ -1,11 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
-import { View, Text, Pressable, ScrollView, StyleSheet, SafeAreaView, Platform } from "react-native";
+import { View, Text, Pressable, ScrollView, StyleSheet, SafeAreaView, Platform, Dimensions } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import LottieView from "lottie-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar as RNStatusBar } from "react-native";
 import  SignInComponents  from "../components/authContext/signInComponents";
 
+const { width, height } = Dimensions.get('window');
 
 
 
@@ -91,6 +92,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center'  
+    
   },
   safeArea: {
     flex: 1,
@@ -109,7 +111,7 @@ const styles = StyleSheet.create({
     marginBottom:10
   },
   title: {
-    fontSize: 48,
+    fontSize: width * 0.12,
     fontWeight: 'bold',
     color: 'white',
     textShadowColor: 'rgba(0, 0, 0, 0.25)',
@@ -117,12 +119,12 @@ const styles = StyleSheet.create({
     textShadowRadius: 4
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: width * 0.045,
     color: '#e2e8f0'
   },
   description: {
     textAlign: 'center',
-    fontSize: 18,
+    fontSize: width * 0.045,
     fontWeight: '500',
     color: '#e2e8f0',
     marginBottom: 24
@@ -132,8 +134,8 @@ const styles = StyleSheet.create({
     marginBottom: 40
   },
   animation: {
-    width: 250,
-    height: 250
+    width: width * 0.6,
+    height: height * 0.3
   },
   signupButton: {
     backgroundColor: '#f59e0b',
@@ -150,7 +152,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: 'white',
-    fontSize: 20,
+    fontSize: width * 0.05,
     fontWeight: 'bold'
   },
   loginLinkContainer: {

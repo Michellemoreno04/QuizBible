@@ -13,7 +13,7 @@ import AppleSignIn from "./appleSignIn";
 
 export default function SignInComponents() {
   const [vidas, setVidas] = useState(3);
-  const [monedas, setMonedas] = useState(500);
+  const [monedas, setMonedas] = useState(300);
   const [exp, setExp] = useState(100);
   const [nivel, setNivel] = useState(0);
   const [racha, setRacha] = useState(0);
@@ -37,7 +37,7 @@ export default function SignInComponents() {
       GoogleSignin.configure({
         iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
         webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-        scopes: ['profile', 'email'],
+       // scopes: ['profile', 'email'],
         offlineAccess: false,
       });
     }

@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
     },
    
     actionButton: {
-      width: width * 0.18,
+      width: width * 0.20,
       height: height * 0.08,
       borderRadius: 30,
       overflow: 'hidden',
@@ -308,7 +308,7 @@ const styles = StyleSheet.create({
     actionText: {
       color: 'white',
       fontWeight: 'bold',
-      fontSize: width * 0.03,
+      fontSize: width * 0.025,
       textShadowColor: 'rgba(0, 0, 0, 0.3)',
       textShadowOffset: { width: 1, height: 1 },
       textShadowRadius: 2,

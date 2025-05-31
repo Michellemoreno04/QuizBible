@@ -27,7 +27,7 @@ export default function AppleSignIn() {
 
   // Valores iniciales para nuevos usuarios
   const vidas = 3;
-  const monedas = 500;
+  const monedas = 300;
   const exp = 100;
   const nivel = 0;
   const racha = 0;

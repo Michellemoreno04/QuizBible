@@ -193,6 +193,7 @@ const DailyReading = () => {
     if(!userId) return;
 
     const fetchDailyVerse = async () => {
+      setIsLoading(true);
       try {
         const today = getLocalDateString(); 
         const lastDate = await AsyncStorage.getItem('lastReadingDate');
@@ -256,6 +257,8 @@ const DailyReading = () => {
       } catch (error) {
         console.error('Error al obtener la siguiente lectura:', error);
         setReadingText([]);
+      } finally {
+        setIsLoading(false);
       }
     };
     

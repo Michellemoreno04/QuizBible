@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, Modal, StyleSheet, Button, Share, TextInput, ScrollView, Dimensions, Platform } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, Modal, StyleSheet, Button, Share, TextInput, ScrollView, Dimensions, Platform, ActivityIndicator } from 'react-native';
 import useAuth from '../../components/authContext/authContext';
 import { doc, collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
@@ -13,6 +13,7 @@ export default function Lecturas() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTema, setSelectedTema] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const userId = user?.uid;
 
@@ -37,6 +38,8 @@ export default function Lecturas() {
       setFilteredLecturas(temasData);
     } catch (error) {
       console.error('Error cargando lecturas:', error);
+    } finally {
+      setIsLoading(false);
     }
   }, [userId]);
 
@@ -115,7 +118,12 @@ export default function Lecturas() {
         onChangeText={handleSearch}
         placeholderTextColor="#666"
       />
-
+      {isLoading ? (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#0000ff" />
+        </View>
+      ) : (
+      
       <FlatList
         data={filteredLecturas}
         renderItem={renderItem}
@@ -129,6 +137,7 @@ export default function Lecturas() {
           </View>
         }
       />
+      )}
 
       <Modal
         visible={isModalVisible}

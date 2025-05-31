@@ -8,7 +8,6 @@ import {
   Alert,
   ScrollView,
   StyleSheet,
- 
   SafeAreaView,
   StatusBar as RNStatusBar,
   TouchableOpacity,
@@ -26,7 +25,6 @@ import {
   MaterialCommunityIcons,
 } from "@expo/vector-icons";
 import SignInComponents from "../components/authContext/signInComponents";
-import  useAuth  from "../components/authContext/authContext";
 
 
 const SignUp = () => {
@@ -38,7 +36,7 @@ const SignUp = () => {
   });
   const [error, setError] = useState("");
   const [vidas, setVidas] = useState(5);
-  const [monedas, setMonedas] = useState(500);
+  const [monedas, setMonedas] = useState(300);
   const [exp, setExp] = useState(100);
   const [nivel, setNivel] = useState(0);
   const [racha, setRacha] = useState(0);

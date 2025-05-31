@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet, Animated, Easing } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSound } from '../soundFunctions/soundFunction';
+import { Entypo } from '@expo/vector-icons';
 
 export const NotVidasModal = ({ visible, setNotVidasModalVisible, userInfo }) => {
  // const scaleValue = new Animated.Value(0);
@@ -76,7 +77,7 @@ export const NotVidasModal = ({ visible, setNotVidasModalVisible, userInfo }) =>
                   <View style={styles.rewardsContainer}>
                   <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
                   <Text style={styles.heart}>❤️</Text>
-                  <Text style={styles.lifeText}>{userInfo?.Premium ? '♾️' : '5'}</Text>
+                  <Text style={styles.lifeText}>{userInfo?.Premium ? <Entypo name="infinity" size={24} color="black" /> : '5'}</Text>
                   </View>
                   <View style={{flexDirection: 'row', alignItems: 'center', justifyContent: 'center'}}>
                     <Text style={styles.heart}>💰</Text>

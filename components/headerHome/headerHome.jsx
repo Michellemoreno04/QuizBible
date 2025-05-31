@@ -205,10 +205,10 @@ const [isInsigniaModalVisible, setIsInsigniaModalVisible] = useState(false);
             <TouchableOpacity onPress={openImage}>
                 <View style={styles.avatarContainer}>
                     <Avatar
-                        size={60}
+                        size={width * 0.15}
                         rounded
                         containerStyle={{
-                            backgroundColor: userAuthenticated?.FotoPerfil ? 'transparent' : 'orange',
+                           backgroundColor: userAuthenticated?.FotoPerfil ? 'transparent' : 'orange',
                         }}
                         {...(userAuthenticated?.FotoPerfil
                             ? { source: { uri: userAuthenticated?.FotoPerfil} }
@@ -374,8 +374,8 @@ const styles = StyleSheet.create({
       },
      
       avatar: {
-        width: 60,
-        height: 60,
+       // width: 60,
+       // height: 60,
         borderRadius: 100,
         borderWidth: 2,
         borderColor: 'white',
@@ -403,7 +403,7 @@ const styles = StyleSheet.create({
       },
       greeting: {
         width: '100%',
-        fontSize: width * 0.04,
+        fontSize: width * 0.043,
         fontWeight: 'bold',
         color: '#FFFFFF',
         flexWrap: 'wrap',
@@ -476,12 +476,14 @@ const styles = StyleSheet.create({
     },
     
     rachaIconsContainer: {
+        position: 'relative',
         flexDirection: 'row',
         alignItems: 'center',
         gap: 3,
         justifyContent: 'flex-end',
        // minWidth: '40%',
         zIndex: 1,
+        marginTop: 15,
     },
     recuperarRachaButton: {
       marginLeft: 5,

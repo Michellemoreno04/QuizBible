@@ -8,7 +8,7 @@
 
 # cosas hecha 
 
-1. App star review added
+1. se modifico las notificaciones para verificar la racha y mandar recordatorio a las 8:00pm y a las 9:00am mantar el versiculo
 
 
 

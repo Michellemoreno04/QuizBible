@@ -216,11 +216,7 @@ const [isInsigniaModalVisible, setIsInsigniaModalVisible] = useState(false);
                         )}
                         avatarStyle={styles.avatar} 
                     />
-                    {userAuthenticated?.Premium && (
-                        <View style={styles.crownContainer}>
-                            <FontAwesome5 name="crown" size={10} color="#FFD700" style={styles.crownIcon} />
-                        </View>
-                    )}
+                    
                 </View>
             </TouchableOpacity>
 
@@ -234,6 +230,7 @@ const [isInsigniaModalVisible, setIsInsigniaModalVisible] = useState(false);
                 </Text>
                 <TouchableOpacity onPress={openInsigniaModal}>
                     <View style={styles.levelContainer}>
+                      <View style={{flexDirection: 'row', alignItems: 'center', gap: 3}}>
                         <LinearGradient
                             colors={['#FFD700', '#D4AF37', '#FFD700']}
                             start={{ x: 0, y: 0 }}
@@ -245,7 +242,14 @@ const [isInsigniaModalVisible, setIsInsigniaModalVisible] = useState(false);
                                     ? niveles(userAuthenticated?.Exp || 0).insignia 
                                     : 'PRINCIPIANTE'}
                             </Text>
+                        
                         </LinearGradient>
+                {userAuthenticated?.Premium && (
+                        <View style={styles.crownContainer}>
+                            <FontAwesome5 name="crown" size={width * 0.025} color="#FFD700" style={styles.crownIcon} />
+                        </View>
+                    )}
+                        </View>
                     </View>
                 </TouchableOpacity>
             </View>
@@ -398,7 +402,7 @@ const styles = StyleSheet.create({
       },
       userInfo: {
         width: '100%',
-        marginLeft: 10,
+        marginLeft: 5,
         flex: 1,
       },
       greeting: {
@@ -522,17 +526,18 @@ const styles = StyleSheet.create({
     },
    
     crownContainer: {
-        position: 'absolute',
-        top: 40,
-        left: 40,
+       width: width * 0.065,
+       height: width * 0.06,
+       alignItems: 'center',
+       justifyContent: 'center',
         backgroundColor: 'rgba(0,0,0,0.7)',
         borderRadius: 15,
         padding: 5,
         borderWidth: 2,
         borderColor: '#FFD700',
+       // zIndex: 1000,
     },
     crownIcon: {
-        //transform: [{ rotate: '10deg' }],
         zIndex: 1000,
     },
 

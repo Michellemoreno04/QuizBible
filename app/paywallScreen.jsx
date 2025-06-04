@@ -332,14 +332,13 @@ const Paywall = () => {
       
                     {/* Legal Text */}
                     <View style={styles.legalContainer}>
-                        <Text style={styles.legalText}>
-                            Suscripción Premium de QuizBible:
-                            {'\n'}- Renovación automática
+                    <Text style={styles.legalSubtext}>
+                            La suscripción se renueva automáticamente. Puedes cancelar en cualquier momento desde la configuración de tu cuenta de App Store o Google Play.
                         </Text>
                         
                         <View style={styles.legalLinks}>
                             <TouchableOpacity onPress={() => Linking.openURL('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')}>
-                                <Text style={styles.legalLink}>Términos de Uso (EULA)</Text>
+                                <Text style={styles.legalLink}>Términos de Uso </Text>
                             </TouchableOpacity>
                             
                             <TouchableOpacity onPress={() => Linking.openURL('https://docs.google.com/document/d/1rzBgeN8I0KuhB7rmxTLB7wfvlzUf8EGKzuA5P9hrb8g/edit?usp=sharing')}>
@@ -347,9 +346,7 @@ const Paywall = () => {
                             </TouchableOpacity>
                         </View>
                         
-                        <Text style={styles.legalSubtext}>
-                            La suscripción se renueva automáticamente. Puedes cancelar en cualquier momento desde la configuración de tu cuenta de App Store o Google Play.
-                        </Text>
+                       
                     </View>
                 </ScrollView>
             </LinearGradient>

@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
-import { Platform } from 'react-native';
+import { Platform, Alert, Linking } from 'react-native';
 import * as Notifications from 'expo-notifications';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase/firebaseConfig';
 import useAuth from '../authContext/authContext';
@@ -14,8 +15,8 @@ Notifications.setNotificationHandler({
 });
 
 async function scheduleDailyNotifications(user) {
-  // Cancelar notificaciones existentes
-  await Notifications.cancelAllScheduledNotificationsAsync();
+  
+  await Notifications.cancelAllScheduledNotificationsAsync(); //cancelar notificaciones existentes
 
   // Obtener el versículo del día
   const versiculoRef = doc(db, 'users', user.uid, 'versiculoDelDia', 'current');
@@ -28,33 +29,35 @@ async function scheduleDailyNotifications(user) {
       title: "¡Buenos días! Tu versículo del día es:",
       body: versiculoData ? 
         `${versiculoData.versiculo.versiculo}\n${versiculoData.versiculo.texto}` :
-        "No olvides mantener tu racha diaria y hacer el quiz para seguir aprendiendo de la palabra de Dios",
+        "No olvides mantener tu racha diaria y hacer el quiz para seguir aprendiendo sobre la palabra de Dios",
       data: { type: 'morning_verse' },
     },
-    trigger: {
+    trigger: { 
       type: 'daily',
       hour: 9,
       minute: 0,
       repeats: true,
     },
-    identifier: 'morning_verse_notification'
+    identifier: 'morning_verse_notification' 
   });
 
   // Verificar la racha antes de programar la notificación de la tarde
+  /*
   const userRef = doc(db, 'users', user.uid);
   const userDoc = await getDoc(userRef);
   const userData = userDoc.data();
   
   const hoy = new Date();
-  hoy.setHours(0, 0, 0, 0);
-  
+  hoy.setHours(0, 0, 0, 0); 
   let ultimaFecha;
   if (userData?.modalRachaShow) {
     ultimaFecha = userData.modalRachaShow?.toDate
-      ? userData.modalRachaShow.toDate()
-      : new Date(userData.modalRachaShow);
+    ? userData.modalRachaShow.toDate()
+    : new Date(userData.modalRachaShow);
     ultimaFecha.setHours(0, 0, 0, 0);
   }
+
+  
 
   // Solo programar la notificación de la tarde si no se ha completado la racha hoy
   if (!ultimaFecha || ultimaFecha.getTime() !== hoy.getTime()) {
@@ -72,6 +75,46 @@ async function scheduleDailyNotifications(user) {
       },
       identifier: 'evening_notification'
     });
+  }
+    */
+}
+  
+
+
+async function showNotificationPermissionAlert() {
+  // Verificamos si ya se mostró la alerta anteriormente
+  try {
+    const alertShown = await AsyncStorage.getItem('notificationAlertShown');
+    if (alertShown === 'true') {
+      return; // Si ya se mostró la alerta antes, no la mostramos de nuevo
+    }
+
+    Alert.alert(
+      "Las notificaciones son importantes!",
+      "Es muy lindo recibir el versiculo del dia y recordatorios para que no pierdas tu racha diaria.",
+      [
+        {
+          text: "No, gracias",
+          style: "cancel",
+          onPress: async () => {
+            // Guardamos en AsyncStorage que el usuario ha visto y rechazado la alerta
+            await AsyncStorage.setItem('notificationAlertShown', 'true');
+          }
+        },
+        {
+          text: "Activar",
+          onPress: () => {
+            if (Platform.OS === 'ios') {
+              Linking.openURL('app-settings:');
+            } else {
+              Linking.openSettings();
+            }
+          }
+        }
+      ]
+    );
+  } catch (error) {
+    console.log('Error al manejar el estado de la alerta:', error);
   }
 }
 
@@ -94,6 +137,7 @@ async function registerForPushNotificationsAsync(user) {
     }
     if (finalStatus !== 'granted') {
       console.log('¡Permiso no concedido para notificaciones!');
+      showNotificationPermissionAlert();
       return;
     }
     

@@ -4,7 +4,7 @@
     "slug": "QuizBible",
     "version": "1.0.4",
     "orientation": "portrait",
-    "icon": "./assets/images/quizBible-logo.png",
+    "icon": "./assets/images/QuizBible-icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": false,
@@ -74,7 +74,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/quizBible-logo.png",
+          "image": "./assets/images/QuizBible-logo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
@@ -98,7 +98,7 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/quizBible-logo.png",
+          "icon": "./assets/images/QuizBible-icon.png",
           "color": "#ffffff",
           "sounds": [
             "./assets/sound/rachasound.mp3"
